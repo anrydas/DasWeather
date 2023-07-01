@@ -12,7 +12,7 @@
 
 ### 📌 Using
 - Register on [Weather API](https://www.weatherapi.com/) and get API-KEY
-- Download last version of [Application distribution](releases/) archive and unpack it into any folder on your PC
+- Download last version of [Application distribution](https://github.com/anrydas/DasWeather/releases) archive and unpack it into any folder on your PC
 - Rename **application.properties** file to **application-PROD.properties**.
 - Into application-PROD.properties file:
   - Provide **app.api-key** parameter as API-KEY you have got before

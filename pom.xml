@@ -18,7 +18,7 @@
     </properties>
     <groupId>das.tools.weather</groupId>
     <artifactId>DasWeather</artifactId>
-    <version>${app.version</version>
+    <version>${app.version}</version>
     <name>DasWeather</name>
     <description>DasWeather</description>
     <dependencies>
