@@ -1,0 +1,18 @@
+{
+  "properties": [
+    {
+      "name": "app.weather.current.url",
+      "type": "java.lang.String",
+      "description": "Description for app.baseUrl."
+    },
+    {
+      "name": "app.api-key",
+      "type": "java.lang.String",
+      "description": "Description for app.api-key."
+    },
+    {
+      "name": "app.weather.forecast.url",
+      "type": "java.lang.String",
+      "description": "Description for app.weather.forecast.url."
+    }
+  ] }
