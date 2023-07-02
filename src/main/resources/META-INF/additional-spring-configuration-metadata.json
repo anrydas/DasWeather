@@ -14,5 +14,10 @@
       "name": "app.weather.forecast.url",
       "type": "java.lang.String",
       "description": "Description for app.weather.forecast.url."
+    },
+    {
+      "name": "app.confirm-exit",
+      "type": "java.lang.String",
+      "description": "Description for app.confirm-exit."
     }
   ] }
