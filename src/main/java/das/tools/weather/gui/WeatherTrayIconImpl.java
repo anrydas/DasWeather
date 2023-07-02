@@ -4,8 +4,10 @@ import das.tools.weather.entity.ForecastWeatherResponse;
 import das.tools.weather.entity.current.WeatherCurrent;
 import das.tools.weather.service.WeatherService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 
@@ -13,6 +15,8 @@ import java.awt.event.ActionListener;
 @Component
 public class WeatherTrayIconImpl implements WeatherTrayIcon {
     private static final String DEFAULT_ICON_PATH = "src/main/resources/images/weather-default-01.png";
+    @Value("${app.confirm-exit}")
+    private final boolean isConfirmExit = true;
 
     private static final String TOOLTIP_MESSAGE = "%s \uD83D\uDD50 %s - %s\n" +
             "\uD83D\uDD25 %.0f\u2103 (як %.0f\u2103) \uD83C\uDF2B %d\uFF05\n" +
@@ -133,7 +137,17 @@ public class WeatherTrayIconImpl implements WeatherTrayIcon {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
                 if(log.isDebugEnabled()) log.debug("[WeatherTrayIconImpl].getCloseListener: Close Menu Item clicked");
-                System.exit(0);
+                if (isConfirmExit) {
+                    int result = JOptionPane.showConfirmDialog(null, "Are you really want to exit?",
+                            "Das Weather",
+                            JOptionPane.YES_NO_OPTION,
+                            JOptionPane.QUESTION_MESSAGE);
+                    if (result == JOptionPane.YES_OPTION) {
+                        System.exit(0);
+                    }
+                } else {
+                    System.exit(0);
+                }
             }
         };
     }
