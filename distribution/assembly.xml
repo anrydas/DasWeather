@@ -15,9 +15,14 @@
         <file>
             <source>${project.basedir}/src/main/resources/application.properties</source>
             <outputDirectory>/</outputDirectory>
+            <destName>application-default.properties</destName>
         </file>
         <file>
             <source>${project.basedir}/start-prod.sh</source>
+            <outputDirectory>/</outputDirectory>
+        </file>
+        <file>
+            <source>${project.basedir}/src/main/resources/images/app-icon.png</source>
             <outputDirectory>/</outputDirectory>
         </file>
     </files>
