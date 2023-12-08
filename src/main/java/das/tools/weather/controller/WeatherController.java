@@ -1,26 +1,33 @@
 package das.tools.weather.controller;
 
-import das.tools.weather.entity.ForecastWeatherResponse;
-import das.tools.weather.gui.WeatherTrayIcon;
+import das.tools.weather.gui.GuiControllerImpl;
 import das.tools.weather.service.WeatherService;
+import javafx.application.Platform;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-@Component
-public class WeatherController {
-    private final WeatherService service;
-    private final WeatherTrayIcon trayIcon;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
-    public WeatherController(WeatherService service, WeatherTrayIcon trayIcon) {
-        this.service = service;
-        this.trayIcon = trayIcon;
+@Component
+@Slf4j
+public class WeatherController {
+    private final GuiControllerImpl guiController;
+
+    public WeatherController(GuiControllerImpl guiController) {
+        this.guiController = guiController;
     }
 
     @Async
-    @Scheduled(fixedRate = 10800000) // Starts every 3 hours
+    @Scheduled(fixedRateString = "${app.update.interval.msec}", initialDelay = 3000)
     public void updateWeather() {
-        ForecastWeatherResponse response = service.getForecastWeather();
-        trayIcon.updateControls(response);
+        // New thread needs to prevent IllegalStateException:
+        // This operation is permitted on the event thread only; currentThread = task-1
+        Thread t = new Thread(() -> {
+            Platform.runLater(guiController::updateWeatherAndControls);
+        });
+        t.start();
     }
 }

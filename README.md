@@ -1,34 +1,33 @@
 ## Das Weather
-### _Application to get Weather and show it (in system tray menu for now)_
+### _Application to get Weather and show it_
 
-[![https://img.shields.io/badge/Java-8-white](https://img.shields.io/badge/Java-8-white)](https://www.java.com/)  [![https://img.shields.io/badge/weather-api-blue](https://img.shields.io/badge/weather-api-blue)](https://www.weatherapi.com/)   [![https://img.shields.io/badge/Spring-Boot-green](https://img.shields.io/badge/Spring-Boot-green)](https://spring.io/)
+[![https://img.shields.io/badge/Java-8-white](https://img.shields.io/badge/Java-8-white)](https://www.java.com/) [![https://img.shields.io/badge/weather-api-blue](https://img.shields.io/badge/weather-api-blue)](https://www.weatherapi.com/) [![https://img.shields.io/badge/Spring-Boot-green](https://img.shields.io/badge/Spring-Boot-green)](https://spring.io/)
 
 ### 📃 Features
 - multiplatform
 - quick and easy to use
 - lightweight
-- uses **Ukrainian** language to show weather info
-- updated every 3 hours
+- uses **multiple** languages to show weather info
+- configured update interval
 
 ### 📌 Using
 - Register on [Weather API](https://www.weatherapi.com/) and get API-KEY
 - Download last version of [Application distribution](https://github.com/anrydas/DasWeather/releases) archive and unpack it into any folder on your PC
-- Rename **application.properties** file to **application-PROD.properties**.
+- Rename **application-default.properties** file to **application-PROD.properties** (if you want to launch application with **start-prod.sh** script).
 - Into application-PROD.properties file:
   - Provide **app.api-key** parameter as API-KEY you have got before
-  - Provide **app.weather.location** parameter
+  - Provide **app.weather.location** parameter - name of city weather you want to get for.
 - Launch **start-prod.sh**
 
-### 📜 Menu items
-![Screenshot](images/WeatherMenu.png)
+### 📜 Main Window items
+![Screenshot](images/WeatherWindow_v2.png)
 - Info Items:
-  - 1st: **_Your Place Name_** 🕐 **_Last Updated_** - **_Condition_** 
+  - 1st: **_Condition_** icon and it's name, **_Your Place Name_** and **_Last Updated_** - time when the weather have been updated  
   - 2nd: 🔥 **_Temperature_** ℃ (**_Fills Like_** ℃) 🌫 **_Humidity_ %** 
   - 3rd: 💨 **Wind Direction** **Wind Speed** (**Wind Gust**) km/h
   - 4th: ☁ **_Cloud_** % ☔ **Precipitation** mm 🔽 **_Pressure_** nnHg
-- Clickable Items:
-  - **Update Weather** - to update
-  - **Exit Application** - to exit
+- Button:
+  - **Update** - to update weather
 
 ### 🐞 Known issues
 - In Linux (Mint?) OS the System Tray Icon doesn't appear - just black square

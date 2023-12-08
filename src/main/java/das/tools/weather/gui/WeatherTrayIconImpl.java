@@ -5,22 +5,21 @@ import das.tools.weather.entity.current.WeatherCurrent;
 import das.tools.weather.service.WeatherService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 
 @Slf4j
-@Component
+//@Component
 public class WeatherTrayIconImpl implements WeatherTrayIcon {
     private static final String DEFAULT_ICON_PATH = "src/main/resources/images/weather-default-01.png";
     @Value("${app.confirm-exit}")
     private final boolean isConfirmExit = true;
 
     private static final String TOOLTIP_MESSAGE = "%s \uD83D\uDD50 %s - %s\n" +
-            "\uD83D\uDD25 %.0f\u2103 (як %.0f\u2103) \uD83C\uDF2B %d\uFF05\n" +
-            "\uD83D\uDCA8 %s %.0f (до %.0f) км/г\n" +
+            "\uD83D\uDD25 %.0f\u2103 (as %.0f\u2103) \uD83C\uDF2B %d\uFF05\n" +
+            "\uD83D\uDCA8 %s %.0f (upto %.0f) km/h\n" +
             "\u2601 %d\uFF05  \u2614 %.0f mm  \uD83D\uDD3D %.0f mmHg";
     private final WeatherService weatherService;
     private final MenuItem[] infoMenuItems;
@@ -84,7 +83,7 @@ public class WeatherTrayIconImpl implements WeatherTrayIcon {
     }
 
     private void setWeatherIcon(ForecastWeatherResponse response) {
-        trayIcon.setImage(weatherService.getRemoteImage(response.getCurrent().getCondition().getIcon()));
+        //trayIcon.setImage(weatherService.getRemoteImage(response.getCurrent().getCondition().getIcon()));
     }
 
     private void updateWeather() {
