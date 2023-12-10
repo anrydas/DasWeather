@@ -22,7 +22,7 @@
             <outputDirectory>/</outputDirectory>
         </file>
         <file>
-            <source>${project.basedir}/src/main/resources/images/app-icon.png</source>
+            <source>${project.basedir}/src/main/resources/images/app-icon.ico</source>
             <outputDirectory>/</outputDirectory>
         </file>
     </files>
