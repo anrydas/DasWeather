@@ -3,7 +3,6 @@ package das.tools.weather.gui;
 import das.tools.weather.entity.ForecastWeatherResponse;
 import das.tools.weather.entity.current.WeatherCurrent;
 import das.tools.weather.service.WeatherService;
-import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -12,14 +11,18 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 
 //@Component
 @Slf4j
 public class GuiControllerImpl {
     public static final String APPLICATION_TITLE = "Das Weather: %s %s";
+    private final RemoteDataHolder dataHolder = RemoteDataHolder.builder().build();
     @FXML
     private Label lbLocation;
     @FXML
@@ -34,11 +37,11 @@ public class GuiControllerImpl {
     private Button btUpdate;
     @FXML
     private ImageView imgWeather;
+    @FXML
+    private ProgressBar pb;
 
     @Autowired
     private WeatherService weatherService;
-
-    private double currentProgress = 0;
 
     public GuiControllerImpl() {
     }
@@ -49,41 +52,40 @@ public class GuiControllerImpl {
         btUpdate.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                updateWeatherAndControls();
+                updateWeatherData();
             }
         });
     }
 
-    private void updateControls(ForecastWeatherResponse response) {
-        WeatherCurrent current = response.getCurrent();
+    private void updateControls() {
+        WeatherCurrent current = this.dataHolder.getResponse().getCurrent();
         String updateDate = current.getLastUpdate().split(" ")[0];
         String updateTime = current.getLastUpdate().split(" ")[1];
-        Image remoteImage = weatherService.getRemoteImage(current.getCondition().getIcon());
 
         Stage stage = (Stage) lbLocation.getScene().getWindow();
         stage.getIcons().removeAll();
-        stage.getIcons().add(remoteImage);
+        stage.getIcons().add(this.dataHolder.getImage());
 
-        imgWeather.setImage(remoteImage);
+        imgWeather.setImage(this.dataHolder.getImage());
         String conditionText = current.getCondition().getText();
         Tooltip.install(imgWeather, new Tooltip(conditionText));
 
         lbCondition.setText(conditionText);
         lbCondition.setTooltip(getTooltip(conditionText));
         stage.setTitle(String.format(APPLICATION_TITLE,
-                response.getLocation().getName(),
+                this.dataHolder.getResponse().getLocation().getName(),
                 current.getLastUpdate()
         ));
 
         String MSG_LOCATION = "%s %s at %s";
         lbLocation.setText(String.format(MSG_LOCATION,
-                response.getLocation().getName(),
+                this.dataHolder.getResponse().getLocation().getName(),
                 updateDate,
                 updateTime
         ));
         lbLocation.setTooltip(getTooltip(String.format("%s, %s %s at %s",
-                response.getLocation().getName(),
-                response.getLocation().getRegion(),
+                this.dataHolder.getResponse().getLocation().getName(),
+                this.dataHolder.getResponse().getLocation().getRegion(),
                 updateDate,
                 updateTime
         )));
@@ -115,14 +117,62 @@ public class GuiControllerImpl {
     private Tooltip getTooltip(String caption) {
         return new Tooltip(caption);
     }
+    public void updateWeatherData() {
+        loadDataWithProgress();
+    }
 
-    public void updateWeatherAndControls() {
-        ForecastWeatherResponse response = weatherService.getForecastWeather();
-        updateControls(response);
+    private void loadDataWithProgress() {
+        if (pb.progressProperty().isBound()) pb.progressProperty().unbind();
+        final Task<Void> loadDataTask = getLoadingTask();
+        pb.progressProperty().bind(loadDataTask.progressProperty());
+
+        Thread thread = new Thread(loadDataTask, "progress-thread");
+        thread.setDaemon(true);
+        thread.start();
+    }
+
+    private Task<Void> getLoadingTask() {
+        final Task<Void> task = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                final int MAX_VALUE = 100;
+                btUpdate.setDisable(true);
+                pb.setVisible(true);
+                updateProgress(10, MAX_VALUE);
+                dataHolder.setResponse(weatherService.getForecastWeather());
+                updateProgress(40, MAX_VALUE);
+                Thread.sleep(10);
+                dataHolder.setImage(weatherService.getRemoteImage(dataHolder.getResponse().getCurrent().getCondition().getIcon()));
+                updateProgress(60, MAX_VALUE);
+                Thread.sleep(10);
+                updateProgress(80, MAX_VALUE);
+                Thread.sleep(10);
+                updateProgress(MAX_VALUE, MAX_VALUE);
+                Thread.sleep(MAX_VALUE);
+                pb.setVisible(false);
+                btUpdate.setDisable(false);
+                return null;
+            }
+        };
+        task.setOnSucceeded(e -> {
+            updateControls();
+        });
+        task.setOnFailed(e -> {
+            Alert alert = new Alert(Alert.AlertType.ERROR,
+                    "There was error loading weather data.\nPlease try again later.",
+                    ButtonType.OK);
+            alert.show();
+        });
+        return task;
     }
 
     private double millibarToMmHg(float mbar) {
         return mbar * 0.750062;
     }
 
+    @Getter @Setter @AllArgsConstructor @Builder
+    static class RemoteDataHolder {
+        private ForecastWeatherResponse response;
+        private Image image;
+    }
 }
