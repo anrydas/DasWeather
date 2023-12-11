@@ -17,7 +17,7 @@
 - Into application-PROD.properties file:
   - Provide **app.api-key** parameter as API-KEY you have got before
   - Provide **app.weather.location** parameter - name of city weather you want to get for.
-- Launch **start-prod.sh**
+- Launch **start-prod.sh** (use Java 8)
 
 ### 📜 Main Window items
 ![Screenshot](images/WeatherWindow_v2.png)
@@ -28,9 +28,5 @@
   - 4th: ☁ **_Cloud_** % ☔ **Precipitation** mm 🔽 **_Pressure_** nnHg
 - Button:
   - **Update** - to update weather
-
-### 🐞 Known issues
-- In Linux (Mint?) OS the System Tray Icon doesn't appear - just black square
-- To pretty view of Tray Icon Menu in Linux (Mint?) it needs to be launched with [JDK17](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html)
 
 ###### _Made by -=:dAs:=-_
