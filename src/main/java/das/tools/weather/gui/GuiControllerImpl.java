@@ -17,12 +17,18 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+
+import java.time.Instant;
 
 //@Component
 @Slf4j
 public class GuiControllerImpl {
     public static final String APPLICATION_TITLE = "Das Weather: %s %s";
+    protected static final int MINIMAL_UPDATE_INTERVAL = 3600000;
     private final RemoteDataHolder dataHolder = RemoteDataHolder.builder().build();
+    @Value("${app.update.interval.msec}")
+    private long updateInterval;
     @FXML
     private Label lbLocation;
     @FXML
@@ -117,8 +123,18 @@ public class GuiControllerImpl {
     private Tooltip getTooltip(String caption) {
         return new Tooltip(caption);
     }
+
     public void updateWeatherData() {
-        loadDataWithProgress();
+        if (updateInterval < MINIMAL_UPDATE_INTERVAL) {
+            updateInterval = MINIMAL_UPDATE_INTERVAL;
+            if (log.isDebugEnabled()) log.debug("Update Interval corrected to {} msec.", MINIMAL_UPDATE_INTERVAL);
+        }
+        long lastUpdated = this.dataHolder.lastUpdatedTimestamp != null ? this.dataHolder.lastUpdatedTimestamp.getEpochSecond() : 0;
+        long msecsAfterUpdateData = Math.abs(Instant.now().getEpochSecond() - lastUpdated) * 1000;
+        if (log.isDebugEnabled()) log.debug("after last data updated spent {} msec.", msecsAfterUpdateData);
+        if (msecsAfterUpdateData >= updateInterval) {
+            loadDataWithProgress();
+        }
     }
 
     private void loadDataWithProgress() {
@@ -143,6 +159,7 @@ public class GuiControllerImpl {
                 updateProgress(40, MAX_VALUE);
                 Thread.sleep(10);
                 dataHolder.setImage(weatherService.getRemoteImage(dataHolder.getResponse().getCurrent().getCondition().getIcon()));
+                dataHolder.setLastUpdatedTimestamp(Instant.now());
                 updateProgress(60, MAX_VALUE);
                 Thread.sleep(10);
                 updateProgress(80, MAX_VALUE);
@@ -174,5 +191,6 @@ public class GuiControllerImpl {
     static class RemoteDataHolder {
         private ForecastWeatherResponse response;
         private Image image;
+        private Instant lastUpdatedTimestamp;
     }
 }
