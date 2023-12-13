@@ -135,7 +135,7 @@ public class GuiControllerImpl {
         if (msecsAfterUpdateData >= updateInterval) {
             loadDataWithProgress();
         } else {
-            log.debug("Update Weather Data has been called but after last data updated spent only {} msec. So it doesn't updated.", msecsAfterUpdateData);
+            log.info("Update Weather Data has been called but after last data updated spent only {} msec. So it doesn't updated.", msecsAfterUpdateData);
         }
     }
 
