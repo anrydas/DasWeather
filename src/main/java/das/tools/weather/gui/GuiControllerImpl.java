@@ -25,7 +25,7 @@ import java.time.Instant;
 @Slf4j
 public class GuiControllerImpl {
     public static final String APPLICATION_TITLE = "Das Weather: %s %s";
-    protected static final int MINIMAL_UPDATE_INTERVAL = 3600000;
+    protected static final int MINIMAL_UPDATE_INTERVAL = 1800000;
     private final RemoteDataHolder dataHolder = RemoteDataHolder.builder().build();
     @Value("${app.update.interval.msec}")
     private long updateInterval;
@@ -69,12 +69,12 @@ public class GuiControllerImpl {
         String updateTime = current.getLastUpdate().split(" ")[1];
 
         Stage stage = (Stage) lbLocation.getScene().getWindow();
-        stage.getIcons().removeAll();
+        stage.getIcons().clear();
         stage.getIcons().add(this.dataHolder.getImage());
 
         imgWeather.setImage(this.dataHolder.getImage());
         String conditionText = current.getCondition().getText();
-        Tooltip.install(imgWeather, new Tooltip(conditionText));
+        Tooltip.install(imgWeather, getTooltip(conditionText));
 
         lbCondition.setText(conditionText);
         lbCondition.setTooltip(getTooltip(conditionText));
@@ -130,12 +130,15 @@ public class GuiControllerImpl {
             if (log.isDebugEnabled()) log.debug("Update Interval corrected to {} msec.", MINIMAL_UPDATE_INTERVAL);
         }
         long lastUpdated = this.dataHolder.lastUpdatedTimestamp != null ? this.dataHolder.lastUpdatedTimestamp.getEpochSecond() : 0;
+        if (log.isDebugEnabled()) log.debug("got lastUpdated={}", lastUpdated);
         long msecsAfterUpdateData = Math.abs(Instant.now().getEpochSecond() - lastUpdated) * 1000;
         if (log.isDebugEnabled()) log.debug("after last data updated spent {} msec.", msecsAfterUpdateData);
-        if (msecsAfterUpdateData >= updateInterval) {
+        long realUpdateInterval = updateInterval * 2;
+        if (msecsAfterUpdateData >= (realUpdateInterval - 60000)) {
             loadDataWithProgress();
         } else {
-            log.info("Update Weather Data has been called but after last data updated spent only {} msec. So it doesn't updated.", msecsAfterUpdateData);
+            log.info("Update Weather Data has been called but after last data updated spent only {} msec with real update interval {} msec. " +
+                    "So it doesn't updated.", msecsAfterUpdateData, realUpdateInterval);
         }
     }
 
