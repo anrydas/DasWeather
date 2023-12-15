@@ -133,12 +133,12 @@ public class GuiControllerImpl {
         if (log.isDebugEnabled()) log.debug("got lastUpdated={}", lastUpdated);
         long msecsAfterUpdateData = Math.abs(Instant.now().getEpochSecond() - lastUpdated) * 1000;
         if (log.isDebugEnabled()) log.debug("after last data updated spent {} msec.", msecsAfterUpdateData);
-        long realUpdateInterval = updateInterval * 2;
-        if (msecsAfterUpdateData >= (realUpdateInterval - 60000)) {
+        if (msecsAfterUpdateData >= (updateInterval - 60000)) {
             loadDataWithProgress();
         } else {
-            log.info("Update Weather Data has been called but after last data updated spent only {} msec with real update interval {} msec. " +
-                    "So it doesn't updated.", msecsAfterUpdateData, realUpdateInterval);
+            log.info("Update Weather Data has been called but weather doesn't updated due to update interval doesn't reached yet.");
+            if (log.isDebugEnabled()) log.debug("Update Weather Data has been called but after last data updated spent only {} msec " +
+                    "with real update interval {} msec. So it doesn't updated.", msecsAfterUpdateData, updateInterval);
         }
     }
 
