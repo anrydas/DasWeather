@@ -17,7 +17,7 @@ public class WeatherController {
     }
 
     @Async
-    @Scheduled(fixedRateString = "${app.update.interval.msec}", initialDelay = 3000)
+    @Scheduled(fixedRate = 1800000, initialDelay = 3000)
     public void updateWeather() {
         // New thread needs to prevent IllegalStateException:
         // This operation is permitted on the event thread only; currentThread = task-1
