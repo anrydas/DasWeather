@@ -19,7 +19,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
+import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 
 //@Component
 @Slf4j
@@ -118,6 +121,9 @@ public class GuiControllerImpl {
                 millibarToMmHg(current.getPressureMb())
         ));
         lbAdd2.setTooltip(getTooltip("Cloud, Precipitation, Pressure"));
+        btUpdate.setTooltip(getTooltip(String.format("Last Time updated %s",
+                new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm").format(Date.from(dataHolder.getLastUpdatedTimestamp()))
+        )));
     }
 
     private Tooltip getTooltip(String caption) {
@@ -129,7 +135,7 @@ public class GuiControllerImpl {
             updateInterval = MINIMAL_UPDATE_INTERVAL;
             if (log.isDebugEnabled()) log.debug("Update Interval corrected to {} msec.", MINIMAL_UPDATE_INTERVAL);
         }
-        long lastUpdated = this.dataHolder.lastUpdatedTimestamp != null ? this.dataHolder.lastUpdatedTimestamp.getEpochSecond() : 0;
+        long lastUpdated = this.dataHolder.getLastUpdatedTimestamp() != null ? this.dataHolder.getLastUpdatedTimestamp().getEpochSecond() : 0;
         if (log.isDebugEnabled()) log.debug("got lastUpdated={}", lastUpdated);
         long msecsAfterUpdateData = Math.abs(Instant.now().getEpochSecond() - lastUpdated) * 1000;
         if (log.isDebugEnabled()) log.debug("after last data updated spent {} msec.", msecsAfterUpdateData);
