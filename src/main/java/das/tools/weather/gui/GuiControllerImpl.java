@@ -133,7 +133,7 @@ public class GuiControllerImpl {
         if (log.isDebugEnabled()) log.debug("got lastUpdated={}", lastUpdated);
         long msecsAfterUpdateData = Math.abs(Instant.now().getEpochSecond() - lastUpdated) * 1000;
         if (log.isDebugEnabled()) log.debug("after last data updated spent {} msec.", msecsAfterUpdateData);
-        if (msecsAfterUpdateData >= (updateInterval - 60000)) {
+        if (msecsAfterUpdateData >= updateInterval) {
             loadDataWithProgress();
         } else {
             log.info("Update Weather Data has been called but weather doesn't updated due to update interval doesn't reached yet.");
