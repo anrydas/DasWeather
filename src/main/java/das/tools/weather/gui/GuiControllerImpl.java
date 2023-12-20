@@ -24,7 +24,6 @@ import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
-//@Component
 @Slf4j
 public class GuiControllerImpl {
     public static final String APPLICATION_TITLE = "Das Weather: %s %s";
