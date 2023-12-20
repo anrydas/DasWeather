@@ -52,7 +52,7 @@ public class WeatherServiceImpl implements WeatherService {
         if(log.isDebugEnabled()) log.debug("[WeatherService].getForecastWeather: got url={}", url);
 
         try {
-            response = getResponseAsync(url); //restTemplate.getForObject(url, ForecastWeatherResponse.class);
+            response = getResponseAsync(url);
             if(log.isDebugEnabled()) log.debug("[WeatherService].getForecastWeather: response={}", response);
             log.info("Weather was updated");
         } catch (HttpClientErrorException e) {
@@ -93,7 +93,6 @@ public class WeatherServiceImpl implements WeatherService {
                         return ImageIO.read(new URL(urlString));
                     } catch (IOException e) {
                         log.error("Error getting image from '{}'", urlString, e);
-                        //throw new RuntimeException(e);
                     }
                     return null;
                 });
@@ -102,7 +101,6 @@ public class WeatherServiceImpl implements WeatherService {
             res = completableFuture.get();
         } catch (InterruptedException | ExecutionException e) {
             log.error("Error getting Image from server: ", e);
-             //throw new RuntimeException(e);
         }
         return res;
     }
