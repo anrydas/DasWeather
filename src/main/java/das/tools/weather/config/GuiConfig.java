@@ -16,7 +16,7 @@ import java.io.InputStream;
 
 @Configuration
 public class GuiConfig {
-    @Bean(name = "guiView")
+    @Bean(name = "guiMainView")
     public ViewHolder getGuiView() throws IOException {
         return loadView("fxml/Main.fxml");
     }

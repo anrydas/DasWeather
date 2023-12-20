@@ -26,13 +26,13 @@ import java.util.Optional;
 @EnableAsync
 public class DasWeatherApplication extends AbstractJavaFxApplicationSupport {
     @Autowired
-    private GuiConfig.ViewHolder guiView;
+    private GuiConfig.ViewHolder guiMainView;
     @Value("${app.confirm-exit}")
     private boolean isConfirmExit;
 
     @Override
     public void start(Stage stage) {
-        Scene scene = new Scene(guiView.getView());
+        Scene scene = new Scene(guiMainView.getView());
         stage.getIcons().add(new Image(Objects.requireNonNull(DasWeatherApplication.class.getResourceAsStream("/images/weather-default-01.png"))));
         stage.setTitle("Das Weather");
         stage.setResizable(false);

@@ -57,6 +57,7 @@ public class WeatherServiceImpl implements WeatherService {
             log.info("Weather was updated");
         } catch (HttpClientErrorException e) {
             log.error("Couldn't get response from server: ", e);
+            throw new RuntimeException(e);
         }
 
         return response;
@@ -101,6 +102,7 @@ public class WeatherServiceImpl implements WeatherService {
             res = completableFuture.get();
         } catch (InterruptedException | ExecutionException e) {
             log.error("Error getting Image from server: ", e);
+            throw new RuntimeException(e);
         }
         return res;
     }
