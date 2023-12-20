@@ -3,6 +3,10 @@ package das.tools.weather.config;
 import das.tools.weather.gui.GuiControllerImpl;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -30,29 +34,9 @@ public class GuiConfig {
         }
     }
 
+    @Getter @Setter @AllArgsConstructor @Builder
     public static class ViewHolder {
         private Parent view;
         private Object controller;
-
-        public ViewHolder(Parent view, Object controller) {
-            this.view = view;
-            this.controller = controller;
-        }
-
-        public Parent getView() {
-            return view;
-        }
-
-        public void setView(Parent view) {
-            this.view = view;
-        }
-
-        public Object getController() {
-            return controller;
-        }
-
-        public void setController(Object controller) {
-            this.controller = controller;
-        }
     }
 }
