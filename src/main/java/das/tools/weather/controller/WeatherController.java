@@ -1,6 +1,6 @@
 package das.tools.weather.controller;
 
-import das.tools.weather.gui.GuiControllerImpl;
+import das.tools.weather.gui.GuiController;
 import javafx.application.Platform;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -10,9 +10,9 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 public class WeatherController {
-    private final GuiControllerImpl guiController;
+    private final GuiController guiController;
 
-    public WeatherController(GuiControllerImpl guiController) {
+    public WeatherController(GuiController guiController) {
         this.guiController = guiController;
     }
 

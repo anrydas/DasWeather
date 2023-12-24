@@ -1,6 +1,6 @@
 package das.tools.weather.config;
 
-import das.tools.weather.gui.GuiControllerImpl;
+import das.tools.weather.gui.GuiController;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import lombok.AllArgsConstructor;
@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,9 +22,9 @@ public class GuiConfig {
         return loadView("fxml/Main.fxml");
     }
 
-    @Bean
-    public GuiControllerImpl getGuiController() throws IOException {
-        return (GuiControllerImpl) getGuiView().getController();
+    @Bean @Primary
+    public GuiController getGuiController() throws IOException {
+        return (GuiController) getGuiView().getController();
     }
 
     protected ViewHolder loadView(String url) throws IOException {
