@@ -2,6 +2,7 @@ package das.tools.weather.gui;
 
 import das.tools.weather.entity.ForecastWeatherResponse;
 import das.tools.weather.entity.current.WeatherCurrent;
+import das.tools.weather.service.GuiConfigService;
 import das.tools.weather.service.WeatherService;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -17,7 +18,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
@@ -30,8 +30,6 @@ public class GuiControllerImpl implements GuiController {
     public static final String APPLICATION_TITLE = "Das Weather: %s %s";
     protected static final int MINIMAL_UPDATE_INTERVAL = 1800000;
     private final RemoteDataHolder dataHolder = RemoteDataHolder.builder().build();
-    @Value("${app.update.interval.msec}")
-    private long updateInterval;
     @FXML
     private Label lbLocation;
     @FXML
@@ -51,6 +49,8 @@ public class GuiControllerImpl implements GuiController {
 
     @Autowired
     private WeatherService weatherService;
+    @Autowired
+    private GuiConfigService guiConfig;
 
     public GuiControllerImpl() {
     }
@@ -132,6 +132,7 @@ public class GuiControllerImpl implements GuiController {
 
     @Override
     public void updateWeatherData() {
+        long updateInterval = Long.parseLong(guiConfig.getConfigStringValue("app.update.interval.msec", "3600000"));
         if (updateInterval < MINIMAL_UPDATE_INTERVAL) {
             updateInterval = MINIMAL_UPDATE_INTERVAL;
             if (log.isDebugEnabled()) log.debug("Update Interval corrected to {} msec.", MINIMAL_UPDATE_INTERVAL);
