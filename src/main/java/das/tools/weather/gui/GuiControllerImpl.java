@@ -18,14 +18,15 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
+@Component
 @Slf4j
-public class GuiControllerImpl {
+public class GuiControllerImpl implements GuiController {
     public static final String APPLICATION_TITLE = "Das Weather: %s %s";
     protected static final int MINIMAL_UPDATE_INTERVAL = 1800000;
     private final RemoteDataHolder dataHolder = RemoteDataHolder.builder().build();
@@ -129,6 +130,7 @@ public class GuiControllerImpl {
         return new Tooltip(caption);
     }
 
+    @Override
     public void updateWeatherData() {
         if (updateInterval < MINIMAL_UPDATE_INTERVAL) {
             updateInterval = MINIMAL_UPDATE_INTERVAL;
