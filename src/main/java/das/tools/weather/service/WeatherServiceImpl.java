@@ -15,23 +15,20 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 @Service
 @Slf4j
 public class WeatherServiceImpl implements WeatherService {
-    @Value("${app.api-key}")
-    String apiKey;
-    @Value("${app.weather.forecast.url}")
-    String baseUrl;
-    @Value("${app.weather.location}")
-    String location;
 
     private final RestTemplate restTemplate;
+    private final GuiConfigService guiConfig;
 
-    public WeatherServiceImpl(RestTemplate restTemplate) {
+    public WeatherServiceImpl(RestTemplate restTemplate, GuiConfigService guiConfig) {
         this.restTemplate = restTemplate;
+        this.guiConfig = guiConfig;
     }
 
     @Override
@@ -41,10 +38,11 @@ public class WeatherServiceImpl implements WeatherService {
 
     @Override
     public ForecastWeatherResponse getForecastWeather() {
+        Properties props = guiConfig.getCurrentConfig();
         ForecastWeatherResponse response = null;
-        String url = ServletUriComponentsBuilder.fromHttpUrl(baseUrl)
-                .queryParam("key", apiKey)
-                .queryParam("q", location)
+        String url = ServletUriComponentsBuilder.fromHttpUrl(props.getProperty("app.weather.forecast.url", ""))
+                .queryParam("key", props.getProperty("app.api-key", ""))
+                .queryParam("q", props.getProperty("app.weather.location", "Kyiv"))
                 .queryParam("aqi", "yes")
                 //.queryParam("lang", "uk")
                 .queryParam("days", "3")

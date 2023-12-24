@@ -18,6 +18,10 @@
             <destName>application-default.properties</destName>
         </file>
         <file>
+            <source>${project.basedir}/config/gui.config</source>
+            <outputDirectory>/config</outputDirectory>
+        </file>
+        <file>
             <source>${project.basedir}/start-prod.sh</source>
             <outputDirectory>/</outputDirectory>
         </file>

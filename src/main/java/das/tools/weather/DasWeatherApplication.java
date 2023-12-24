@@ -1,6 +1,7 @@
 package das.tools.weather;
 
 import das.tools.weather.config.GuiConfig;
+import das.tools.weather.service.GuiConfigService;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -27,8 +28,8 @@ import java.util.Optional;
 public class DasWeatherApplication extends AbstractJavaFxApplicationSupport {
     @Autowired
     private GuiConfig.ViewHolder guiMainView;
-    @Value("${app.confirm-exit}")
-    private boolean isConfirmExit;
+    @Autowired
+    private GuiConfigService guiConfig;
 
     @Override
     public void start(Stage stage) {
@@ -37,6 +38,7 @@ public class DasWeatherApplication extends AbstractJavaFxApplicationSupport {
         stage.setTitle("Das Weather");
         stage.setResizable(false);
         stage.setScene(scene);
+        boolean isConfirmExit = Boolean.parseBoolean(guiConfig.getConfigStringValue("app.confirm-exit", "true"));
         if (isConfirmExit) {
             stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
                 @Override
