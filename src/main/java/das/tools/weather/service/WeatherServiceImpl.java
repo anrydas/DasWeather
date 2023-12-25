@@ -44,7 +44,7 @@ public class WeatherServiceImpl implements WeatherService {
                 .queryParam("key", props.getProperty("app.api-key", ""))
                 .queryParam("q", props.getProperty("app.weather.location", "Kyiv"))
                 .queryParam("aqi", "yes")
-                //.queryParam("lang", "uk")
+                .queryParam("lang", props.getProperty("app.weather.condition.lang", "en"))
                 .queryParam("days", "3")
                 .toUriString();
         if(log.isDebugEnabled()) log.debug("[WeatherService].getForecastWeather: got url={}", url);
