@@ -161,7 +161,8 @@ public class GuiControllerImpl implements GuiController {
 
     @Override
     public void updateWeatherData() {
-        long updateInterval = Long.parseLong(guiConfig.getConfigStringValue(GuiConfigService.GUI_CONFIG_UPDATE_INTERVAL_KEY, "3600000"));
+        long updateInterval = Long.parseLong(guiConfig.getConfigStringValue(GuiConfigService.GUI_CONFIG_UPDATE_INTERVAL_KEY,
+                guiConfig.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_UPDATE_INTERVAL_KEY)));
         if (updateInterval < MINIMAL_UPDATE_INTERVAL) {
             updateInterval = MINIMAL_UPDATE_INTERVAL;
             if (log.isDebugEnabled()) log.debug("Update Interval corrected to {} msec.", MINIMAL_UPDATE_INTERVAL);
