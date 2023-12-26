@@ -5,6 +5,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +16,11 @@ import java.util.Properties;
 
 @Component
 @Slf4j
-public class ConfigControllerImpl {
+public class ConfigControllerImpl implements ConfigController {
     @Autowired
     private GuiConfigService configService;
     private Properties appProps;
+    private boolean isConfigChanged;
 
     @FXML
     private TextField edApiKey;
@@ -45,16 +47,38 @@ public class ConfigControllerImpl {
         btCancel.setOnAction(actionEvent -> closeStage());
     }
 
+    @Override
     public void onShowingStage() {
         appProps = configService.getCurrentConfig();
-        edApiKey.setText(appProps.getProperty(GuiConfigService.GUI_CONFIG_API_KEY_KEY, ""));
-        edForecastUrl.setText(appProps.getProperty(GuiConfigService.GUI_CONFIG_FORECAST_URL_KEY, "http://api.weatherapi.com/v1/forecast.json"));
-        edLocation.setText(appProps.getProperty(GuiConfigService.GUI_CONFIG_WEATHER_LOCATION_KEY, "Kyiv"));
-        chbConfirmExit.setSelected(Boolean.parseBoolean(appProps.getProperty(GuiConfigService.GUI_CONFIG_CONFIRM_EXIT_KEY, "true")));
-        spUpdateInterval.getValueFactory().setValue(mSecToMin(Integer.parseInt(appProps.getProperty(GuiConfigService.GUI_CONFIG_UPDATE_INTERVAL_KEY, "60"))));
+        edApiKey.setText(appProps.getProperty(GuiConfigService.GUI_CONFIG_API_KEY_KEY,
+                configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_API_KEY_KEY)));
+        edForecastUrl.setText(appProps.getProperty(GuiConfigService.GUI_CONFIG_FORECAST_URL_KEY,
+                configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_FORECAST_URL_KEY)));
+        edLocation.setText(appProps.getProperty(GuiConfigService.GUI_CONFIG_WEATHER_LOCATION_KEY,
+                configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_WEATHER_LOCATION_KEY)));
+        chbConfirmExit.setSelected(Boolean.parseBoolean(appProps.getProperty(GuiConfigService.GUI_CONFIG_CONFIRM_EXIT_KEY,
+                configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_CONFIRM_EXIT_KEY))));
+        spUpdateInterval.getValueFactory().setValue(
+                mSecToMin(
+                        Integer.parseInt(
+                                appProps.getProperty(GuiConfigService.GUI_CONFIG_UPDATE_INTERVAL_KEY,
+                                        configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_UPDATE_INTERVAL_KEY)
+                                )
+                        )
+                )
+        );
         cbCondLang.setItems(getLanguagesList());
-        String langName = configService.getLangName(appProps.getProperty(GuiConfigService.GUI_CONFIG_CONDITION_LANGUAGE_KEY, "en"));
+        String langName = configService.getLangName(
+                appProps.getProperty(GuiConfigService.GUI_CONFIG_CONDITION_LANGUAGE_KEY,
+                        configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_CONDITION_LANGUAGE_KEY)
+                )
+        );
         cbCondLang.getSelectionModel().select(langName);
+    }
+
+    @Override
+    public boolean isConfigChanged() {
+        return isConfigChanged;
     }
 
     private ObservableList<String> getLanguagesList() {
@@ -64,11 +88,15 @@ public class ConfigControllerImpl {
     }
 
     private void saveConfigAndClose() {
-        saveConfig();
-        closeStage();
+        if (isFieldsValid()) {
+            saveConfig();
+            closeStage();
+            isConfigChanged = true;
+        }
     }
 
     private void closeStage() {
+        isConfigChanged = false;
         ((Stage) btCancel.getScene().getWindow()).close();
     }
 
@@ -88,8 +116,8 @@ public class ConfigControllerImpl {
     }
 
     private void setPropertyIfChanged(String key, String value) {
-        String oldProperty = appProps.getProperty(key);
-        if (oldProperty != null && !"".equals(oldProperty) && !oldProperty.equals(value)) {
+        String oldProperty = appProps.getProperty(key, configService.getDefaultConfigValue(key));
+        if (!oldProperty.equals(value)) {
             appProps.setProperty(key, value);
         }
     }
@@ -100,5 +128,30 @@ public class ConfigControllerImpl {
 
     private Integer mSecToMin(int msec) {
         return Math.round((float) msec / (60 * 1000));
+    }
+
+    private boolean isFieldsValid() {
+        String msgEmpty = "%s couldn't be empty";
+        if ("".equals(edApiKey.getText())) {
+            showError(String.format(msgEmpty, "API key"));
+            return false;
+        }
+        if ("".equals(edLocation.getText())) {
+            showError(String.format(msgEmpty, "Location"));
+            return false;
+        }
+        if ("".equals(edForecastUrl.getText())) {
+            showError(String.format(msgEmpty, "Forecast URL"));
+            return false;
+        }
+        return true;
+    }
+
+    private void showError(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR,
+                message,
+                ButtonType.OK);
+        alert.setTitle("Configuration error");
+        alert.showAndWait();
     }
 }

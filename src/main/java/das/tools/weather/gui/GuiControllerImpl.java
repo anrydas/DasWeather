@@ -5,11 +5,11 @@ import das.tools.weather.entity.ForecastWeatherResponse;
 import das.tools.weather.entity.current.WeatherCurrent;
 import das.tools.weather.service.GuiConfigService;
 import das.tools.weather.service.WeatherService;
+import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -27,7 +27,6 @@ import org.springframework.stereotype.Component;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Date;
-import java.util.Properties;
 
 @Component
 @Slf4j
@@ -59,9 +58,9 @@ public class GuiControllerImpl implements GuiController {
     @Autowired
     private WeatherService weatherService;
     @Autowired
-    private GuiConfigService guiConfig;
+    private GuiConfigService configService;
     @Autowired
-    private ConfigControllerImpl configController;
+    private ConfigController configController;
     @Autowired
     private GuiConfig.ViewHolder guiConfigView;
 
@@ -150,9 +149,12 @@ public class GuiControllerImpl implements GuiController {
         stage.setTitle("Weather Application Config");
         stage.setScene(configScene);
         stage.setResizable(false);
-        stage.initModality(Modality.WINDOW_MODAL);
+        stage.initModality(Modality.APPLICATION_MODAL);
         stage.setOnShowing(windowEvent -> configController.onShowingStage());
-        stage.show();
+        stage.showAndWait();
+        if (configController.isConfigChanged()) {
+            updateWeatherDataForce();
+        }
     }
 
     private static Tooltip getTooltip(String caption) {
@@ -161,7 +163,8 @@ public class GuiControllerImpl implements GuiController {
 
     @Override
     public void updateWeatherData() {
-        long updateInterval = Long.parseLong(guiConfig.getConfigStringValue(GuiConfigService.GUI_CONFIG_UPDATE_INTERVAL_KEY, "3600000"));
+        long updateInterval = Long.parseLong(configService.getConfigStringValue(GuiConfigService.GUI_CONFIG_UPDATE_INTERVAL_KEY,
+                configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_UPDATE_INTERVAL_KEY)));
         if (updateInterval < MINIMAL_UPDATE_INTERVAL) {
             updateInterval = MINIMAL_UPDATE_INTERVAL;
             if (log.isDebugEnabled()) log.debug("Update Interval corrected to {} msec.", MINIMAL_UPDATE_INTERVAL);
@@ -177,6 +180,11 @@ public class GuiControllerImpl implements GuiController {
             if (log.isDebugEnabled()) log.debug("Update Weather Data has been called but after last data updated spent only {} msec " +
                     "with real update interval {} msec. So it doesn't updated.", msecsAfterUpdateData, updateInterval);
         }
+    }
+
+    @Override
+    public void updateWeatherDataForce() {
+        loadDataWithProgress();
     }
 
     private void loadDataWithProgress() {
