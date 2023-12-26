@@ -19,6 +19,7 @@ public class ConfigControllerImpl implements ConfigController {
     @Autowired
     private GuiConfigService configService;
     private Properties appProps;
+    private boolean isConfigChanged;
 
     @FXML
     private TextField edApiKey;
@@ -74,6 +75,11 @@ public class ConfigControllerImpl implements ConfigController {
         cbCondLang.getSelectionModel().select(langName);
     }
 
+    @Override
+    public boolean isConfigChanged() {
+        return isConfigChanged;
+    }
+
     private ObservableList<String> getLanguagesList() {
         String[] langs = GuiConfigService.GUI_SUPPORTED_CONDITION_LANGUAGES.values().toArray(new String[0]);
         Arrays.sort(langs);
@@ -83,6 +89,7 @@ public class ConfigControllerImpl implements ConfigController {
     private void saveConfigAndClose() {
         saveConfig();
         closeStage();
+        isConfigChanged = true;
     }
 
     private void closeStage() {
