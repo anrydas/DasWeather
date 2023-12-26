@@ -5,6 +5,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,9 +88,11 @@ public class ConfigControllerImpl implements ConfigController {
     }
 
     private void saveConfigAndClose() {
-        saveConfig();
-        closeStage();
-        isConfigChanged = true;
+        if (isFieldsValid()) {
+            saveConfig();
+            closeStage();
+            isConfigChanged = true;
+        }
     }
 
     private void closeStage() {
@@ -125,5 +128,30 @@ public class ConfigControllerImpl implements ConfigController {
 
     private Integer mSecToMin(int msec) {
         return Math.round((float) msec / (60 * 1000));
+    }
+
+    private boolean isFieldsValid() {
+        String msgEmpty = "%s couldn't be empty";
+        if ("".equals(edApiKey.getText())) {
+            showError(String.format(msgEmpty, "API key"));
+            return false;
+        }
+        if ("".equals(edLocation.getText())) {
+            showError(String.format(msgEmpty, "Location"));
+            return false;
+        }
+        if ("".equals(edForecastUrl.getText())) {
+            showError(String.format(msgEmpty, "Forecast URL"));
+            return false;
+        }
+        return true;
+    }
+
+    private void showError(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR,
+                message,
+                ButtonType.OK);
+        alert.setTitle("Configuration error");
+        alert.showAndWait();
     }
 }
