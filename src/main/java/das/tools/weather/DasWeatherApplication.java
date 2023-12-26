@@ -38,7 +38,7 @@ public class DasWeatherApplication extends AbstractJavaFxApplicationSupport {
         stage.setTitle("Das Weather");
         stage.setResizable(false);
         stage.setScene(scene);
-        boolean isConfirmExit = Boolean.parseBoolean(guiConfig.getConfigStringValue("app.confirm-exit", "true"));
+        boolean isConfirmExit = Boolean.parseBoolean(guiConfig.getConfigStringValue(GuiConfigService.GUI_CONFIG_CONFIRM_EXIT_KEY, "true"));
         if (isConfirmExit) {
             stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
                 @Override

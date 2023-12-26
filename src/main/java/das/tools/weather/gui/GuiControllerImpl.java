@@ -1,5 +1,6 @@
 package das.tools.weather.gui;
 
+import das.tools.weather.config.GuiConfig;
 import das.tools.weather.entity.ForecastWeatherResponse;
 import das.tools.weather.entity.current.WeatherCurrent;
 import das.tools.weather.service.GuiConfigService;
@@ -8,9 +9,12 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,6 +27,7 @@ import org.springframework.stereotype.Component;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Date;
+import java.util.Properties;
 
 @Component
 @Slf4j
@@ -43,14 +48,24 @@ public class GuiControllerImpl implements GuiController {
     @FXML
     private Button btUpdate;
     @FXML
+    private Button btConfig;
+    @FXML
     private ImageView imgWeather;
     @FXML
     private ProgressBar pb;
+    @FXML
+    private ImageView imgConfigure;
 
     @Autowired
     private WeatherService weatherService;
     @Autowired
     private GuiConfigService guiConfig;
+    @Autowired
+    private ConfigControllerImpl configController;
+    @Autowired
+    private GuiConfig.ViewHolder guiConfigView;
+
+    private Scene configScene;
 
     public GuiControllerImpl() {
     }
@@ -64,6 +79,9 @@ public class GuiControllerImpl implements GuiController {
                 updateWeatherData();
             }
         });
+        btConfig.setTooltip(getTooltip("Configure Application"));
+        btConfig.setOnAction(actionEvent -> showConfigWindow());
+        imgConfigure.setImage(new Image("/images/configure.png"));
     }
 
     private void updateControls() {
@@ -99,7 +117,7 @@ public class GuiControllerImpl implements GuiController {
                 updateTime
         )));
 
-        String MSG_TEMPERATURE = "\uD83D\uDD25 %.0f\u2103 (fills %.0f\u2103) \uD83C\uDF2B %d\uFF05";
+        String MSG_TEMPERATURE = "\uD83D\uDD25 %.0f℃ (fills %.0f℃) \uD83C\uDF2B %d％";
         lbTemperature.setText(String.format(MSG_TEMPERATURE,
                 current.getTemperatureC(),
                 current.getFeelsLike(),
@@ -126,13 +144,24 @@ public class GuiControllerImpl implements GuiController {
         )));
     }
 
-    private Tooltip getTooltip(String caption) {
+    private void showConfigWindow() {
+        configScene = configScene == null ? new Scene(guiConfigView.getView()) : configScene;
+        Stage stage = new Stage();
+        stage.setTitle("Weather Application Config");
+        stage.setScene(configScene);
+        stage.setResizable(false);
+        stage.initModality(Modality.WINDOW_MODAL);
+        stage.setOnShowing(windowEvent -> configController.onShowingStage());
+        stage.show();
+    }
+
+    private static Tooltip getTooltip(String caption) {
         return new Tooltip(caption);
     }
 
     @Override
     public void updateWeatherData() {
-        long updateInterval = Long.parseLong(guiConfig.getConfigStringValue("app.update.interval.msec", "3600000"));
+        long updateInterval = Long.parseLong(guiConfig.getConfigStringValue(GuiConfigService.GUI_CONFIG_UPDATE_INTERVAL_KEY, "3600000"));
         if (updateInterval < MINIMAL_UPDATE_INTERVAL) {
             updateInterval = MINIMAL_UPDATE_INTERVAL;
             if (log.isDebugEnabled()) log.debug("Update Interval corrected to {} msec.", MINIMAL_UPDATE_INTERVAL);
