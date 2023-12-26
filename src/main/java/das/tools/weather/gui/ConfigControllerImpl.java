@@ -15,7 +15,7 @@ import java.util.Properties;
 
 @Component
 @Slf4j
-public class ConfigControllerImpl {
+public class ConfigControllerImpl implements ConfigController {
     @Autowired
     private GuiConfigService configService;
     private Properties appProps;
@@ -45,6 +45,7 @@ public class ConfigControllerImpl {
         btCancel.setOnAction(actionEvent -> closeStage());
     }
 
+    @Override
     public void onShowingStage() {
         appProps = configService.getCurrentConfig();
         edApiKey.setText(appProps.getProperty(GuiConfigService.GUI_CONFIG_API_KEY_KEY,
