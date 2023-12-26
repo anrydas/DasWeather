@@ -59,7 +59,7 @@ public class GuiControllerImpl implements GuiController {
     @Autowired
     private GuiConfigService configService;
     @Autowired
-    private ConfigControllerImpl configController;
+    private ConfigController configController;
     @Autowired
     private GuiConfig.ViewHolder guiConfigView;
 

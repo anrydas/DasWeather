@@ -1,5 +1,6 @@
 package das.tools.weather.config;
 
+import das.tools.weather.gui.ConfigController;
 import das.tools.weather.gui.ConfigControllerImpl;
 import das.tools.weather.gui.GuiController;
 import javafx.fxml.FXMLLoader;
@@ -34,8 +35,8 @@ public class GuiConfig {
     }
 
     @Bean @Primary
-    public ConfigControllerImpl getConfigController() throws IOException {
-        return (ConfigControllerImpl) getConfigView().getController();
+    public ConfigController getConfigController() throws IOException {
+        return (ConfigController) getConfigView().getController();
     }
 
     protected ViewHolder loadView(String url) throws IOException {
