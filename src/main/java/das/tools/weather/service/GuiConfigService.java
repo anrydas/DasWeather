@@ -13,6 +13,10 @@ public interface GuiConfigService {
     public static final String GUI_CONFIG_CONDITION_LANGUAGE_KEY = "app.weather.condition.lang";
     public static final String GUI_CONFIG_FORECAST_URL_KEY = "app.weather.forecast.url";
     public static final Map<String,String> GUI_SUPPORTED_CONDITION_LANGUAGES = new HashMap<>();
+    public static final Map<String,String> GUI_CONFIG_DEFAULT_VALUES = new HashMap<>();
+
+    String getDefaultConfigValue(String key);
+
     Properties getCurrentConfig();
 
     void saveConfig(Properties props);

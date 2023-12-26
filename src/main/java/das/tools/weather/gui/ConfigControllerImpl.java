@@ -47,13 +47,29 @@ public class ConfigControllerImpl {
 
     public void onShowingStage() {
         appProps = configService.getCurrentConfig();
-        edApiKey.setText(appProps.getProperty(GuiConfigService.GUI_CONFIG_API_KEY_KEY, ""));
-        edForecastUrl.setText(appProps.getProperty(GuiConfigService.GUI_CONFIG_FORECAST_URL_KEY, "http://api.weatherapi.com/v1/forecast.json"));
-        edLocation.setText(appProps.getProperty(GuiConfigService.GUI_CONFIG_WEATHER_LOCATION_KEY, "Kyiv"));
-        chbConfirmExit.setSelected(Boolean.parseBoolean(appProps.getProperty(GuiConfigService.GUI_CONFIG_CONFIRM_EXIT_KEY, "true")));
-        spUpdateInterval.getValueFactory().setValue(mSecToMin(Integer.parseInt(appProps.getProperty(GuiConfigService.GUI_CONFIG_UPDATE_INTERVAL_KEY, "60"))));
+        edApiKey.setText(appProps.getProperty(GuiConfigService.GUI_CONFIG_API_KEY_KEY,
+                configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_API_KEY_KEY)));
+        edForecastUrl.setText(appProps.getProperty(GuiConfigService.GUI_CONFIG_FORECAST_URL_KEY,
+                configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_FORECAST_URL_KEY)));
+        edLocation.setText(appProps.getProperty(GuiConfigService.GUI_CONFIG_WEATHER_LOCATION_KEY,
+                configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_WEATHER_LOCATION_KEY)));
+        chbConfirmExit.setSelected(Boolean.parseBoolean(appProps.getProperty(GuiConfigService.GUI_CONFIG_CONFIRM_EXIT_KEY,
+                configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_CONFIRM_EXIT_KEY))));
+        spUpdateInterval.getValueFactory().setValue(
+                mSecToMin(
+                        Integer.parseInt(
+                                appProps.getProperty(GuiConfigService.GUI_CONFIG_UPDATE_INTERVAL_KEY,
+                                        configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_UPDATE_INTERVAL_KEY)
+                                )
+                        )
+                )
+        );
         cbCondLang.setItems(getLanguagesList());
-        String langName = configService.getLangName(appProps.getProperty(GuiConfigService.GUI_CONFIG_CONDITION_LANGUAGE_KEY, "en"));
+        String langName = configService.getLangName(
+                appProps.getProperty(GuiConfigService.GUI_CONFIG_CONDITION_LANGUAGE_KEY,
+                        configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_CONDITION_LANGUAGE_KEY)
+                )
+        );
         cbCondLang.getSelectionModel().select(langName);
     }
 
@@ -88,8 +104,8 @@ public class ConfigControllerImpl {
     }
 
     private void setPropertyIfChanged(String key, String value) {
-        String oldProperty = appProps.getProperty(key);
-        if (oldProperty != null && !"".equals(oldProperty) && !oldProperty.equals(value)) {
+        String oldProperty = appProps.getProperty(key, configService.getDefaultConfigValue(key));
+        if (!oldProperty.equals(value)) {
             appProps.setProperty(key, value);
         }
     }

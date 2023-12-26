@@ -20,25 +20,39 @@ public class GuiConfigServiceImpl implements GuiConfigService {
     private String configFile = "config" + System.getProperty("file.separator") + GUI_CONFIG_DEFAULT_FILE_NAME_KEY;
 
     static {
-        Map<String,String> map = GUI_SUPPORTED_CONDITION_LANGUAGES;
-        map.put("en", "English");
-        map.put("uk", "Ukrainian");
-        map.put("bg", "Bulgarian");
-        map.put("cs", "Czech");
-        map.put("nl", "Dutch");
-        map.put("fi", "Finnish");
-        map.put("fr", "French");
-        map.put("de", "German");
-        map.put("el", "Greek");
-        map.put("it", "Italian");
-        map.put("ja", "Japanese");
-        map.put("ko", "Korean");
-        map.put("po", "Polish");
-        map.put("pt", "Portuguese");
-        map.put("sp", "Spanish");
-        map.put("sk", "Slovak");
-        map.put("sv", "Swedish");
-        map.put("vi", "Vietnamese");
+        Map<String,String> mapConditions = GUI_SUPPORTED_CONDITION_LANGUAGES;
+        mapConditions.put("en", "English");
+        mapConditions.put("uk", "Ukrainian");
+        mapConditions.put("bg", "Bulgarian");
+        mapConditions.put("cs", "Czech");
+        mapConditions.put("nl", "Dutch");
+        mapConditions.put("fi", "Finnish");
+        mapConditions.put("fr", "French");
+        mapConditions.put("de", "German");
+        mapConditions.put("el", "Greek");
+        mapConditions.put("it", "Italian");
+        mapConditions.put("ja", "Japanese");
+        mapConditions.put("ko", "Korean");
+        mapConditions.put("po", "Polish");
+        mapConditions.put("pt", "Portuguese");
+        mapConditions.put("sp", "Spanish");
+        mapConditions.put("sk", "Slovak");
+        mapConditions.put("sv", "Swedish");
+        mapConditions.put("vi", "Vietnamese");
+
+        Map<String,String> mapDefaults = GUI_CONFIG_DEFAULT_VALUES;
+        mapDefaults.put(GUI_CONFIG_DEFAULT_FILE_NAME_KEY, "config/gui.config");
+        mapDefaults.put(GUI_CONFIG_UPDATE_INTERVAL_KEY, "3600000");
+        mapDefaults.put(GUI_CONFIG_CONFIRM_EXIT_KEY, "true");
+        mapDefaults.put(GUI_CONFIG_API_KEY_KEY, "");
+        mapDefaults.put(GUI_CONFIG_WEATHER_LOCATION_KEY, "Kyiv");
+        mapDefaults.put(GUI_CONFIG_CONDITION_LANGUAGE_KEY, "en");
+        mapDefaults.put(GUI_CONFIG_FORECAST_URL_KEY, "http://api.weatherapi.com/v1/forecast.json");
+    }
+
+    @Override
+    public String getDefaultConfigValue(String key) {
+        return GUI_CONFIG_DEFAULT_VALUES.get(key);
     }
 
     @Override
@@ -66,7 +80,7 @@ public class GuiConfigServiceImpl implements GuiConfigService {
 
     @Override
     public String getLangName(String code) {
-        return GUI_SUPPORTED_CONDITION_LANGUAGES.getOrDefault(code, GUI_SUPPORTED_CONDITION_LANGUAGES.get("en"));
+        return GUI_SUPPORTED_CONDITION_LANGUAGES.getOrDefault(code, GUI_SUPPORTED_CONDITION_LANGUAGES.get(getDefaultConfigValue(GUI_CONFIG_CONDITION_LANGUAGE_KEY)));
     }
 
     @Override
@@ -76,7 +90,7 @@ public class GuiConfigServiceImpl implements GuiConfigService {
                 return entry.getKey();
             }
         }
-        return GUI_SUPPORTED_CONDITION_LANGUAGES.get("en");
+        return GUI_SUPPORTED_CONDITION_LANGUAGES.get(getDefaultConfigValue(GUI_CONFIG_CONDITION_LANGUAGE_KEY));
     }
 
     private String getConfigDefaultFileName() {
