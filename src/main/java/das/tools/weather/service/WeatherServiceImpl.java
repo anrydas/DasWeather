@@ -5,7 +5,6 @@ import das.tools.weather.entity.ForecastWeatherResponse;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -24,11 +23,11 @@ import java.util.concurrent.ExecutionException;
 public class WeatherServiceImpl implements WeatherService {
 
     private final RestTemplate restTemplate;
-    private final GuiConfigService guiConfig;
+    private final GuiConfigService configService;
 
-    public WeatherServiceImpl(RestTemplate restTemplate, GuiConfigService guiConfig) {
+    public WeatherServiceImpl(RestTemplate restTemplate, GuiConfigService configService) {
         this.restTemplate = restTemplate;
-        this.guiConfig = guiConfig;
+        this.configService = configService;
     }
 
     @Override
@@ -38,17 +37,17 @@ public class WeatherServiceImpl implements WeatherService {
 
     @Override
     public ForecastWeatherResponse getForecastWeather() {
-        Properties props = guiConfig.getCurrentConfig();
+        Properties props = configService.getCurrentConfig();
         ForecastWeatherResponse response = null;
         String url = ServletUriComponentsBuilder.fromHttpUrl(props.getProperty(GuiConfigService.GUI_CONFIG_FORECAST_URL_KEY,
-                        guiConfig.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_FORECAST_URL_KEY)))
+                        configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_FORECAST_URL_KEY)))
                 .queryParam("key", props.getProperty(GuiConfigService.GUI_CONFIG_API_KEY_KEY,
-                        guiConfig.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_API_KEY_KEY)))
+                        configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_API_KEY_KEY)))
                 .queryParam("q", props.getProperty(GuiConfigService.GUI_CONFIG_WEATHER_LOCATION_KEY,
-                        guiConfig.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_WEATHER_LOCATION_KEY)))
+                        configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_WEATHER_LOCATION_KEY)))
                 .queryParam("aqi", "yes")
                 .queryParam("lang", props.getProperty(GuiConfigService.GUI_CONFIG_CONDITION_LANGUAGE_KEY,
-                        guiConfig.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_CONDITION_LANGUAGE_KEY)))
+                        configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_CONDITION_LANGUAGE_KEY)))
                 .queryParam("days", "3")
                 .toUriString();
         if(log.isDebugEnabled()) log.debug("[WeatherService].getForecastWeather: got url={}", url);
