@@ -5,6 +5,7 @@ import das.tools.weather.entity.ForecastWeatherResponse;
 import das.tools.weather.entity.current.WeatherCurrent;
 import das.tools.weather.service.GuiConfigService;
 import das.tools.weather.service.WeatherService;
+import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -148,9 +149,12 @@ public class GuiControllerImpl implements GuiController {
         stage.setTitle("Weather Application Config");
         stage.setScene(configScene);
         stage.setResizable(false);
-        stage.initModality(Modality.WINDOW_MODAL);
+        stage.initModality(Modality.APPLICATION_MODAL);
         stage.setOnShowing(windowEvent -> configController.onShowingStage());
-        stage.show();
+        stage.showAndWait();
+        if (configController.isConfigChanged()) {
+            updateWeatherDataForce();
+        }
     }
 
     private static Tooltip getTooltip(String caption) {
@@ -176,6 +180,11 @@ public class GuiControllerImpl implements GuiController {
             if (log.isDebugEnabled()) log.debug("Update Weather Data has been called but after last data updated spent only {} msec " +
                     "with real update interval {} msec. So it doesn't updated.", msecsAfterUpdateData, updateInterval);
         }
+    }
+
+    @Override
+    public void updateWeatherDataForce() {
+        loadDataWithProgress();
     }
 
     private void loadDataWithProgress() {
