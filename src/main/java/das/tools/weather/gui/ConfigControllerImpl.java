@@ -1,0 +1,104 @@
+package das.tools.weather.gui;
+
+import das.tools.weather.service.GuiConfigService;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+import javafx.stage.Stage;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.Arrays;
+import java.util.Properties;
+
+@Component
+@Slf4j
+public class ConfigControllerImpl {
+    @Autowired
+    private GuiConfigService configService;
+    private Properties appProps;
+
+    @FXML
+    private TextField edApiKey;
+    @FXML
+    private TextField edForecastUrl;
+    @FXML
+    private TextField edLocation;
+    @FXML
+    private Spinner<Integer> spUpdateInterval;
+    @FXML
+    private ComboBox<String> cbCondLang;
+    @FXML
+    private CheckBox chbConfirmExit;
+    @FXML
+    private Button btOk;
+    @FXML
+    private Button btCancel;
+    public ConfigControllerImpl() {
+    }
+
+    @FXML
+    private void initialize() {
+        btOk.setOnAction(actionEvent -> saveConfigAndClose());
+        btCancel.setOnAction(actionEvent -> closeStage());
+    }
+
+    public void onShowingStage() {
+        appProps = configService.getCurrentConfig();
+        edApiKey.setText(appProps.getProperty(GuiConfigService.GUI_CONFIG_API_KEY_KEY, ""));
+        edForecastUrl.setText(appProps.getProperty(GuiConfigService.GUI_CONFIG_FORECAST_URL_KEY, "http://api.weatherapi.com/v1/forecast.json"));
+        edLocation.setText(appProps.getProperty(GuiConfigService.GUI_CONFIG_WEATHER_LOCATION_KEY, "Kyiv"));
+        chbConfirmExit.setSelected(Boolean.parseBoolean(appProps.getProperty(GuiConfigService.GUI_CONFIG_CONFIRM_EXIT_KEY, "true")));
+        spUpdateInterval.getValueFactory().setValue(mSecToMin(Integer.parseInt(appProps.getProperty(GuiConfigService.GUI_CONFIG_UPDATE_INTERVAL_KEY, "60"))));
+        cbCondLang.setItems(getLanguagesList());
+        String langName = configService.getLangName(appProps.getProperty(GuiConfigService.GUI_CONFIG_CONDITION_LANGUAGE_KEY, "en"));
+        cbCondLang.getSelectionModel().select(langName);
+    }
+
+    private ObservableList<String> getLanguagesList() {
+        String[] langs = GuiConfigService.GUI_SUPPORTED_CONDITION_LANGUAGES.values().toArray(new String[0]);
+        Arrays.sort(langs);
+        return FXCollections.observableArrayList(langs);
+    }
+
+    private void saveConfigAndClose() {
+        saveConfig();
+        closeStage();
+    }
+
+    private void closeStage() {
+        ((Stage) btCancel.getScene().getWindow()).close();
+    }
+
+    private void saveConfig() {
+        updateConfigFromForm();
+        configService.saveConfig(appProps);
+    }
+
+    private void updateConfigFromForm() {
+        setPropertyIfChanged(GuiConfigService.GUI_CONFIG_API_KEY_KEY, edApiKey.getText());
+        setPropertyIfChanged(GuiConfigService.GUI_CONFIG_FORECAST_URL_KEY, edForecastUrl.getText());
+        setPropertyIfChanged(GuiConfigService.GUI_CONFIG_WEATHER_LOCATION_KEY, edLocation.getText());
+        setPropertyIfChanged(GuiConfigService.GUI_CONFIG_CONFIRM_EXIT_KEY, String.valueOf(chbConfirmExit.isSelected()));
+        setPropertyIfChanged(GuiConfigService.GUI_CONFIG_UPDATE_INTERVAL_KEY, String.valueOf(minToMSec(spUpdateInterval.getValue())));
+        String langCode = configService.getLangCode(cbCondLang.getValue());
+        setPropertyIfChanged(GuiConfigService.GUI_CONFIG_CONDITION_LANGUAGE_KEY, langCode);
+    }
+
+    private void setPropertyIfChanged(String key, String value) {
+        String oldProperty = appProps.getProperty(key);
+        if (oldProperty != null && !"".equals(oldProperty) && !oldProperty.equals(value)) {
+            appProps.setProperty(key, value);
+        }
+    }
+
+    private Integer minToMSec(int min) {
+        return min * 60 * 1000;
+    }
+
+    private Integer mSecToMin(int msec) {
+        return Math.round((float) msec / (60 * 1000));
+    }
+}

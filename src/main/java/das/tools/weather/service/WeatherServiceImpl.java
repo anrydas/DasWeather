@@ -40,11 +40,11 @@ public class WeatherServiceImpl implements WeatherService {
     public ForecastWeatherResponse getForecastWeather() {
         Properties props = guiConfig.getCurrentConfig();
         ForecastWeatherResponse response = null;
-        String url = ServletUriComponentsBuilder.fromHttpUrl(props.getProperty("app.weather.forecast.url", ""))
-                .queryParam("key", props.getProperty("app.api-key", ""))
-                .queryParam("q", props.getProperty("app.weather.location", "Kyiv"))
+        String url = ServletUriComponentsBuilder.fromHttpUrl(props.getProperty(GuiConfigService.GUI_CONFIG_FORECAST_URL_KEY, ""))
+                .queryParam("key", props.getProperty(GuiConfigService.GUI_CONFIG_API_KEY_KEY, ""))
+                .queryParam("q", props.getProperty(GuiConfigService.GUI_CONFIG_WEATHER_LOCATION_KEY, "Kyiv"))
                 .queryParam("aqi", "yes")
-                .queryParam("lang", props.getProperty("app.weather.condition.lang", "en"))
+                .queryParam("lang", props.getProperty(GuiConfigService.GUI_CONFIG_CONDITION_LANGUAGE_KEY, "en"))
                 .queryParam("days", "3")
                 .toUriString();
         if(log.isDebugEnabled()) log.debug("[WeatherService].getForecastWeather: got url={}", url);
