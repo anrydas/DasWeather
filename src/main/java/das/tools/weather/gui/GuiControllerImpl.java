@@ -9,7 +9,6 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -27,7 +26,6 @@ import org.springframework.stereotype.Component;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Date;
-import java.util.Properties;
 
 @Component
 @Slf4j
@@ -59,7 +57,7 @@ public class GuiControllerImpl implements GuiController {
     @Autowired
     private WeatherService weatherService;
     @Autowired
-    private GuiConfigService guiConfig;
+    private GuiConfigService configService;
     @Autowired
     private ConfigControllerImpl configController;
     @Autowired
@@ -161,8 +159,8 @@ public class GuiControllerImpl implements GuiController {
 
     @Override
     public void updateWeatherData() {
-        long updateInterval = Long.parseLong(guiConfig.getConfigStringValue(GuiConfigService.GUI_CONFIG_UPDATE_INTERVAL_KEY,
-                guiConfig.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_UPDATE_INTERVAL_KEY)));
+        long updateInterval = Long.parseLong(configService.getConfigStringValue(GuiConfigService.GUI_CONFIG_UPDATE_INTERVAL_KEY,
+                configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_UPDATE_INTERVAL_KEY)));
         if (updateInterval < MINIMAL_UPDATE_INTERVAL) {
             updateInterval = MINIMAL_UPDATE_INTERVAL;
             if (log.isDebugEnabled()) log.debug("Update Interval corrected to {} msec.", MINIMAL_UPDATE_INTERVAL);
