@@ -33,26 +33,23 @@ public class GuiControllerImpl implements GuiController {
     public static final String APPLICATION_TITLE = "Das Weather: %s %s";
     protected static final int MINIMAL_UPDATE_INTERVAL = 1800000;
     private final RemoteDataHolder dataHolder = RemoteDataHolder.builder().build();
-    @FXML
-    private Label lbLocation;
-    @FXML
-    private Label lbCondition;
-    @FXML
-    private Label lbTemperature;
-    @FXML
-    private Label lbAdd1;
-    @FXML
-    private Label lbAdd2;
-    @FXML
-    private Button btUpdate;
-    @FXML
-    private Button btConfig;
-    @FXML
-    private ImageView imgWeather;
-    @FXML
-    private ProgressBar pb;
-    @FXML
-    private ImageView imgConfigure;
+    @FXML public Label lbHumidity;
+    @FXML public Label lbFills;
+    @FXML public Label lbWindSpeed;
+    @FXML public Label lbWindGusts;
+    @FXML public Label lbPrecipitation;
+    @FXML public Label lbPressure;
+    @FXML private Label lbLocation;
+    @FXML private Label lbCondition;
+    @FXML private Label lbTemperature;
+    @FXML private Label lbWindDirection;
+    @FXML private Label lbCloud;
+    @FXML private Button btUpdate;
+    @FXML private Button btConfig;
+    @FXML private ImageView imgWeather;
+    @FXML private ProgressBar pb;
+    @FXML private ImageView imgConfigure;
+    @FXML public ImageView imgWindDirection;
 
     @Autowired
     private WeatherService weatherService;
@@ -80,6 +77,7 @@ public class GuiControllerImpl implements GuiController {
         btConfig.setTooltip(getTooltip("Configure Application"));
         btConfig.setOnAction(actionEvent -> showConfigWindow());
         imgConfigure.setImage(new Image("/images/configure.png"));
+        imgWindDirection.setImage(new Image("/images/wind_arrow.png"));
     }
 
     private void updateControls() {
@@ -115,31 +113,24 @@ public class GuiControllerImpl implements GuiController {
                 updateTime
         )));
 
-        String MSG_TEMPERATURE = "\uD83D\uDD25 %.0f℃ (fills %.0f℃) \uD83C\uDF2B %d％";
-        lbTemperature.setText(String.format(MSG_TEMPERATURE,
-                current.getTemperatureC(),
-                current.getFeelsLike(),
-                current.getHumidity()));
-        lbTemperature.setTooltip(getTooltip("Temperature (Fills like) Humidity"));
+        lbTemperature.setText(String.format("%.0f℃", current.getTemperatureC()));
+        lbFills.setText(String.format("%.0f℃", current.getFeelsLike()));
+        lbHumidity.setText(String.format("%d％", current.getHumidity()));
 
-        String MSG_ADD1 = "\uD83D\uDCA8 %s %.0f (upto %.0f) km/h";
-        lbAdd1.setText(String.format(MSG_ADD1,
-                current.getWindDirection(),
-                current.getWindKmh(),
-                current.getGust()
-        ));
-        lbAdd1.setTooltip(getTooltip("Wind direction, Wind speed (Gusts)"));
+        lbWindDirection.setText(current.getWindDirection());
+        lbWindSpeed.setText(String.format("%.0f km/h", current.getWindKmh()));
+        lbWindGusts.setText(String.format("%.0f km/h", current.getGust()));
 
-        String MSG_ADD2 = "☁ %d％  ☔ %.0f mm \uD83D\uDD3D %.0f mmHg";
-        lbAdd2.setText(String.format(MSG_ADD2,
-                current.getCloud(),
-                current.getPrecipitation(),
-                millibarToMmHg(current.getPressureMb())
-        ));
-        lbAdd2.setTooltip(getTooltip("Cloud, Precipitation, Pressure"));
+        lbCloud.setText(String.format("%d％", current.getCloud()));
+        lbPrecipitation.setText(String.format("%.0f mm", current.getPrecipitation()));
+        lbPressure.setText(String.format("%.0f mmHg", millibarToMmHg(current.getPressureMb())));
+
         btUpdate.setTooltip(getTooltip(String.format("Last Time updated %s",
                 new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm").format(Date.from(dataHolder.getLastUpdatedTimestamp()))
         )));
+
+        imgWindDirection.setRotate(current.getWindDegree());
+        Tooltip.install(imgWindDirection, getTooltip(String.format("Wind direction: %s", current.getWindDirection())));
     }
 
     private void showConfigWindow() {
