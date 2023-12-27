@@ -10,7 +10,7 @@ public abstract class AbstractJavaFxApplicationSupport extends Application {
     protected ConfigurableApplicationContext context;
 
     @Override
-    public void init() throws Exception {
+    public void init() {
         context = SpringApplication.run(getClass(), savedArgs);
         context.getAutowireCapableBeanFactory().autowireBean(this);
     }

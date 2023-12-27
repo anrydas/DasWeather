@@ -28,5 +28,6 @@
   - 4th: ☁ **_Cloud_** % ☔ **Precipitation** mm 🔽 **_Pressure_** nnHg
 - Button:
   - **Update** - to update weather
+  - **Config** - to change Application's config
 
 ###### _Made by -=:dAs:=-_
