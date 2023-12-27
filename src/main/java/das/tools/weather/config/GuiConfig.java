@@ -1,7 +1,6 @@
 package das.tools.weather.config;
 
 import das.tools.weather.gui.ConfigController;
-import das.tools.weather.gui.ConfigControllerImpl;
 import das.tools.weather.gui.GuiController;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
