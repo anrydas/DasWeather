@@ -5,7 +5,6 @@ import das.tools.weather.entity.ForecastWeatherResponse;
 import das.tools.weather.entity.current.WeatherCurrent;
 import das.tools.weather.service.GuiConfigService;
 import das.tools.weather.service.WeatherService;
-import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -131,7 +130,7 @@ public class GuiControllerImpl implements GuiController {
         ));
         lbAdd1.setTooltip(getTooltip("Wind direction, Wind speed (Gusts)"));
 
-        String MSG_ADD2 = "\u2601 %d\uFF05  \u2614 %.0f mm  \uD83D\uDD3D %.0f mmHg";
+        String MSG_ADD2 = "☁ %d％  ☔ %.0f mm \uD83D\uDD3D %.0f mmHg";
         lbAdd2.setText(String.format(MSG_ADD2,
                 current.getCloud(),
                 current.getPrecipitation(),
