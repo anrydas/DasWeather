@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.Properties;
+import java.util.regex.Matcher;
 
 @Component
 @Slf4j
@@ -132,6 +133,7 @@ public class ConfigControllerImpl implements ConfigController {
 
     private boolean isFieldsValid() {
         String msgEmpty = "%s couldn't be empty";
+        String msgNotValid = "%s is not valid";
         if ("".equals(edApiKey.getText())) {
             showError(String.format(msgEmpty, "API key"));
             return false;
@@ -142,6 +144,16 @@ public class ConfigControllerImpl implements ConfigController {
         }
         if ("".equals(edForecastUrl.getText())) {
             showError(String.format(msgEmpty, "Forecast URL"));
+            return false;
+        }
+        Matcher matchKey = API_KEY_PATTERN.matcher(edApiKey.getText());
+        if (!matchKey.find()) {
+            showError(String.format(msgNotValid, "API key"));
+            return false;
+        }
+        matchKey = FORECAST_URL_PATTERN.matcher(edForecastUrl.getText());
+        if (!matchKey.find()) {
+            showError(String.format(msgNotValid, "Forecast URL"));
             return false;
         }
         return true;
