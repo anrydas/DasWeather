@@ -39,6 +39,9 @@ public class GuiControllerImpl implements GuiController {
     @FXML public Label lbWindGusts;
     @FXML public Label lbPrecipitation;
     @FXML public Label lbPressure;
+    @FXML public Label lbVisibility;
+    @FXML public Label lbUvIdx;
+    @FXML public Label lbAirQuality;
     @FXML private Label lbLocation;
     @FXML private Label lbCondition;
     @FXML private Label lbTemperature;
@@ -125,12 +128,24 @@ public class GuiControllerImpl implements GuiController {
         lbPrecipitation.setText(String.format("%.0f mm", current.getPrecipitation()));
         lbPressure.setText(String.format("%.0f mmHg", millibarToMmHg(current.getPressureMb())));
 
+        lbVisibility.setText(String.format("%.0f km", current.getVisibilityKm()));
+        lbUvIdx.setText(String.format("%.00f", current.getUvIndex()));
+        lbUvIdx.setTooltip(getTooltip("0-2 - OK, Green\n3-5 - Yellow, recommended to be inside\n6-7 - Orange\n8-10 - Red\n11+ - Violet, Dangerous"));
+
+        String MSG_AIR_QUALITY = "CO=%.00f,   NO2=%.00f,   O3=%.00f,   SO2=%.00f";
+        lbAirQuality.setText(String.format(MSG_AIR_QUALITY,
+                current.getAirQuality().getCo(),
+                current.getAirQuality().getNo2(),
+                current.getAirQuality().getO3(),
+                current.getAirQuality().getSo2())
+        );
+
         btUpdate.setTooltip(getTooltip(String.format("Last Time updated %s",
                 new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm").format(Date.from(dataHolder.getLastUpdatedTimestamp()))
         )));
 
         imgWindDirection.setRotate(current.getWindDegree());
-        Tooltip.install(imgWindDirection, getTooltip(String.format("Wind direction: %s", current.getWindDirection())));
+        Tooltip.install(imgWindDirection, getTooltip(String.format("Wind direction: %s (%d degree)", current.getWindDirection(), current.getWindDegree())));
     }
 
     private void showConfigWindow() {
