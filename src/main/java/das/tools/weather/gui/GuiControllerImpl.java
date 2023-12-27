@@ -3,6 +3,7 @@ package das.tools.weather.gui;
 import das.tools.weather.config.GuiConfig;
 import das.tools.weather.entity.ForecastWeatherResponse;
 import das.tools.weather.entity.current.WeatherCurrent;
+import das.tools.weather.entity.forecast.WeatherAstro;
 import das.tools.weather.service.GuiConfigService;
 import das.tools.weather.service.WeatherService;
 import javafx.concurrent.Task;
@@ -33,15 +34,25 @@ public class GuiControllerImpl implements GuiController {
     public static final String APPLICATION_TITLE = "Das Weather: %s %s";
     protected static final int MINIMAL_UPDATE_INTERVAL = 1800000;
     private final RemoteDataHolder dataHolder = RemoteDataHolder.builder().build();
-    @FXML public Label lbHumidity;
-    @FXML public Label lbFills;
-    @FXML public Label lbWindSpeed;
-    @FXML public Label lbWindGusts;
-    @FXML public Label lbPrecipitation;
-    @FXML public Label lbPressure;
-    @FXML public Label lbVisibility;
-    @FXML public Label lbUvIdx;
+    @FXML private ImageView imgMoonPhase;
+    @FXML private Label lbMoonPhase;
+    @FXML private Label lbHumidity;
+    @FXML private Label lbFills;
+    @FXML private Label lbWindSpeed;
+    @FXML private Label lbWindGusts;
+    @FXML private Label lbPrecipitation;
+    @FXML private Label lbPressure;
+    @FXML private Label lbVisibility;
+    @FXML private Label lbUvIdx;
     @FXML public Label lbAirQuality;
+    @FXML private ImageView imgSunRise;
+    @FXML private Label lbSunRise;
+    @FXML private ImageView imgSunSet;
+    @FXML private Label lbSunSet;
+    @FXML private ImageView imgMoonRise;
+    @FXML private Label lbMoonRise;
+    @FXML private ImageView imgMoonSet;
+    @FXML private Label lbMoonSet;
     @FXML private Label lbLocation;
     @FXML private Label lbCondition;
     @FXML private Label lbTemperature;
@@ -81,6 +92,10 @@ public class GuiControllerImpl implements GuiController {
         btConfig.setOnAction(actionEvent -> showConfigWindow());
         imgConfigure.setImage(new Image("/images/configure.png"));
         imgWindDirection.setImage(new Image("/images/wind_arrow.png"));
+        imgSunRise.setImage(new Image("/images/sunrise.png"));
+        imgSunSet.setImage(new Image("/images/sunset.png"));
+        imgMoonRise.setImage(new Image("/images/moonrise.png"));
+        imgMoonSet.setImage(new Image("/images/moonset.png"));
     }
 
     private void updateControls() {
@@ -140,12 +155,24 @@ public class GuiControllerImpl implements GuiController {
                 current.getAirQuality().getSo2())
         );
 
+        WeatherAstro currentAstro = this.dataHolder.getResponse().getForecast().getDayForecast()[0].getAstro();
+        lbSunRise.setText(currentAstro.getSunRise());
+        lbSunSet.setText(currentAstro.getSunSet());
+        lbMoonRise.setText(currentAstro.getMoonRise());
+        imgMoonPhase.setImage(new Image(getMoonPhaseImageName(currentAstro.getMoonPhase())));
+        lbMoonPhase.setText(currentAstro.getMoonPhase());
+        lbMoonSet.setText(currentAstro.getMoonSet());
+
         btUpdate.setTooltip(getTooltip(String.format("Last Time updated %s",
                 new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm").format(Date.from(dataHolder.getLastUpdatedTimestamp()))
         )));
 
         imgWindDirection.setRotate(current.getWindDegree());
         Tooltip.install(imgWindDirection, getTooltip(String.format("Wind direction: %s (%d degree)", current.getWindDirection(), current.getWindDegree())));
+    }
+
+    private String getMoonPhaseImageName(String phase) {
+        return "/images/moon/" + phase.toLowerCase().replace(" ", "-") + ".png";
     }
 
     private void showConfigWindow() {
