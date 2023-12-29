@@ -162,6 +162,9 @@ public class GuiControllerImpl implements GuiController {
         imgMoonPhase.setImage(new Image(getMoonPhaseImageName(currentAstro.getMoonPhase())));
         lbMoonPhase.setText(currentAstro.getMoonPhase());
         lbMoonSet.setText(currentAstro.getMoonSet());
+        Tooltip moonPhaseTooltip = getTooltip(currentAstro.getMoonPhase());
+        Tooltip.install(imgMoonPhase, moonPhaseTooltip);
+        lbMoonPhase.setTooltip(moonPhaseTooltip);
 
         btUpdate.setTooltip(getTooltip(String.format("Last Time updated %s",
                 new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm").format(Date.from(dataHolder.getLastUpdatedTimestamp()))
