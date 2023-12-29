@@ -126,11 +126,14 @@
                        <Label fx:id="lbMoonRise" />
                    </VBox>
                    <VBox alignment="CENTER" layoutX="178.0" layoutY="10.0">
-                       <ImageView fx:id="imgMoonPhase" fitHeight="64.0" fitWidth="64.0" pickOnBounds="true" preserveRatio="true">
+                       <ImageView fx:id="imgMoonPhase" fitHeight="51.0" fitWidth="64.0" pickOnBounds="true" preserveRatio="true">
                         <VBox.margin>
                            <Insets />
                         </VBox.margin></ImageView>
-                       <Label fx:id="lbMoonPhase" />
+                       <Label fx:id="lbMoonPhase" alignment="CENTER" prefHeight="33.0" prefWidth="64.0" textAlignment="CENTER" wrapText="true">
+                        <font>
+                           <Font size="10.0" />
+                        </font></Label>
                    </VBox>
                   <VBox alignment="CENTER" layoutX="267.0" layoutY="10.0">
                      <children>
