@@ -4,6 +4,7 @@ import das.tools.weather.config.GuiConfig;
 import das.tools.weather.entity.ForecastWeatherResponse;
 import das.tools.weather.entity.current.WeatherCurrent;
 import das.tools.weather.entity.forecast.WeatherAstro;
+import das.tools.weather.entity.forecast.WeatherDayForecast;
 import das.tools.weather.service.GuiConfigService;
 import das.tools.weather.service.WeatherService;
 import javafx.concurrent.Task;
@@ -26,6 +27,8 @@ import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 @Component
@@ -34,6 +37,15 @@ public class GuiControllerImpl implements GuiController {
     public static final String APPLICATION_TITLE = "Das Weather: %s %s";
     protected static final int MINIMAL_UPDATE_INTERVAL = 1800000;
     private final RemoteDataHolder dataHolder = RemoteDataHolder.builder().build();
+    @FXML private Label lbForecastCond03;
+    @FXML private Label lbForecastCond02;
+    @FXML private Label lbForecastCond01;
+    @FXML private ImageView imgForecast01;
+    @FXML private Label lbForecast01;
+    @FXML private ImageView imgForecast02;
+    @FXML private Label lbgForecast02;
+    @FXML private ImageView imgForecast03;
+    @FXML private Label lbgForecast03;
     @FXML private ImageView imgMoonPhase;
     @FXML private Label lbMoonPhase;
     @FXML private Label lbHumidity;
@@ -155,6 +167,72 @@ public class GuiControllerImpl implements GuiController {
                 current.getAirQuality().getSo2())
         );
 
+        fillAstro();
+        fillForecast();
+
+        btUpdate.setTooltip(getTooltip(String.format("Last Time updated %s",
+                new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm").format(Date.from(dataHolder.getLastUpdatedTimestamp()))
+        )));
+
+        imgWindDirection.setRotate(current.getWindDegree());
+        Tooltip.install(imgWindDirection, getTooltip(String.format("Wind direction: %s (%d degree)", current.getWindDirection(), current.getWindDegree())));
+    }
+
+    private void fillForecast() {
+        imgForecast01.setImage(this.dataHolder.getImage());
+        imgForecast02.setImage(this.dataHolder.getImageForecast1());
+        imgForecast03.setImage(this.dataHolder.getImageForecast2());
+
+        WeatherDayForecast[] dayForecasts = this.dataHolder.getResponse().getForecast().getDayForecast();
+        DateTimeFormatter formatterForView = DateTimeFormatter.ofPattern("dd-MMM-yyyy");
+        DateTimeFormatter formatterForResponse = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        lbForecast01.setText(formatterForView.format(LocalDate.now()));
+        LocalDate dt1 = LocalDate.parse(dayForecasts[1].getDate(), formatterForResponse);
+        lbgForecast02.setText(formatterForView.format(dt1));
+        LocalDate dt2 = LocalDate.parse(dayForecasts[2].getDate(), formatterForResponse);
+        lbgForecast03.setText(formatterForView.format(dt2));
+
+        final String TOOLTIP_TEXT = "%s\nfrom %.0f℃ to %.0f℃";
+        Tooltip.install(imgForecast01, getTooltip(String.format(
+                TOOLTIP_TEXT,
+                this.dataHolder.getResponse().getCurrent().getCondition().getText(),
+                dayForecasts[0].getDay().getMaxTempC(),
+                dayForecasts[0].getDay().getMinTempC()
+                ))
+        );
+        Tooltip.install(imgForecast02, getTooltip(String.format(
+                TOOLTIP_TEXT,
+                dayForecasts[1].getDay().getCondition().getText(),
+                dayForecasts[1].getDay().getMaxTempC(),
+                dayForecasts[1].getDay().getMinTempC()
+                ))
+        );
+        Tooltip.install(imgForecast03, getTooltip(String.format(
+                TOOLTIP_TEXT,
+                dayForecasts[2].getDay().getCondition().getText(),
+                dayForecasts[2].getDay().getMaxTempC(),
+                dayForecasts[2].getDay().getMinTempC()
+        )));
+
+        final String LABEL_TEXT = "%.0f℃ to %.0f℃";
+        lbForecastCond01.setText(String.format(
+                LABEL_TEXT,
+                dayForecasts[0].getDay().getMaxTempC(),
+                dayForecasts[0].getDay().getMinTempC()
+        ));
+        lbForecastCond02.setText(String.format(
+                LABEL_TEXT,
+                dayForecasts[1].getDay().getMaxTempC(),
+                dayForecasts[1].getDay().getMinTempC()
+        ));
+        lbForecastCond03.setText(String.format(
+                LABEL_TEXT,
+                dayForecasts[2].getDay().getMaxTempC(),
+                dayForecasts[2].getDay().getMinTempC()
+        ));
+    }
+
+    private void fillAstro() {
         WeatherAstro currentAstro = this.dataHolder.getResponse().getForecast().getDayForecast()[0].getAstro();
         lbSunRise.setText(currentAstro.getSunRise());
         lbSunSet.setText(currentAstro.getSunSet());
@@ -165,13 +243,6 @@ public class GuiControllerImpl implements GuiController {
         Tooltip moonPhaseTooltip = getTooltip(currentAstro.getMoonPhase());
         Tooltip.install(imgMoonPhase, moonPhaseTooltip);
         lbMoonPhase.setTooltip(moonPhaseTooltip);
-
-        btUpdate.setTooltip(getTooltip(String.format("Last Time updated %s",
-                new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm").format(Date.from(dataHolder.getLastUpdatedTimestamp()))
-        )));
-
-        imgWindDirection.setRotate(current.getWindDegree());
-        Tooltip.install(imgWindDirection, getTooltip(String.format("Wind direction: %s (%d degree)", current.getWindDirection(), current.getWindDegree())));
     }
 
     private String getMoonPhaseImageName(String phase) {
@@ -241,10 +312,16 @@ public class GuiControllerImpl implements GuiController {
                 pb.setVisible(true);
                 updateProgress(10, MAX_VALUE);
                 dataHolder.setResponse(weatherService.getForecastWeather());
-                updateProgress(40, MAX_VALUE);
+                updateProgress(20, MAX_VALUE);
                 Thread.sleep(10);
                 dataHolder.setImage(weatherService.getRemoteImage(dataHolder.getResponse().getCurrent().getCondition().getIcon()));
                 dataHolder.setLastUpdatedTimestamp(Instant.now());
+                updateProgress(30, MAX_VALUE);
+                Thread.sleep(10);
+                dataHolder.setImageForecast1(weatherService.getRemoteImage(dataHolder.getResponse().getForecast().getDayForecast()[1].getDay().getCondition().getIcon()));
+                updateProgress(40, MAX_VALUE);
+                Thread.sleep(10);
+                dataHolder.setImageForecast2(weatherService.getRemoteImage(dataHolder.getResponse().getForecast().getDayForecast()[2].getDay().getCondition().getIcon()));
                 updateProgress(60, MAX_VALUE);
                 Thread.sleep(10);
                 updateProgress(80, MAX_VALUE);
@@ -277,5 +354,7 @@ public class GuiControllerImpl implements GuiController {
         private ForecastWeatherResponse response;
         private Image image;
         private Instant lastUpdatedTimestamp;
+        private Image imageForecast1;
+        private Image imageForecast2;
     }
 }
