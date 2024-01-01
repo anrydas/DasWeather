@@ -28,6 +28,8 @@
   - 4th: 💨 **Wind Direction** (with arrow) **Wind Speed** km/h **Wind Gust** km/h
   - 5th: **Visibility** km **Ultra Violet Index** (with tooltip)
   - 6th: **Air Quality:**
+  - 7th: **Sun Rise** **Sun Set** **Moon Rise** **Moon Phase** **Moon Set**
+  - 8th: **Weather Forecast**
 - Button:
   - **Update** - to update weather data
   - **Config** - to change Application's config
