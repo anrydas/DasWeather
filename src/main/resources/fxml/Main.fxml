@@ -46,26 +46,6 @@
             </Label>
         </HBox>
         <HBox id="HBox" alignment="CENTER" prefHeight="38.0" prefWidth="250.0" spacing="5.0">
-            <Label alignment="CENTER_RIGHT" prefHeight="21.0" prefWidth="149.0" text="Wind: " textAlignment="CENTER" />
-            <Label fx:id="lbWindDirection" prefHeight="21.0" prefWidth="155.0" text="NNW" textAlignment="CENTER">
-                <font>
-                    <Font size="18.0" />
-                </font>
-            </Label>
-            <Label alignment="TOP_RIGHT" contentDisplay="CENTER" prefHeight="16.0" prefWidth="176.0" text="Speed: " textAlignment="CENTER" />
-            <Label fx:id="lbWindSpeed" contentDisplay="RIGHT" prefHeight="21.0" prefWidth="193.0" text="20 km/h" textAlignment="CENTER">
-                <font>
-                    <Font size="18.0" />
-                </font>
-            </Label>
-            <Label alignment="TOP_RIGHT" contentDisplay="CENTER" prefHeight="16.0" prefWidth="152.0" text="Upto: " textAlignment="CENTER" />
-            <Label fx:id="lbWindGusts" prefHeight="21.0" prefWidth="203.0" text="20 km/h" textAlignment="CENTER">
-                <font>
-                    <Font size="18.0" />
-                </font>
-            </Label>
-        </HBox>
-        <HBox id="HBox" alignment="CENTER" prefHeight="38.0" prefWidth="250.0" spacing="5.0">
             <Label alignment="TOP_RIGHT" contentDisplay="CENTER" prefHeight="16.0" prefWidth="127.0" text="Cloud: " textAlignment="CENTER" />
             <Label fx:id="lbCloud" prefHeight="21.0" prefWidth="138.0" text="100%" textAlignment="CENTER">
                 <font>
@@ -80,6 +60,29 @@
             </Label>
             <Label alignment="TOP_RIGHT" contentDisplay="CENTER" prefHeight="16.0" prefWidth="152.0" text="Pressure: " textAlignment="CENTER" />
             <Label fx:id="lbPressure" prefHeight="21.0" prefWidth="181.0" text="760 mmHg" textAlignment="CENTER">
+                <font>
+                    <Font size="18.0" />
+                </font>
+            </Label>
+        </HBox>
+        <HBox id="HBox" alignment="CENTER" prefHeight="38.0" prefWidth="250.0" spacing="5.0">
+            <Label alignment="CENTER_RIGHT" prefHeight="21.0" prefWidth="149.0" text="Wind: " textAlignment="CENTER" />
+            <Label fx:id="lbWindDirection" prefHeight="21.0" prefWidth="146.0" text="NNW" textAlignment="CENTER">
+                <font>
+                    <Font size="18.0" />
+                </font>
+            </Label>
+            <ImageView fx:id="imgWindDirection" fitHeight="26.0" fitWidth="14.0">
+                <Image url="@/images/wind_arrow.png" />
+            </ImageView>
+            <Label alignment="TOP_RIGHT" contentDisplay="CENTER" prefHeight="16.0" prefWidth="176.0" text="Speed: " textAlignment="CENTER" />
+            <Label fx:id="lbWindSpeed" contentDisplay="RIGHT" prefHeight="21.0" prefWidth="193.0" text="20 km/h" textAlignment="CENTER">
+                <font>
+                    <Font size="18.0" />
+                </font>
+            </Label>
+            <Label alignment="TOP_RIGHT" contentDisplay="CENTER" prefHeight="16.0" prefWidth="152.0" text="Upto: " textAlignment="CENTER" />
+            <Label fx:id="lbWindGusts" prefHeight="21.0" prefWidth="203.0" text="20 km/h" textAlignment="CENTER">
                 <font>
                     <Font size="18.0" />
                 </font>
@@ -205,9 +208,6 @@
                 <padding>
                     <Insets top="10.0" />
                 </padding>
-                <left>
-                    <ImageView fx:id="imgWindDirection" fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER" />
-                </left>
             </BorderPane>
         </children>
     </VBox>
