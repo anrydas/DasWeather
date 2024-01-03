@@ -337,8 +337,10 @@ public class GuiControllerImpl implements GuiController {
             updateControls();
         });
         task.setOnFailed(e -> {
+            pb.setVisible(false);
+            btUpdate.setDisable(false);
             Alert alert = new Alert(Alert.AlertType.ERROR,
-                    "There was error loading weather data.\nPlease try again later.",
+                    task.getException().getCause().getLocalizedMessage(),
                     ButtonType.OK);
             alert.show();
         });
