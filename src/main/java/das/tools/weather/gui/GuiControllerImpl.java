@@ -26,9 +26,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Date;
 
 @Component
@@ -36,6 +39,10 @@ import java.util.Date;
 public class GuiControllerImpl implements GuiController {
     public static final String APPLICATION_TITLE = "Das Weather: %s %s";
     protected static final int MINIMAL_UPDATE_INTERVAL = 1800000;
+    protected static final DateTimeFormatter DATE_FORMATTER_FOR_RESPONSE = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    protected static final DateTimeFormatter DATE_FORMATTER_FOR_VIEW = DateTimeFormatter.ofPattern("dd-MMM-yyyy");
+    protected static final DateTimeFormatter TIME_FORMATTER_FOR_RESPONSE = DateTimeFormatter.ofPattern("hh:mm a");
+    protected static final DateTimeFormatter TIME_FORMATTER_FOR_VIEW = DateTimeFormatter.ofPattern("HH:mm");
     private final RemoteDataHolder dataHolder = RemoteDataHolder.builder().build();
     @FXML private Label lbForecastCond03;
     @FXML private Label lbForecastCond02;
@@ -184,13 +191,11 @@ public class GuiControllerImpl implements GuiController {
         imgForecast03.setImage(this.dataHolder.getImageForecast2());
 
         WeatherDayForecast[] dayForecasts = this.dataHolder.getResponse().getForecast().getDayForecast();
-        DateTimeFormatter formatterForView = DateTimeFormatter.ofPattern("dd-MMM-yyyy");
-        DateTimeFormatter formatterForResponse = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        lbForecast01.setText(formatterForView.format(LocalDate.now()));
-        LocalDate dt1 = LocalDate.parse(dayForecasts[1].getDate(), formatterForResponse);
-        lbgForecast02.setText(formatterForView.format(dt1));
-        LocalDate dt2 = LocalDate.parse(dayForecasts[2].getDate(), formatterForResponse);
-        lbgForecast03.setText(formatterForView.format(dt2));
+        lbForecast01.setText(DATE_FORMATTER_FOR_VIEW.format(LocalDate.now()));
+        LocalDate dt1 = LocalDate.parse(dayForecasts[1].getDate(), DATE_FORMATTER_FOR_RESPONSE);
+        lbgForecast02.setText(DATE_FORMATTER_FOR_VIEW.format(dt1));
+        LocalDate dt2 = LocalDate.parse(dayForecasts[2].getDate(), DATE_FORMATTER_FOR_RESPONSE);
+        lbgForecast03.setText(DATE_FORMATTER_FOR_VIEW.format(dt2));
 
         final String TOOLTIP_TEXT = "%s\nfrom %.0f℃ to %.0f℃";
         Tooltip.install(imgForecast01, getTooltip(String.format(
@@ -234,15 +239,43 @@ public class GuiControllerImpl implements GuiController {
 
     private void fillAstro() {
         WeatherAstro currentAstro = this.dataHolder.getResponse().getForecast().getDayForecast()[0].getAstro();
-        lbSunRise.setText(currentAstro.getSunRise());
-        lbSunSet.setText(currentAstro.getSunSet());
-        lbMoonRise.setText(currentAstro.getMoonRise());
+        lbSunRise.setText(getProperlyFormattedTime(currentAstro.getSunRise()));
+        lbSunSet.setText(getProperlyFormattedTime(currentAstro.getSunSet()));
+        Tooltip dayLength = getTooltip(String.format("Day length: %s", getTimeLength(currentAstro.getSunRise(), currentAstro.getSunSet())));
+        lbSunRise.setTooltip(dayLength);
+        lbSunSet.setTooltip(dayLength);
+        Tooltip.install(imgSunRise, dayLength);
+        Tooltip.install(imgSunSet, dayLength);
+
+        lbMoonRise.setText(getProperlyFormattedTime(currentAstro.getMoonRise()));
         imgMoonPhase.setImage(new Image(getMoonPhaseImageName(currentAstro.getMoonPhase())));
         lbMoonPhase.setText(currentAstro.getMoonPhase());
-        lbMoonSet.setText(currentAstro.getMoonSet());
+        lbMoonSet.setText(getProperlyFormattedTime(currentAstro.getMoonSet()));
         Tooltip moonPhaseTooltip = getTooltip(currentAstro.getMoonPhase());
         Tooltip.install(imgMoonPhase, moonPhaseTooltip);
         lbMoonPhase.setTooltip(moonPhaseTooltip);
+    }
+
+    private String getProperlyFormattedTime(String time) {
+        String res;
+        try {
+            LocalTime dt = LocalTime.parse(time, TIME_FORMATTER_FOR_RESPONSE);
+            res = TIME_FORMATTER_FOR_VIEW.format(dt);
+            log.debug("got formatted time: {}", res);
+        } catch (DateTimeParseException e) {
+            log.error("Time formatting error: ", e);
+            res = "n/a";
+        }
+        return res;
+    }
+
+    private String getTimeLength(String start, String end) {
+        LocalTime startTime = LocalTime.parse(start, TIME_FORMATTER_FOR_RESPONSE);
+        LocalTime endTime = LocalTime.parse(end, TIME_FORMATTER_FOR_RESPONSE);
+        long diff = Duration.between(startTime, endTime).getSeconds();
+        long hours = diff / (60 * 60) % 24;
+        long minutes = diff / (60) % 60;
+        return String.format("%02d:%02d", hours, minutes);
     }
 
     private String getMoonPhaseImageName(String phase) {
