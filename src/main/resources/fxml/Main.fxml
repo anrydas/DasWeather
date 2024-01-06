@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane prefHeight="510.0" prefWidth="521.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="das.tools.weather.gui.GuiControllerImpl">
+<AnchorPane prefHeight="510.0" prefWidth="521.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="das.tools.weather.gui.GuiControllerImpl">
     <VBox layoutX="10.0" layoutY="14.0" prefHeight="388.0" prefWidth="501.0" spacing="5.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="14.0">
         <HBox id="HBox" alignment="CENTER_LEFT" prefHeight="38.0" prefWidth="250.0" spacing="5.0">
             <VBox alignment="CENTER" prefHeight="60.0" prefWidth="136.0">
@@ -152,8 +152,8 @@
         </VBox>
         <VBox alignment="CENTER" layoutX="10.0" layoutY="10.0">
             <Label fx:id="lbForecast01" />
-            <ImageView fx:id="imgForecast01" fitHeight="55.0" fitWidth="64.0" pickOnBounds="true" preserveRatio="true" />
-            <Label fx:id="lbForecastCond01" alignment="CENTER" prefWidth="64.0" textAlignment="CENTER">
+            <ImageView fx:id="imgForecast01" fitHeight="55.0" fitWidth="82.0" pickOnBounds="true" preserveRatio="true" />
+            <Label fx:id="lbForecastCond01" alignment="CENTER" prefWidth="82.0" textAlignment="CENTER">
                 <font>
                     <Font size="10.0" />
                 </font>
@@ -161,8 +161,8 @@
         </VBox>
         <VBox alignment="CENTER" layoutX="94.0" layoutY="10.0">
             <Label fx:id="lbgForecast02" />
-            <ImageView fx:id="imgForecast02" fitHeight="55.0" fitWidth="64.0" pickOnBounds="true" preserveRatio="true" />
-            <Label fx:id="lbForecastCond02" alignment="CENTER" prefWidth="64.0" textAlignment="CENTER">
+            <ImageView fx:id="imgForecast02" fitHeight="55.0" fitWidth="82.0" pickOnBounds="true" preserveRatio="true" />
+            <Label fx:id="lbForecastCond02" alignment="CENTER" prefWidth="82.0" textAlignment="CENTER">
                 <font>
                     <Font size="10.0" />
                 </font>
@@ -170,8 +170,8 @@
         </VBox>
             <VBox alignment="CENTER" layoutX="267.0" layoutY="10.0">
                 <Label fx:id="lbgForecast03" />
-                <ImageView fx:id="imgForecast03" fitHeight="55.0" fitWidth="64.0" pickOnBounds="true" preserveRatio="true" />
-                <Label fx:id="lbForecastCond03" alignment="CENTER" prefWidth="64.0" textAlignment="CENTER">
+                <ImageView fx:id="imgForecast03" fitHeight="55.0" fitWidth="82.0" pickOnBounds="true" preserveRatio="true" />
+                <Label fx:id="lbForecastCond03" alignment="CENTER" prefWidth="82.0" textAlignment="CENTER">
                     <font>
                         <Font size="10.0" />
                     </font>
