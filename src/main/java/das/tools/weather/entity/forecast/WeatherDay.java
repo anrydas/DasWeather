@@ -37,6 +37,8 @@ public class WeatherDay {
     float maxWindKmh;
     @JsonProperty("totalprecip_mm")
     float totalPrecipitation;
+    @JsonProperty("totalsnow_cm")
+    float totalSnow;
     @JsonProperty("uv")
     float uvIndex;
 }

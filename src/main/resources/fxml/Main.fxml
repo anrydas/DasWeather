@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane prefHeight="510.0" prefWidth="521.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="das.tools.weather.gui.GuiControllerImpl">
+<AnchorPane prefHeight="510.0" prefWidth="521.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="das.tools.weather.gui.GuiControllerImpl">
     <VBox layoutX="10.0" layoutY="14.0" prefHeight="388.0" prefWidth="501.0" spacing="5.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="14.0">
         <HBox id="HBox" alignment="CENTER_LEFT" prefHeight="38.0" prefWidth="250.0" spacing="5.0">
             <VBox alignment="CENTER" prefHeight="60.0" prefWidth="136.0">
@@ -52,13 +52,19 @@
                     <Font size="18.0" />
                 </font>
             </Label>
-            <Label alignment="TOP_RIGHT" contentDisplay="CENTER" prefHeight="16.0" prefWidth="183.0" text="Precipitation: " textAlignment="CENTER" />
-            <Label fx:id="lbPrecipitation" prefHeight="21.0" prefWidth="159.0" text="100 mm" textAlignment="CENTER">
+            <!--<Label alignment="CENTER_RIGHT" contentDisplay="CENTER" prefHeight="18.0" prefWidth="139.0" text="Precipitation: " textAlignment="CENTER">
+            <font>
+               <Font size="10.0" />
+            </font></Label>-->
+            <ImageView fx:id="imgPrecipitation" fitHeight="26.0" fitWidth="32.0">
+                <Image url="@/images/precip/snow.png" />
+            </ImageView>
+            <Label fx:id="lbPrecipitation" prefHeight="27.0" prefWidth="151.0" text="100 mm" textAlignment="CENTER">
                 <font>
                     <Font size="18.0" />
                 </font>
             </Label>
-            <Label alignment="TOP_RIGHT" contentDisplay="CENTER" prefHeight="16.0" prefWidth="152.0" text="Pressure: " textAlignment="CENTER" />
+            <Label alignment="TOP_RIGHT" contentDisplay="CENTER" prefHeight="18.0" prefWidth="139.0" text="Pressure: " textAlignment="CENTER" />
             <Label fx:id="lbPressure" prefHeight="21.0" prefWidth="181.0" text="760 mmHg" textAlignment="CENTER">
                 <font>
                     <Font size="18.0" />
