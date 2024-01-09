@@ -4,6 +4,7 @@ import das.tools.weather.config.GuiConfig;
 import das.tools.weather.entity.ForecastWeatherResponse;
 import das.tools.weather.entity.current.WeatherCurrent;
 import das.tools.weather.entity.forecast.WeatherAstro;
+import das.tools.weather.entity.forecast.WeatherDay;
 import das.tools.weather.entity.forecast.WeatherDayForecast;
 import das.tools.weather.service.GuiConfigService;
 import das.tools.weather.service.WeatherService;
@@ -15,6 +16,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import lombok.AllArgsConstructor;
@@ -32,7 +34,10 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.Map;
+import java.util.Objects;
 
 @Component
 @Slf4j
@@ -44,6 +49,7 @@ public class GuiControllerImpl implements GuiController {
     protected static final DateTimeFormatter TIME_FORMATTER_FOR_RESPONSE = DateTimeFormatter.ofPattern("hh:mm a");
     protected static final DateTimeFormatter TIME_FORMATTER_FOR_VIEW = DateTimeFormatter.ofPattern("HH:mm");
     private final RemoteDataHolder dataHolder = RemoteDataHolder.builder().build();
+    @FXML private ImageView imgPrecipitation;
     @FXML private Label lbForecastCond03;
     @FXML private Label lbForecastCond02;
     @FXML private Label lbForecastCond01;
@@ -94,6 +100,26 @@ public class GuiControllerImpl implements GuiController {
     private GuiConfig.ViewHolder guiConfigView;
 
     private Scene configScene;
+
+    static {
+        Map<String,String> mapDirection = WIND_DIRECTIONS;
+        mapDirection.put("N", "North");
+        mapDirection.put("NNE", "North-Northeast");
+        mapDirection.put("NE", "Northeast");
+        mapDirection.put("ENE", "East-Northeast");
+        mapDirection.put("E", "East");
+        mapDirection.put("ESE", "East-Southeast");
+        mapDirection.put("SE", "Southeast");
+        mapDirection.put("SSE", "South-Southeast");
+        mapDirection.put("S", "South");
+        mapDirection.put("SSW", "South-Southwest");
+        mapDirection.put("SW", "Southwest");
+        mapDirection.put("WSW", "West-Southwest");
+        mapDirection.put("W", "West");
+        mapDirection.put("WNW", "West-Northwest");
+        mapDirection.put("NW", "Northwest");
+        mapDirection.put("NNW", "North-Northwest");
+    }
 
     public GuiControllerImpl() {
     }
@@ -154,12 +180,10 @@ public class GuiControllerImpl implements GuiController {
         lbFills.setText(String.format("%.0f℃", current.getFeelsLike()));
         lbHumidity.setText(String.format("%d％", current.getHumidity()));
 
-        lbWindDirection.setText(current.getWindDirection());
-        lbWindSpeed.setText(String.format("%.0f km/h", current.getWindKmh()));
-        lbWindGusts.setText(String.format("%.0f km/h", current.getGust()));
+        fillWind();
 
         lbCloud.setText(String.format("%d％", current.getCloud()));
-        lbPrecipitation.setText(String.format("%.0f mm", current.getPrecipitation()));
+        fillPrecipitation();
         lbPressure.setText(String.format("%.0f mmHg", millibarToMmHg(current.getPressureMb())));
 
         lbVisibility.setText(String.format("%.0f km", current.getVisibilityKm()));
@@ -180,9 +204,69 @@ public class GuiControllerImpl implements GuiController {
         btUpdate.setTooltip(getTooltip(String.format("Last Time updated %s",
                 new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm").format(Date.from(dataHolder.getLastUpdatedTimestamp()))
         )));
+    }
+
+    private void fillWind() {
+        WeatherCurrent current = this.dataHolder.getResponse().getCurrent();
+
+        lbWindDirection.setText(current.getWindDirection());
+        lbWindSpeed.setText(String.format("%.0f km/h", current.getWindKmh()));
+        lbWindGusts.setText(String.format("%.0f km/h", current.getGust()));
 
         imgWindDirection.setRotate(current.getWindDegree());
-        Tooltip.install(imgWindDirection, getTooltip(String.format("Wind direction: %s (%d degree)", current.getWindDirection(), current.getWindDegree())));
+        Tooltip tooltip = getTooltip(String.format("Wind direction: %s - %s wind (%d degree)",
+                current.getWindDirection(),
+                getWindDirection(current.getWindDirection()),
+                current.getWindDegree()));
+
+        lbWindDirection.setTooltip(tooltip);
+        Tooltip.install(imgWindDirection, tooltip);
+    }
+
+    private String getWindDirection(String s) {
+        return WIND_DIRECTIONS.get(s);
+    }
+
+    private void fillPrecipitation() {
+        WeatherDay day = this.dataHolder.getResponse().getForecast().getDayForecast()[0].getDay();
+
+        float totalPrecipitation = day.getTotalPrecipitation();
+        float totalSnow = day.getTotalSnow();
+        imgPrecipitation.setImage(null);
+        Image image = new Image(Objects.requireNonNull(this.getClass().getResourceAsStream(getPrecipitationImageResourceFileName(day))));
+        imgPrecipitation.setImage(image);
+
+        if (totalPrecipitation > 0 && totalSnow > 0) {
+            lbPrecipitation.setText(String.format("%.0f/%.0f", totalPrecipitation, totalSnow));
+        } else if (totalPrecipitation > 0 && totalSnow <= 0) {
+            lbPrecipitation.setText(String.format("%.0f mm", totalPrecipitation));
+        } else if (totalPrecipitation <= 0 && totalSnow > 0) {
+            lbPrecipitation.setText(String.format("%.0f cm", totalSnow));
+        } else {
+            lbPrecipitation.setText("0 mm");
+        }
+
+        Tooltip tooltip = getTooltip(String.format("Precipitation:\nRain: %.0f mm\nShow: %.0f cm", totalPrecipitation, totalSnow));
+        tooltip.setTextAlignment(TextAlignment.RIGHT);
+        tooltip.setGraphic(new ImageView(image));
+        lbPrecipitation.setTooltip(tooltip);
+        Tooltip.install(imgPrecipitation, tooltip);
+    }
+
+    private String getPrecipitationImageResourceFileName(WeatherDay day) {
+        String res;
+        boolean isWillRain = day.isWillBeRain();
+        boolean isWillSnow = day.isWillBeSnow();
+        if (isWillRain && isWillSnow) {
+            res ="/images/precip/snow_and_rain.png";
+        } else if (!isWillRain && isWillSnow) {
+            res = "/images/precip/snow.png";
+        } else if (isWillRain && !isWillSnow) {
+            res = "/images/precip/rain.png";
+        } else {
+            res = "/images/precip/no_precipitation_1.png";
+        }
+        return res;
     }
 
     private void fillForecast() {
