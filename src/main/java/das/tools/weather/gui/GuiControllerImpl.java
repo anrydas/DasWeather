@@ -49,6 +49,11 @@ public class GuiControllerImpl implements GuiController {
     protected static final DateTimeFormatter TIME_FORMATTER_FOR_RESPONSE = DateTimeFormatter.ofPattern("hh:mm a");
     protected static final DateTimeFormatter TIME_FORMATTER_FOR_VIEW = DateTimeFormatter.ofPattern("HH:mm");
     private final RemoteDataHolder dataHolder = RemoteDataHolder.builder().build();
+    @FXML private ImageView imgWind;
+    @FXML private ImageView imgHumidity;
+    @FXML private ImageView imgTemperature;
+    @FXML private ImageView imgPressure;
+    @FXML private ImageView imgCloud;
     @FXML private ImageView imgPrecipitation;
     @FXML private Label lbForecastCond03;
     @FXML private Label lbForecastCond02;
@@ -145,46 +150,26 @@ public class GuiControllerImpl implements GuiController {
 
     private void updateControls() {
         WeatherCurrent current = this.dataHolder.getResponse().getCurrent();
-        String updateDate = current.getLastUpdate().split(" ")[0];
-        String updateTime = current.getLastUpdate().split(" ")[1];
 
         Stage stage = (Stage) lbLocation.getScene().getWindow();
         stage.getIcons().clear();
         stage.getIcons().add(this.dataHolder.getImage());
-
-        imgWeather.setImage(this.dataHolder.getImage());
-        String conditionText = current.getCondition().getText();
-        Tooltip.install(imgWeather, getTooltip(conditionText));
-
-        lbCondition.setText(conditionText);
-        lbCondition.setTooltip(getTooltip(conditionText));
         stage.setTitle(String.format(APPLICATION_TITLE,
                 this.dataHolder.getResponse().getLocation().getName(),
                 current.getLastUpdate()
         ));
 
-        String MSG_LOCATION = "%s %s at %s";
-        lbLocation.setText(String.format(MSG_LOCATION,
-                this.dataHolder.getResponse().getLocation().getName(),
-                updateDate,
-                updateTime
-        ));
-        lbLocation.setTooltip(getTooltip(String.format("%s, %s %s at %s",
-                this.dataHolder.getResponse().getLocation().getName(),
-                this.dataHolder.getResponse().getLocation().getRegion(),
-                updateDate,
-                updateTime
-        )));
+        fillConditions();
+        fillLocation();
 
-        lbTemperature.setText(String.format("%.0f℃", current.getTemperatureC()));
-        lbFills.setText(String.format("%.0f℃", current.getFeelsLike()));
-        lbHumidity.setText(String.format("%d％", current.getHumidity()));
+        fillTemperature();
+        fillHumidity();
+
+        fillCloud();
+        fillPrecipitation();
+        fillPressure();
 
         fillWind();
-
-        lbCloud.setText(String.format("%d％", current.getCloud()));
-        fillPrecipitation();
-        lbPressure.setText(String.format("%.0f mmHg", millibarToMmHg(current.getPressureMb())));
 
         lbVisibility.setText(String.format("%.0f km", current.getVisibilityKm()));
         lbUvIdx.setText(String.format("%.00f", current.getUvIndex()));
@@ -206,6 +191,94 @@ public class GuiControllerImpl implements GuiController {
         )));
     }
 
+    private void fillLocation() {
+        WeatherCurrent current = this.dataHolder.getResponse().getCurrent();
+        String updateDate = current.getLastUpdate().split(" ")[0];
+        String updateTime = current.getLastUpdate().split(" ")[1];
+        String MSG_LOCATION = "%s %s at %s";
+        lbLocation.setText(String.format(MSG_LOCATION,
+                this.dataHolder.getResponse().getLocation().getName(),
+                updateDate,
+                updateTime
+        ));
+        Tooltip tooltip = getTooltip(String.format("In %s, %s %s at %s\nthe weather is '%s'",
+                this.dataHolder.getResponse().getLocation().getName(),
+                this.dataHolder.getResponse().getLocation().getRegion(),
+                updateDate,
+                updateTime,
+                current.getCondition().getText()
+        ));
+        ImageView iv = getTooltipImage(imgWeather.getImage());
+        tooltip.setGraphic(iv);
+        lbLocation.setTooltip(tooltip);
+    }
+
+    private void fillConditions() {
+        WeatherCurrent current = this.dataHolder.getResponse().getCurrent();
+        imgWeather.setImage(this.dataHolder.getImage());
+        String conditionText = current.getCondition().getText();
+        Tooltip.install(imgWeather, getTooltip(conditionText));
+        lbCondition.setText(conditionText);
+        lbCondition.setTooltip(getTooltip(conditionText));
+    }
+
+    private void fillTemperature() {
+        WeatherCurrent current = this.dataHolder.getResponse().getCurrent();
+        lbTemperature.setText(String.format("%.0f℃", current.getTemperatureC()));
+        lbFills.setText(String.format("%.0f℃", current.getFeelsLike()));
+        String imageName = current.getTemperatureC() > 0 ? "/images/temp_hot.png" : "/images/temp_cold.png";
+        Image image = new Image(Objects.requireNonNull(this.getClass().getResourceAsStream(imageName)));
+        imgTemperature.setImage(image);
+        ImageView iv = getTooltipImage(image);
+        Tooltip tooltip = getTooltip(
+                String.format("Temperature: %.0f℃\t%.0f°F\nFills Like:%.0f℃\t%.0f°F",
+                        current.getTemperatureC(),
+                        current.getTemperatureF(),
+                        current.getFeelsLike(),
+                        current.getFeelsLikeF()
+                )
+        );
+        tooltip.setGraphic(iv);
+        lbTemperature.setTooltip(tooltip);
+        lbFills.setTooltip(tooltip);
+        Tooltip.install(imgTemperature, tooltip);
+    }
+
+    private void fillHumidity() {
+        WeatherCurrent current = this.dataHolder.getResponse().getCurrent();
+        lbHumidity.setText(String.format("%d％", current.getHumidity()));
+        ImageView iv = getTooltipImage(imgHumidity.getImage());
+        Tooltip tooltip = getTooltip(String.format("Humidity: %d％", current.getHumidity()));
+        tooltip.setGraphic(iv);
+        lbHumidity.setTooltip(tooltip);
+        Tooltip.install(imgHumidity, tooltip);
+    }
+
+    private void fillPressure() {
+        WeatherCurrent current = this.dataHolder.getResponse().getCurrent();
+        lbPressure.setText(String.format("%.0f mmHg", millibarToMmHg(current.getPressureMb())));
+        Tooltip tooltip = getTooltip(String.format("Pressure:\n%.0f mBar", current.getPressureMb()));
+        tooltip.setGraphic(getTooltipImage(imgPressure.getImage()));
+        lbPressure.setTooltip(tooltip);
+        Tooltip.install(imgPressure, tooltip);
+    }
+
+    private ImageView getTooltipImage(Image image) {
+        ImageView iv = new ImageView(image);
+        iv.setPreserveRatio(true);
+        iv.setFitWidth(100);
+        return iv;
+    }
+
+    private void fillCloud() {
+        WeatherCurrent current = this.dataHolder.getResponse().getCurrent();
+        lbCloud.setText(String.format("%d％", current.getCloud()));
+        Tooltip tooltip = getTooltip(String.format("Cloud:\n%d％", current.getCloud()));
+        tooltip.setGraphic(getTooltipImage(imgCloud.getImage()));
+        lbCloud.setTooltip(tooltip);
+        Tooltip.install(imgCloud, tooltip);
+    }
+
     private void fillWind() {
         WeatherCurrent current = this.dataHolder.getResponse().getCurrent();
 
@@ -214,13 +287,25 @@ public class GuiControllerImpl implements GuiController {
         lbWindGusts.setText(String.format("%.0f km/h", current.getGust()));
 
         imgWindDirection.setRotate(current.getWindDegree());
-        Tooltip tooltip = getTooltip(String.format("Wind direction: %s - %s wind (%d degree)",
-                current.getWindDirection(),
-                getWindDirection(current.getWindDirection()),
-                current.getWindDegree()));
-
+        Tooltip tooltip = getTooltip(
+                String.format("Wind direction: %s - %s wind (%d degree)\nSpeed: %.0f km/h\t%.0f mp/h\nGists:  %.0f km/h\t%.0f mp/h",
+                        current.getWindDirection(),
+                        getWindDirection(current.getWindDirection()),
+                        current.getWindDegree(),
+                        current.getWindKmh(),
+                        current.getWindMph(),
+                        current.getGust(),
+                        current.getGustMph()
+                )
+        );
+        ImageView iv = getTooltipImage(new Image(Objects.requireNonNull(this.getClass().getResourceAsStream("/images/compass_arrow.png"))));
+        iv.setRotate(current.getWindDegree());
+        tooltip.setGraphic(iv);
         lbWindDirection.setTooltip(tooltip);
+        lbWindSpeed.setTooltip(tooltip);
+        lbWindGusts.setTooltip(tooltip);
         Tooltip.install(imgWindDirection, tooltip);
+        Tooltip.install(imgWind, tooltip);
     }
 
     private String getWindDirection(String s) {
@@ -248,7 +333,7 @@ public class GuiControllerImpl implements GuiController {
 
         Tooltip tooltip = getTooltip(String.format("Precipitation:\nRain: %.0f mm\nShow: %.0f cm", totalPrecipitation, totalSnow));
         tooltip.setTextAlignment(TextAlignment.RIGHT);
-        tooltip.setGraphic(new ImageView(image));
+        tooltip.setGraphic(getTooltipImage(image));
         lbPrecipitation.setTooltip(tooltip);
         Tooltip.install(imgPrecipitation, tooltip);
     }

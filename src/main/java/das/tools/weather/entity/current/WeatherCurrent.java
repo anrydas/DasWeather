@@ -20,8 +20,12 @@ public class WeatherCurrent {
     int cloud;
     @JsonProperty("feelslike_c")
     float feelsLike;
+    @JsonProperty("feelslike_f")
+    float feelsLikeF;
     @JsonProperty("gust_kph")
     float gust; // Пориви вітру
+    @JsonProperty("gust_mph")
+    float gustMph;
     int humidity;
     @JsonProperty("is_day")
     boolean isDay;
@@ -35,6 +39,8 @@ public class WeatherCurrent {
     float pressureMb;
     @JsonProperty("temp_c")
     float temperatureC;
+    @JsonProperty("temp_f")
+    float temperatureF;
     @JsonProperty("uv")
     float uvIndex;
     @JsonProperty("vis_km")
@@ -45,4 +51,6 @@ public class WeatherCurrent {
     String windDirection;
     @JsonProperty("wind_kph")
     float windKmh;
+    @JsonProperty("wind_mph")
+    float windMph;
 }
