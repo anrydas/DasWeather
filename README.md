@@ -34,4 +34,7 @@
   - **Update** - to update weather data
   - **Config** - to change Application's config
 
+### 📜 Configuration Window
+![Screenshot](images/PreferencesWindow.png)
+
 ###### _Made by -=:dAs:=-_
