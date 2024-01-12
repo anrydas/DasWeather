@@ -18,9 +18,9 @@
   - Provide **app.api-key** parameter as API-KEY you have got before
   - Provide **app.weather.location** parameter - name of city weather you want to get for.
 - Launch **start-prod.sh** (use Java 8)
-- Also, you may change settings with _Configuration window_ after launching the application
+- Also, you may change settings with [Configuration window](#ConfigWin) after launching the application
 
-### 📜 Main Window
+### 📜 Main Window<a id='MainWin'/>
 ![Screenshot](images/WeatherWindow_v2.png)
 - Info Items:
   - 1st: **_Condition_** icon and it's name, **_Your Place Name_** and **_Last Updated_** - time when the weather have been updated  
@@ -31,11 +31,15 @@
   - 6th: **Air Quality:**
   - 7th: **Sun Rise** **Sun Set** **Moon Rise** **Moon Phase** **Moon Set**
   - 8th: **Weather Forecast**
-- Button:
+- Buttons:
   - **Update** - to update weather data
   - **Config** - to change Application's config
 
-### 📜 Configuration Window
+### 📜 Configuration Window<a id='ConfigWin'/>
 ![Screenshot](images/PreferencesWindow.png)
+
+### 🐞 Known issues
+- On Windows 11 after Hibernation the [Main window](#MainWin) may not be updated for long time
+  - **_Resolving:_** Press **Update** button
 
 ###### _Made by -=:dAs:=-_
