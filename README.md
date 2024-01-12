@@ -19,15 +19,22 @@
   - Provide **app.weather.location** parameter - name of city weather you want to get for.
 - Launch **start-prod.sh** (use Java 8)
 
-### 📜 Main Window items
+### 📜 Main Window
 ![Screenshot](images/WeatherWindow_v2.png)
 - Info Items:
   - 1st: **_Condition_** icon and it's name, **_Your Place Name_** and **_Last Updated_** - time when the weather have been updated  
-  - 2nd: 🔥 **_Temperature_** ℃ (**_Fills Like_** ℃) 🌫 **_Humidity_ %** 
-  - 3rd: 💨 **Wind Direction** **Wind Speed** (**Wind Gust**) km/h
-  - 4th: ☁ **_Cloud_** % ☔ **Precipitation** mm 🔽 **_Pressure_** nnHg
+  - 2nd: 🔥 **_Temperature_** ℃ **_Fills Like_** ℃ 🌫 **_Humidity_ %** 
+  - 3rd: **Cloud** % **Precipitation** mm **Pressure** mmHg
+  - 4th: 💨 **Wind Direction** (with arrow) **Wind Speed** km/h **Wind Gust** km/h
+  - 5th: **Visibility** km **Ultra Violet Index** (with tooltip)
+  - 6th: **Air Quality:**
+  - 7th: **Sun Rise** **Sun Set** **Moon Rise** **Moon Phase** **Moon Set**
+  - 8th: **Weather Forecast**
 - Button:
-  - **Update** - to update weather
+  - **Update** - to update weather data
   - **Config** - to change Application's config
+
+### 📜 Configuration Window
+![Screenshot](images/PreferencesWindow.png)
 
 ###### _Made by -=:dAs:=-_
