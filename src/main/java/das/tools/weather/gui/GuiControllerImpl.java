@@ -48,6 +48,7 @@ public class GuiControllerImpl implements GuiController {
     protected static final DateTimeFormatter TIME_FORMATTER_FOR_RESPONSE = DateTimeFormatter.ofPattern("hh:mm a");
     protected static final DateTimeFormatter TIME_FORMATTER_FOR_VIEW = DateTimeFormatter.ofPattern("HH:mm");
     private final RemoteDataHolder dataHolder = RemoteDataHolder.builder().build();
+    @FXML private ImageView imgAirQuality;
     @FXML private ImageView imgWindGists;
     @FXML private ImageView imgVisibility;
     @FXML private ImageView imgUvIndex;
@@ -175,13 +176,7 @@ public class GuiControllerImpl implements GuiController {
 
         fillVisibilityAndUv();
 
-        String MSG_AIR_QUALITY = "CO=%.00f,   NO2=%.00f,   O3=%.00f,   SO2=%.00f";
-        lbAirQuality.setText(String.format(MSG_AIR_QUALITY,
-                current.getAirQuality().getCo(),
-                current.getAirQuality().getNo2(),
-                current.getAirQuality().getO3(),
-                current.getAirQuality().getSo2())
-        );
+        fillAirQuality();
 
         fillAstro();
         fillForecast();
@@ -189,6 +184,22 @@ public class GuiControllerImpl implements GuiController {
         btUpdate.setTooltip(getTooltip(String.format("Last Time updated %s",
                 new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm").format(Date.from(dataHolder.getLastUpdatedTimestamp()))
         )));
+    }
+
+    private void fillAirQuality() {
+        WeatherCurrent current = this.dataHolder.getResponse().getCurrent();
+        String MSG_AIR_QUALITY = "CO=%.00f,   NO2=%.00f,   O3=%.00f,   SO2=%.00f";
+        lbAirQuality.setText(String.format(MSG_AIR_QUALITY,
+                current.getAirQuality().getCo(),
+                current.getAirQuality().getNo2(),
+                current.getAirQuality().getO3(),
+                current.getAirQuality().getSo2())
+        );
+        Tooltip tooltip = getTooltip(lbAirQuality.getText());
+        ImageView iv = getTooltipImage(new Image(IMAGE_AIR_QUALITY_HINT_PNG), 100);
+        tooltip.setGraphic(iv);
+        lbAirQuality.setTooltip(tooltip);
+        Tooltip.install(imgAirQuality, tooltip);
     }
 
     private void fillVisibilityAndUv() {

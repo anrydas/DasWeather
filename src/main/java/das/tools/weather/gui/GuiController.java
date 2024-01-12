@@ -17,6 +17,8 @@ public interface GuiController {
     String IMAGE_SNOW_PNG = "/images/precip/snow.png";
     String IMAGE_RAIN_PNG = "/images/precip/rain.png";
     String IMAGE_NO_PRECIPITATION_PNG = "/images/precip/no_precipitation_1.png";
+    String IMAGE_AIR_QUALITY_PNG = "/images/AirQuality.png";
+    String IMAGE_AIR_QUALITY_HINT_PNG = "/images/AirQualityHint.png";
     Map<String,String> WIND_DIRECTIONS = new HashMap<>();
     void updateWeatherData();
     void updateWeatherDataForce();
