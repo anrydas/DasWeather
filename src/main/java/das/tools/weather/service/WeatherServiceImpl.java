@@ -2,9 +2,11 @@ package das.tools.weather.service;
 
 import das.tools.weather.entity.CurrenWeatherResponse;
 import das.tools.weather.entity.ForecastWeatherResponse;
+import das.tools.weather.exceptions.RestTemplateResponseErrorHandler;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -24,10 +26,14 @@ public class WeatherServiceImpl implements WeatherService {
 
     private final RestTemplate restTemplate;
     private final GuiConfigService configService;
+    private final RestTemplateResponseErrorHandler responseErrorHandler;
 
-    public WeatherServiceImpl(RestTemplate restTemplate, GuiConfigService configService) {
-        this.restTemplate = restTemplate;
+    public WeatherServiceImpl(RestTemplateBuilder restTemplateBuilder, GuiConfigService configService, RestTemplateResponseErrorHandler responseErrorHandler) {
+        this.restTemplate = restTemplateBuilder
+                .errorHandler(responseErrorHandler)
+                .build();
         this.configService = configService;
+        this.responseErrorHandler = responseErrorHandler;
     }
 
     @Override
