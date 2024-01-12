@@ -288,7 +288,7 @@ public class GuiControllerImpl implements GuiController {
 
         imgWindDirection.setRotate(current.getWindDegree());
         Tooltip tooltip = getTooltip(
-                String.format("Wind direction: %s - %s wind (%d degree)\nSpeed: %.0f km/h\t%.0f mp/h\nGists:  %.0f km/h\t%.0f mp/h",
+                String.format("Wind direction: %s - %s wind (%d degree)\nSpeed: %.0f km/h\t%.0f mp/h\nGists: %.0f km/h\t%.0f mp/h",
                         current.getWindDirection(),
                         getWindDirection(current.getWindDirection()),
                         current.getWindDegree(),
@@ -299,6 +299,8 @@ public class GuiControllerImpl implements GuiController {
                 )
         );
         ImageView iv = getTooltipImage(new Image(Objects.requireNonNull(this.getClass().getResourceAsStream("/images/compass_arrow.png"))));
+        iv.setPreserveRatio(true);
+        iv.setFitHeight(50);
         iv.setRotate(current.getWindDegree());
         tooltip.setGraphic(iv);
         lbWindDirection.setTooltip(tooltip);
