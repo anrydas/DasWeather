@@ -93,21 +93,27 @@
                     <Font size="18.0" />
                 </font>
             </Label>
-            <Label alignment="TOP_RIGHT" contentDisplay="CENTER" prefHeight="18.0" prefWidth="44.0" text="Upto: " textAlignment="CENTER" />
-            <Label fx:id="lbWindGusts" prefHeight="27.0" prefWidth="87.0" text="20 km/h" textAlignment="CENTER">
+            <ImageView fx:id="imgWindGists" fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
+                <Image url="@/images/WindGist.png" />
+            </ImageView>
+            <Label fx:id="lbWindGists" prefHeight="27.0" prefWidth="87.0" text="20 km/h" textAlignment="CENTER">
                 <font>
                     <Font size="18.0" />
                 </font>
             </Label>
         </HBox>
         <HBox id="HBox" alignment="CENTER" prefHeight="38.0" prefWidth="494.0" spacing="5.0">
-            <Label alignment="TOP_RIGHT" contentDisplay="CENTER" prefHeight="16.0" prefWidth="107.0" text="Visibility: " textAlignment="CENTER" />
+            <ImageView fx:id="imgVisibility" fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
+                <Image url="@/images/visibility.png" />
+            </ImageView>
             <Label fx:id="lbVisibility" prefHeight="21.0" prefWidth="107.0" text="100 km" textAlignment="CENTER">
                 <font>
                     <Font size="18.0" />
                 </font>
             </Label>
-            <Label alignment="TOP_RIGHT" contentDisplay="CENTER" prefHeight="16.0" prefWidth="101.0" text="UV index: " textAlignment="CENTER" />
+            <ImageView fx:id="imgUvIndex" fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
+                <Image url="@/images/UVindex.png" />
+            </ImageView>
             <Label fx:id="lbUvIdx" prefHeight="21.0" prefWidth="126.0" text="100" textAlignment="CENTER">
                 <font>
                     <Font size="18.0" />
