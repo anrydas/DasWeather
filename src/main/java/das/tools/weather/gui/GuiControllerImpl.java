@@ -142,12 +142,12 @@ public class GuiControllerImpl implements GuiController {
         });
         btConfig.setTooltip(getTooltip("Configure Application"));
         btConfig.setOnAction(actionEvent -> showConfigWindow());
-        imgConfigure.setImage(new Image("/images/configure.png"));
-        imgWindDirection.setImage(new Image("/images/wind_arrow.png"));
-        imgSunRise.setImage(new Image("/images/sunrise.png"));
-        imgSunSet.setImage(new Image("/images/sunset.png"));
-        imgMoonRise.setImage(new Image("/images/moonrise.png"));
-        imgMoonSet.setImage(new Image("/images/moonset.png"));
+        imgConfigure.setImage(new Image(IMAGE_CONFIGURE_PNG));
+        imgWindDirection.setImage(new Image(IMAGE_WIND_ARROW_PNG));
+        imgSunRise.setImage(new Image(IMAGE_SUNRISE_PNG));
+        imgSunSet.setImage(new Image(IMAGE_SUNSET_PNG));
+        imgMoonRise.setImage(new Image(IMAGE_MOONRISE_PNG));
+        imgMoonSet.setImage(new Image(IMAGE_MOONSET_PNG));
     }
 
     private void updateControls() {
@@ -243,7 +243,7 @@ public class GuiControllerImpl implements GuiController {
         WeatherCurrent current = this.dataHolder.getResponse().getCurrent();
         lbTemperature.setText(String.format("%.0f℃", current.getTemperatureC()));
         lbFills.setText(String.format("%.0f℃", current.getFeelsLike()));
-        String imageName = current.getTemperatureC() > 0 ? "/images/temp_hot.png" : "/images/temp_cold.png";
+        String imageName = current.getTemperatureC() > 0 ? IMAGE_TEMP_HOT_PNG : IMAGE_TEMP_COLD_PNG;
         Image image = new Image(Objects.requireNonNull(this.getClass().getResourceAsStream(imageName)));
         imgTemperature.setImage(image);
         ImageView iv = getTooltipImage(image, 100);
@@ -315,7 +315,7 @@ public class GuiControllerImpl implements GuiController {
                         current.getGustMph()
                 )
         );
-        ImageView iv = getTooltipImage(new Image(Objects.requireNonNull(this.getClass().getResourceAsStream("/images/compass_arrow.png"))), 40);
+        ImageView iv = getTooltipImage(new Image(Objects.requireNonNull(this.getClass().getResourceAsStream(IMAGE_COMPASS_ARROW_PNG))), 40);
         iv.setRotate(current.getWindDegree());
         tooltip.setGraphic(iv);
         lbWindDirection.setTooltip(tooltip);
@@ -361,13 +361,13 @@ public class GuiControllerImpl implements GuiController {
         boolean isWillRain = day.isWillBeRain();
         boolean isWillSnow = day.isWillBeSnow();
         if (isWillRain && isWillSnow) {
-            res ="/images/precip/snow_and_rain.png";
+            res = IMAGE_SNOW_AND_RAIN_PNG;
         } else if (!isWillRain && isWillSnow) {
-            res = "/images/precip/snow.png";
+            res = IMAGE_SNOW_PNG;
         } else if (isWillRain && !isWillSnow) {
-            res = "/images/precip/rain.png";
+            res = IMAGE_RAIN_PNG;
         } else {
-            res = "/images/precip/no_precipitation_1.png";
+            res = IMAGE_NO_PRECIPITATION_PNG;
         }
         return res;
     }
