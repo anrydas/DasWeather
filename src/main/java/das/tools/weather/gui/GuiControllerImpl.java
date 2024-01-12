@@ -25,6 +25,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.info.BuildProperties;
 import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
@@ -41,6 +42,8 @@ import java.util.Objects;
 @Component
 @Slf4j
 public class GuiControllerImpl implements GuiController {
+    @Autowired
+    private BuildProperties buildProperties;
     public static final String APPLICATION_TITLE = "Das Weather: %s %s";
     protected static final int MINIMAL_UPDATE_INTERVAL = 1800000;
     protected static final DateTimeFormatter DATE_FORMATTER_FOR_RESPONSE = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -135,12 +138,7 @@ public class GuiControllerImpl implements GuiController {
     @FXML
     private void initialize() {
         btUpdate.setStyle("-fx-background-color: #457ecd; -fx-text-fill: #ffffff;");
-        btUpdate.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                updateWeatherData();
-            }
-        });
+        btUpdate.setOnAction(event -> updateWeatherData());
         btConfig.setTooltip(getTooltip("Configure Application"));
         btConfig.setOnAction(actionEvent -> showConfigWindow());
         imgConfigure.setImage(new Image(IMAGE_CONFIGURE_PNG));
@@ -301,7 +299,7 @@ public class GuiControllerImpl implements GuiController {
     private void fillCloud() {
         WeatherCurrent current = this.dataHolder.getResponse().getCurrent();
         lbCloud.setText(String.format("%d％", current.getCloud()));
-        Tooltip tooltip = getTooltip(String.format("Cloud:\n%d％", current.getCloud()));
+        Tooltip tooltip = getTooltip(String.format("Cloud: %d％", current.getCloud()));
         tooltip.setGraphic(getTooltipImage(imgCloud.getImage(), 100));
         lbCloud.setTooltip(tooltip);
         Tooltip.install(imgCloud, tooltip);
@@ -483,7 +481,7 @@ public class GuiControllerImpl implements GuiController {
     private void showConfigWindow() {
         configScene = configScene == null ? new Scene(guiConfigView.getView()) : configScene;
         Stage stage = new Stage();
-        stage.setTitle("Weather Application Config");
+        stage.setTitle(String.format("Das Weather Config (v.%s)", buildProperties.getVersion()));
         stage.setScene(configScene);
         stage.setResizable(false);
         stage.initModality(Modality.APPLICATION_MODAL);
