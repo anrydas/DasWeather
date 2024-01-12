@@ -193,7 +193,7 @@ public class GuiControllerImpl implements GuiController {
                 current.getAirQuality().getO3(),
                 current.getAirQuality().getSo2())
         );
-        Tooltip tooltip = getTooltip(lbAirQuality.getText());
+        Tooltip tooltip = getTooltip(String.format("Air Quality:\n%s", lbAirQuality.getText()));
         ImageView iv = getTooltipImage(new Image(IMAGE_AIR_QUALITY_HINT_PNG), 100);
         tooltip.setGraphic(iv);
         lbAirQuality.setTooltip(tooltip);
