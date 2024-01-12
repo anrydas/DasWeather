@@ -106,7 +106,7 @@
             <ImageView fx:id="imgVisibility" fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
                 <Image url="@/images/visibility.png" />
             </ImageView>
-            <Label fx:id="lbVisibility" prefHeight="21.0" prefWidth="107.0" text="100 km" textAlignment="CENTER">
+            <Label fx:id="lbVisibility" prefHeight="27.0" prefWidth="91.0" text="100 km" textAlignment="CENTER">
                 <font>
                     <Font size="18.0" />
                 </font>
@@ -114,7 +114,7 @@
             <ImageView fx:id="imgUvIndex" fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
                 <Image url="@/images/UVindex.png" />
             </ImageView>
-            <Label fx:id="lbUvIdx" prefHeight="21.0" prefWidth="126.0" text="100" textAlignment="CENTER">
+            <Label fx:id="lbUvIdx" prefHeight="27.0" prefWidth="63.0" text="100" textAlignment="CENTER">
                 <font>
                     <Font size="18.0" />
                 </font>
@@ -199,36 +199,34 @@
             </VBox>
         </HBox>
     </VBox>
-    <VBox alignment="TOP_CENTER" layoutX="10.0" layoutY="223.0" prefHeight="58.0" prefWidth="408.0" spacing="5.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
-        <children>
-            <BorderPane prefHeight="62.0" prefWidth="494.0">
-                <center>
-                    <Button fx:id="btUpdate" defaultButton="true" prefHeight="24.0" prefWidth="90.0" text="Update" BorderPane.alignment="CENTER" />
-                </center>
-                <right>
-                    <Button fx:id="btConfig" prefHeight="32.0" prefWidth="32.0" BorderPane.alignment="CENTER">
-                        <graphic>
-                            <ImageView fx:id="imgConfigure" fitHeight="32.0" fitWidth="32.0" preserveRatio="true" />
-                        </graphic>
-                    </Button>
-                </right>
-                <bottom>
-                    <HBox alignment="CENTER">
-                        <children>
-                            <ProgressBar fx:id="pb" prefHeight="18.0" prefWidth="387.0" progress="0.0" visible="false" />
-                        </children>
-                        <BorderPane.margin>
-                            <Insets top="10.0" />
-                        </BorderPane.margin>
-                    </HBox>
-                </bottom>
-                <VBox.margin>
-                    <Insets />
-                </VBox.margin>
-                <padding>
-                    <Insets top="10.0" />
-                </padding>
-            </BorderPane>
-        </children>
+    <VBox alignment="TOP_CENTER" layoutX="10.0" layoutY="223.0" prefHeight="58.0" prefWidth="408.0" spacing="5.0"
+          AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
+        <BorderPane prefHeight="62.0" prefWidth="494.0">
+            <center>
+                <Button fx:id="btUpdate" defaultButton="true" prefHeight="24.0" prefWidth="90.0" text="Update"
+                        BorderPane.alignment="CENTER"/>
+            </center>
+            <right>
+                <Button fx:id="btConfig" prefHeight="32.0" prefWidth="32.0" BorderPane.alignment="CENTER">
+                    <graphic>
+                        <ImageView fx:id="imgConfigure" fitHeight="32.0" fitWidth="32.0" preserveRatio="true"/>
+                    </graphic>
+                </Button>
+            </right>
+            <bottom>
+                <HBox alignment="CENTER">
+                    <BorderPane.margin>
+                        <Insets top="10.0"/>
+                    </BorderPane.margin>
+                    <ProgressBar fx:id="pb" prefHeight="18.0" prefWidth="387.0" progress="0.0" visible="false"/>
+                </HBox>
+            </bottom>
+            <VBox.margin>
+                <Insets/>
+            </VBox.margin>
+            <padding>
+                <Insets top="10.0"/>
+            </padding>
+        </BorderPane>
     </VBox>
 </AnchorPane>
