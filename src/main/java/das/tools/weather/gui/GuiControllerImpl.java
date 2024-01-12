@@ -221,8 +221,7 @@ public class GuiControllerImpl implements GuiController {
         WeatherCurrent current = this.dataHolder.getResponse().getCurrent();
         String updateDate = current.getLastUpdate().split(" ")[0];
         String updateTime = current.getLastUpdate().split(" ")[1];
-        String MSG_LOCATION = "%s %s at %s";
-        lbLocation.setText(String.format(MSG_LOCATION,
+        lbLocation.setText(String.format("%s %s at %s",
                 this.dataHolder.getResponse().getLocation().getName(),
                 updateDate,
                 updateTime
@@ -257,7 +256,7 @@ public class GuiControllerImpl implements GuiController {
         imgTemperature.setImage(image);
         ImageView iv = getTooltipImage(image, 100);
         Tooltip tooltip = getTooltip(
-                String.format("Temperature: %.0f℃\t%.0f°F\nFills Like:%.0f℃\t%.0f°F",
+                String.format("Temperature: %.0f℃  %.0f°F\nFills Like:%.0f℃  %.0f°F",
                         current.getTemperatureC(),
                         current.getTemperatureF(),
                         current.getFeelsLike(),
@@ -283,7 +282,7 @@ public class GuiControllerImpl implements GuiController {
     private void fillPressure() {
         WeatherCurrent current = this.dataHolder.getResponse().getCurrent();
         lbPressure.setText(String.format("%.0f mmHg", millibarToMmHg(current.getPressureMb())));
-        Tooltip tooltip = getTooltip(String.format("Pressure:\n%.0f mBar", current.getPressureMb()));
+        Tooltip tooltip = getTooltip(String.format("Pressure:\n%.0f mmHg\n%.0f mBar", millibarToMmHg(current.getPressureMb()), current.getPressureMb()));
         tooltip.setGraphic(getTooltipImage(imgPressure.getImage(), 100));
         lbPressure.setTooltip(tooltip);
         Tooltip.install(imgPressure, tooltip);
@@ -314,7 +313,7 @@ public class GuiControllerImpl implements GuiController {
 
         imgWindDirection.setRotate(current.getWindDegree());
         Tooltip tooltip = getTooltip(
-                String.format("Wind direction: %s - %s wind (%d degree)\nSpeed: %.0f km/h\t%.0f mp/h\nGists: %.0f km/h\t%.0f mp/h",
+                String.format("Wind direction: %s - %s wind (%d degree)\nSpeed: %.0f km/h  %.0f mp/h\nGists: %.0f km/h  %.0f mp/h",
                         current.getWindDirection(),
                         getWindDirection(current.getWindDirection()),
                         current.getWindDegree(),
