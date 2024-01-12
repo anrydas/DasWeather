@@ -7,7 +7,7 @@
 <?import javafx.scene.text.*?>
 
 <AnchorPane prefHeight="510.0" prefWidth="521.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="das.tools.weather.gui.GuiControllerImpl">
-    <VBox layoutX="10.0" layoutY="14.0" prefHeight="388.0" prefWidth="501.0" spacing="5.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="14.0">
+    <VBox layoutX="10.0" layoutY="14.0" prefHeight="414.0" prefWidth="501.0" spacing="4.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="14.0">
         <HBox id="HBox" alignment="CENTER_LEFT" prefHeight="38.0" prefWidth="250.0" spacing="5.0">
             <VBox alignment="CENTER" prefHeight="60.0" prefWidth="136.0">
                 <ImageView fx:id="imgWeather" fitHeight="42.0" fitWidth="71.0" preserveRatio="true">
@@ -120,9 +120,11 @@
                 </font>
             </Label>
         </HBox>
-        <HBox id="HBox" alignment="CENTER_LEFT" prefHeight="38.0" prefWidth="494.0" spacing="5.0">
-            <Label alignment="TOP_RIGHT" contentDisplay="CENTER" prefHeight="16.0" prefWidth="124.0" text="Air Quality: " textAlignment="CENTER" />
-            <Label fx:id="lbAirQuality" alignment="CENTER" prefHeight="21.0" prefWidth="376.0" text="100" textAlignment="CENTER">
+        <HBox id="HBox" alignment="CENTER" prefHeight="50.0" prefWidth="502.0" spacing="10.0">
+            <ImageView fx:id="imgAirQuality" fitHeight="32.0" fitWidth="32.0" preserveRatio="true">
+                <Image url="@/images/AirQuality.png" />
+            </ImageView>
+            <Label fx:id="lbAirQuality" alignment="CENTER" prefHeight="27.0" prefWidth="315.0" text="100" textAlignment="CENTER">
                 <font>
                     <Font size="18.0" />
                 </font>
