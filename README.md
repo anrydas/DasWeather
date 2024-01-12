@@ -14,10 +14,11 @@
 - Register on [Weather API](https://www.weatherapi.com/) and get API-KEY
 - Download last version of [Application distribution](https://github.com/anrydas/DasWeather/releases) archive and unpack it into any folder on your PC
 - Rename **application-default.properties** file to **application-PROD.properties** (if you want to launch application with **start-prod.sh** script).
-- Into application-PROD.properties file:
+- In **config/gui.config** file:
   - Provide **app.api-key** parameter as API-KEY you have got before
   - Provide **app.weather.location** parameter - name of city weather you want to get for.
 - Launch **start-prod.sh** (use Java 8)
+- Also, you may change settings with _Configuration window_ after launching the application
 
 ### 📜 Main Window
 ![Screenshot](images/WeatherWindow_v2.png)

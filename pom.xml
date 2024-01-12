@@ -9,7 +9,7 @@
         <relativePath/>
     </parent>
     <properties>
-        <app.version>2.7.3-RELEASE</app.version>
+        <app.version>2.7.4-RELEASE</app.version>
         <java.version>8</java.version>
         <jackson.version>2.14.1</jackson.version>
         <httpclient.version>4.5.14</httpclient.version>
@@ -19,14 +19,13 @@
     <groupId>das.tools.weather</groupId>
     <artifactId>DasWeather</artifactId>
     <version>${app.version}</version>
-    <name>DasWeather</name>
-    <description>DasWeather</description>
+    <name>Das Weather</name>
+    <description>Das Weather Application</description>
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
