@@ -9,8 +9,6 @@ import das.tools.weather.entity.forecast.WeatherDayForecast;
 import das.tools.weather.service.GuiConfigService;
 import das.tools.weather.service.WeatherService;
 import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -42,15 +40,23 @@ import java.util.Objects;
 @Component
 @Slf4j
 public class GuiControllerImpl implements GuiController {
-    @Autowired
-    private BuildProperties buildProperties;
     public static final String APPLICATION_TITLE = "Das Weather: %s %s";
     protected static final int MINIMAL_UPDATE_INTERVAL = 1800000;
     protected static final DateTimeFormatter DATE_FORMATTER_FOR_RESPONSE = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     protected static final DateTimeFormatter DATE_FORMATTER_FOR_VIEW = DateTimeFormatter.ofPattern("dd-MMM-yyyy");
-    protected static final DateTimeFormatter TIME_FORMATTER_FOR_RESPONSE = DateTimeFormatter.ofPattern("hh:mm a");
     protected static final DateTimeFormatter TIME_FORMATTER_FOR_VIEW = DateTimeFormatter.ofPattern("HH:mm");
     private final RemoteDataHolder dataHolder = RemoteDataHolder.builder().build();
+    private Scene configScene;
+    private Scene forecastScene;
+
+    @Autowired private BuildProperties buildProperties;
+    @Autowired private WeatherService weatherService;
+    @Autowired private GuiConfigService configService;
+    @Autowired private ConfigController configController;
+    @Autowired private GuiConfig.ViewHolder guiConfigView;
+    @Autowired private GuiConfig.ViewHolder guiForecastView;
+    @Autowired private ForecastController forecastController;
+
     @FXML private ImageView imgAirQuality;
     @FXML private ImageView imgWindGists;
     @FXML private ImageView imgVisibility;
@@ -101,17 +107,6 @@ public class GuiControllerImpl implements GuiController {
     @FXML private ImageView imgConfigure;
     @FXML public ImageView imgWindDirection;
 
-    @Autowired
-    private WeatherService weatherService;
-    @Autowired
-    private GuiConfigService configService;
-    @Autowired
-    private ConfigController configController;
-    @Autowired
-    private GuiConfig.ViewHolder guiConfigView;
-
-    private Scene configScene;
-
     static {
         Map<String,String> mapDirection = WIND_DIRECTIONS;
         mapDirection.put("N", "North");
@@ -141,12 +136,17 @@ public class GuiControllerImpl implements GuiController {
         btUpdate.setOnAction(event -> updateWeatherData());
         btConfig.setTooltip(getTooltip("Configure Application"));
         btConfig.setOnAction(actionEvent -> showConfigWindow());
+
         imgConfigure.setImage(new Image(IMAGE_CONFIGURE_PNG));
         imgWindDirection.setImage(new Image(IMAGE_WIND_ARROW_PNG));
         imgSunRise.setImage(new Image(IMAGE_SUNRISE_PNG));
         imgSunSet.setImage(new Image(IMAGE_SUNSET_PNG));
         imgMoonRise.setImage(new Image(IMAGE_MOONRISE_PNG));
         imgMoonSet.setImage(new Image(IMAGE_MOONSET_PNG));
+
+        imgForecast01.setOnMouseClicked(mouseEvent -> showForecastWindow());
+        imgForecast02.setOnMouseClicked(mouseEvent -> showForecastWindow());
+        imgForecast03.setOnMouseClicked(mouseEvent -> showForecastWindow());
     }
 
     private void updateControls() {
@@ -392,7 +392,7 @@ public class GuiControllerImpl implements GuiController {
         LocalDate dt2 = LocalDate.parse(dayForecasts[2].getDate(), DATE_FORMATTER_FOR_RESPONSE);
         lbgForecast03.setText(DATE_FORMATTER_FOR_VIEW.format(dt2));
 
-        final String TOOLTIP_TEXT = "%s\nfrom %.0f℃ to %.0f℃";
+        final String TOOLTIP_TEXT = "%s\nfrom %.0fc to %.0f℃";
         Tooltip.install(imgForecast01, getTooltip(String.format(
                 TOOLTIP_TEXT,
                 this.dataHolder.getResponse().getCurrent().getCondition().getText(),
@@ -491,6 +491,19 @@ public class GuiControllerImpl implements GuiController {
         }
     }
 
+    private void showForecastWindow() {
+        forecastScene = forecastScene == null ? new Scene(guiForecastView.getView()) : forecastScene;
+        Stage stage = new Stage();
+        stage.setTitle(String.format("Das Weather Forecast (v.%s)", buildProperties.getVersion()));
+        stage.setScene(forecastScene);
+        stage.setMinHeight(400);
+        stage.setMinWidth(600);
+        //stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setOnShowing(windowEvent -> forecastController.onShowing());
+        forecastController.setData(this.dataHolder.getResponse());
+        stage.showAndWait();
+    }
+
     private static Tooltip getTooltip(String caption) {
         return new Tooltip(caption);
     }
@@ -575,7 +588,7 @@ public class GuiControllerImpl implements GuiController {
         return task;
     }
 
-    private double millibarToMmHg(float mbar) {
+    public static double millibarToMmHg(float mbar) {
         return mbar * 0.750062;
     }
 
