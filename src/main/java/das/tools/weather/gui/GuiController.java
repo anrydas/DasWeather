@@ -1,9 +1,11 @@
 package das.tools.weather.gui;
 
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
 public interface GuiController {
+    public static final DateTimeFormatter TIME_FORMATTER_FOR_RESPONSE = DateTimeFormatter.ofPattern("hh:mm a");
     String IMAGE_CONFIGURE_PNG = "/images/configure.png";
     String IMAGE_WIND_ARROW_PNG = "/images/wind_arrow.png";
     String IMAGE_SUNRISE_PNG = "/images/sunrise.png";
@@ -20,6 +22,8 @@ public interface GuiController {
     String IMAGE_AIR_QUALITY_PNG = "/images/AirQuality.png";
     String IMAGE_AIR_QUALITY_HINT_PNG = "/images/AirQualityHint.png";
     Map<String,String> WIND_DIRECTIONS = new HashMap<>();
+    String IMAGE_WEATHER_DEFAULT_ICON_PNG = "/images/weather-default-01.png";
+
     void updateWeatherData();
     void updateWeatherDataForce();
 }
