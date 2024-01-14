@@ -9,6 +9,7 @@
 - lightweight
 - uses **multiple** languages to show weather info
 - configured update interval
+- weather forecast
 
 ### 📌 Using
 - Register on [Weather API](https://www.weatherapi.com/) and get API-KEY
@@ -30,7 +31,7 @@
   - 5th: **Visibility** km **Ultra Violet Index** (with tooltip)
   - 6th: **Air Quality:**
   - 7th: **Sun Rise** **Sun Set** **Moon Rise** **Moon Phase** **Moon Set**
-  - 8th: **Weather Forecast**
+  - 8th: **Weather Forecast** - click on Image to show [Forecast Window](#ForecastWin) with forecast weather data
 - Buttons:
   - **Update** - to update weather data
   - **Config** - to change Application's config
@@ -38,8 +39,12 @@
 ### 📜 Configuration Window<a id='ConfigWin'/>
 ![Screenshot](images/PreferencesWindow.png)
 
+### 📜 Forecast Window<a id='ForecastWin'/>
+![Screenshot](images/ForecastWindow.png)
+- Any forecast chart could be saved as PNG, JPEG, GIF or BMP file.
+
 ### 🐞 Known issues
-- On Windows 11 after Hibernation the [Main window](#MainWin) may not be updated for long time
+- On Windows 11 after Hibernation the [Main window](#MainWin) may not be updated for couple minutes
   - **_Resolving:_** Press **Update** button
 
 ###### _Made by -=:dAs:=-_
