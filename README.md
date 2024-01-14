@@ -9,17 +9,19 @@
 - lightweight
 - uses **multiple** languages to show weather info
 - configured update interval
+- weather forecast
 
 ### 📌 Using
 - Register on [Weather API](https://www.weatherapi.com/) and get API-KEY
 - Download last version of [Application distribution](https://github.com/anrydas/DasWeather/releases) archive and unpack it into any folder on your PC
 - Rename **application-default.properties** file to **application-PROD.properties** (if you want to launch application with **start-prod.sh** script).
-- Into application-PROD.properties file:
+- In **config/gui.config** file:
   - Provide **app.api-key** parameter as API-KEY you have got before
   - Provide **app.weather.location** parameter - name of city weather you want to get for.
 - Launch **start-prod.sh** (use Java 8)
+- Also, you may change settings with [Configuration window](#ConfigWin) after launching the application
 
-### 📜 Main Window
+### 📜 Main Window<a id='MainWin'/>
 ![Screenshot](images/WeatherWindow_v2.png)
 - Info Items:
   - 1st: **_Condition_** icon and it's name, **_Your Place Name_** and **_Last Updated_** - time when the weather have been updated  
@@ -29,12 +31,20 @@
   - 5th: **Visibility** km **Ultra Violet Index** (with tooltip)
   - 6th: **Air Quality:**
   - 7th: **Sun Rise** **Sun Set** **Moon Rise** **Moon Phase** **Moon Set**
-  - 8th: **Weather Forecast**
-- Button:
+  - 8th: **Weather Forecast** - click on Image to show [Forecast Window](#ForecastWin) with forecast weather data
+- Buttons:
   - **Update** - to update weather data
   - **Config** - to change Application's config
 
-### 📜 Configuration Window
+### 📜 Configuration Window<a id='ConfigWin'/>
 ![Screenshot](images/PreferencesWindow.png)
+
+### 📜 Forecast Window<a id='ForecastWin'/>
+![Screenshot](images/ForecastWindow.png)
+- Any forecast chart could be saved as PNG, JPEG, GIF or BMP file.
+
+### 🐞 Known issues
+- On Windows 11 after Hibernation the [Main window](#MainWin) may not be updated for couple minutes
+  - **_Resolving:_** Press **Update** button
 
 ###### _Made by -=:dAs:=-_
