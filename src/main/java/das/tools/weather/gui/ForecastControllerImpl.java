@@ -5,7 +5,6 @@ import das.tools.weather.service.ChartDataProducer;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.scene.SnapshotParameters;
-import javafx.scene.chart.BarChart;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Alert;
@@ -64,10 +63,10 @@ public class ForecastControllerImpl implements ForecastController {
         TABS_TO_CHART_MAP.put(TAB_NAMES.get(5), chWind);
 
         btClose.setOnAction(actionEvent -> ((Stage) btClose.getScene().getWindow()).close());
-        btSave.setOnAction(actionEvent -> saveToFile());
+        btSave.setOnAction(actionEvent -> saveChartToFile());
     }
 
-    private void saveToFile() {
+    private File selectFileToSaveChart() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Chose file name to save the Chart");
         fileChooser.setInitialDirectory(this.saveFileInitialDirectory);
@@ -80,7 +79,11 @@ public class ForecastControllerImpl implements ForecastController {
         );
         fileChooser.setInitialFileName("forecast.png");
         Window window = btClose.getScene().getWindow();
-        File file = fileChooser.showSaveDialog(window);
+        return fileChooser.showSaveDialog(window);
+    }
+
+    private void saveChartToFile() {
+        File file = selectFileToSaveChart();
         if (file != null) {
             XYChart<String, Number> activeCart = getActiveCart();
             WritableImage image = activeCart.snapshot(
