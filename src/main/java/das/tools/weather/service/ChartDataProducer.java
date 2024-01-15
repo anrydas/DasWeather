@@ -1,10 +1,15 @@
 package das.tools.weather.service;
 
+import com.sun.javafx.charts.Legend;
 import das.tools.weather.entity.forecast.WeatherDayForecast;
 import das.tools.weather.entity.forecast.WeatherHour;
 import das.tools.weather.gui.ForecastController;
 import das.tools.weather.gui.GuiControllerImpl;
+import javafx.scene.Cursor;
+import javafx.scene.Node;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.Tooltip;
+import javafx.scene.input.MouseButton;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -70,6 +75,38 @@ public class ChartDataProducer {
                 series.getData().add(new XYChart.Data<>(String.valueOf(i), numbers[i]));
             }
             chart.getData().add(series);
+        }
+    }
+
+    public void makeLegendClickable(XYChart<String,Number> chart) {
+        for (Node node : chart.getChildrenUnmodifiable()) {
+            if (node instanceof Legend) {
+                Legend legend = (Legend) node;
+                for (Legend.LegendItem legendItem: legend.getItems()) {
+                    for (XYChart.Series<String, Number> series: chart.getData()){
+                        if (series.getName().equals(legendItem.getText())) {
+                            Node item = legendItem.getSymbol();
+                            item.setCursor(Cursor.HAND);
+                            Tooltip.install(item, new Tooltip("Click to toggle chart\n" +
+                                    "Click with Ctrl to toggle cart's line but points aren't\n" +
+                                    "It could be also used to toggle points onto chart"));
+                            item.setOnMouseClicked(event -> {
+                                if (event.getButton() == MouseButton.PRIMARY) {
+                                    series.getNode().setVisible(!series.getNode().isVisible());
+                                    if (!event.isControlDown()) {
+                                        for (XYChart.Data<String, Number> data : series.getData()) {
+                                            if (data.getNode() != null) {
+                                                data.getNode().setVisible(series.getNode().isVisible());
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    }
+
+                }
+             }
         }
     }
 

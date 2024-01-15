@@ -140,5 +140,11 @@ public class ForecastControllerImpl implements ForecastController {
         chartsData.fillChart(chHumidity, TAB_NAMES.get(3));
         chartsData.fillChart(chCloud, TAB_NAMES.get(4));
         chartsData.fillChart(chWind, TAB_NAMES.get(5));
+
+        chartsData.makeLegendClickable(chTemperature);
+        chartsData.makeLegendClickable(chPressure);
+        chartsData.makeLegendClickable(chHumidity);
+        chartsData.makeLegendClickable(chCloud);
+        chartsData.makeLegendClickable(chWind);
     }
 }
