@@ -555,14 +555,19 @@ public class GuiControllerImpl implements GuiController {
                 dataHolder.setResponse(weatherService.getForecastWeather());
                 updateProgress(20, MAX_VALUE);
                 Thread.sleep(10);
-                dataHolder.setImage(weatherService.getRemoteImage(dataHolder.getResponse().getCurrent().getCondition().getIcon()));
+                //dataHolder.setImage(weatherService.getRemoteImage(dataHolder.getResponse().getCurrent().getCondition().getIcon()));
+                dataHolder.setImage(weatherService.getWeatherIcon(dataHolder.getResponse().getCurrent().getCondition().getCode(), dataHolder.getResponse().getCurrent().isDay()));
                 dataHolder.setLastUpdatedTimestamp(Instant.now());
                 updateProgress(30, MAX_VALUE);
                 Thread.sleep(10);
-                dataHolder.setImageForecast1(weatherService.getRemoteImage(dataHolder.getResponse().getForecast().getDayForecast()[1].getDay().getCondition().getIcon()));
+                //dataHolder.setImageForecast1(weatherService.getRemoteImage(dataHolder.getResponse().getForecast().getDayForecast()[1].getDay().getCondition().getIcon()));
+                dataHolder.setImageForecast1(weatherService.getWeatherIcon(
+                        dataHolder.getResponse().getForecast().getDayForecast()[1].getDay().getCondition().getCode(), true));
                 updateProgress(40, MAX_VALUE);
                 Thread.sleep(10);
-                dataHolder.setImageForecast2(weatherService.getRemoteImage(dataHolder.getResponse().getForecast().getDayForecast()[2].getDay().getCondition().getIcon()));
+                //dataHolder.setImageForecast2(weatherService.getRemoteImage(dataHolder.getResponse().getForecast().getDayForecast()[2].getDay().getCondition().getIcon()));
+                dataHolder.setImageForecast2(weatherService.getWeatherIcon(
+                        dataHolder.getResponse().getForecast().getDayForecast()[2].getDay().getCondition().getCode(), true));
                 updateProgress(60, MAX_VALUE);
                 Thread.sleep(10);
                 updateProgress(80, MAX_VALUE);

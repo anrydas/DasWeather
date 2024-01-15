@@ -16,6 +16,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -27,6 +28,58 @@ public class WeatherServiceImpl implements WeatherService {
     private final RestTemplate restTemplate;
     private final GuiConfigService configService;
     private final RestTemplateResponseErrorHandler responseErrorHandler;
+
+    static {
+        Map<Integer,Integer> map = WEATHER_CODE_CONDITION_IMAGES;
+        map.put(1000, 113);
+        map.put(1003, 116);
+        map.put(1006, 119);
+        map.put(1009, 122);
+        map.put(1030, 143);
+        map.put(1063, 176);
+        map.put(1066, 179);
+        map.put(1069, 182);
+        map.put(1072, 185);
+        map.put(1087, 200);
+        map.put(1114, 227);
+        map.put(1117, 230);
+        map.put(1135, 248);
+        map.put(1147, 260);
+        map.put(1150, 263);
+        map.put(1153, 266);
+        map.put(1168, 281);
+        map.put(1171, 284);
+        map.put(1180, 293);
+        map.put(1183, 296);
+        map.put(1186, 299);
+        map.put(1189, 302);
+        map.put(1192, 305);
+        map.put(1195, 308);
+        map.put(1198, 311);
+        map.put(1201, 314);
+        map.put(1204, 317);
+        map.put(1207, 320);
+        map.put(1210, 323);
+        map.put(1213, 326);
+        map.put(1216, 329);
+        map.put(1219, 332);
+        map.put(1222, 335);
+        map.put(1225, 338);
+        map.put(1237, 350);
+        map.put(1240, 353);
+        map.put(1243, 356);
+        map.put(1246, 359);
+        map.put(1249, 362);
+        map.put(1252, 365);
+        map.put(1255, 368);
+        map.put(1258, 371);
+        map.put(1261, 374);
+        map.put(1264, 377);
+        map.put(1273, 386);
+        map.put(1276, 389);
+        map.put(1279, 392);
+        map.put(1282, 395);
+    }
 
     public WeatherServiceImpl(RestTemplateBuilder restTemplateBuilder, GuiConfigService configService, RestTemplateResponseErrorHandler responseErrorHandler) {
         this.restTemplate = restTemplateBuilder
@@ -92,6 +145,14 @@ public class WeatherServiceImpl implements WeatherService {
         String msg = image != null ? "[WeatherService].getRemoteImage: got weather image from {}" : "[WeatherService].getRemoteImage: Couldn't get weather image from {}" ;
         if(log.isDebugEnabled()) log.debug(msg, url);
         return image;
+    }
+
+    @Override
+    public Image getWeatherIcon(int weatherCode, boolean isDay) {
+        String path = "/images/conditions" + (isDay ? "/day" : "/night");
+        String url = path + "/" + WEATHER_CODE_CONDITION_IMAGES.get(weatherCode) + ".png";
+        if (log.isDebugEnabled()) log.debug("got image file url={}", url);
+        return new Image(url);
     }
 
     private BufferedImage getImageAsync(String urlString) {

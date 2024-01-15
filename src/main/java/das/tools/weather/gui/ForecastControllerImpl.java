@@ -112,9 +112,9 @@ public class ForecastControllerImpl implements ForecastController {
 
     private String getFileFormatName(File file) {
         String ext = file.getName().substring(file.getName().lastIndexOf(".") + 1).toUpperCase();
-        log.debug("got ext={}", ext);
+        if (log.isDebugEnabled()) log.debug("got ext={}", ext);
         String res = FILE_FORMAT_NAMES.get(ext);
-        log.debug("got resulted file extension={}", res);
+        if (log.isDebugEnabled()) log.debug("got resulted file extension={}", res);
         return !"".equals(res) ? ext : "PNG";
     }
 
