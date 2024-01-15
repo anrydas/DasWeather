@@ -82,9 +82,10 @@ public class ForecastControllerImpl implements ForecastController {
         Window window = btClose.getScene().getWindow();
         File file = fileChooser.showSaveDialog(window);
         if (file != null) {
-            WritableImage image = getActiveCart().snapshot(
+            XYChart<String, Number> activeCart = getActiveCart();
+            WritableImage image = activeCart.snapshot(
                     new SnapshotParameters(),
-                    new WritableImage((int) window.getWidth(), (int) window.getHeight())
+                    new WritableImage((int) activeCart.getWidth(), (int) activeCart.getHeight())
             );
             try {
                 String fileFormatName = getFileFormatName(file);
