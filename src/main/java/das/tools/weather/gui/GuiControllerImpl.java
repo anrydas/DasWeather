@@ -210,7 +210,16 @@ public class GuiControllerImpl implements GuiController {
         Tooltip.install(imgVisibility, tooltipVisibility);
 
         lbUvIdx.setText(String.format("%.00f", current.getUvIndex()));
-        Tooltip tooltipUv = getTooltip("UV Index:\n0-2 - OK, Green\n3-5 - Yellow, recommended to be inside\n6-7 - Orange\n8-10 - Red\n11+ - Violet, Dangerous");
+        Tooltip tooltipUv = getTooltip(
+                String.format("UV Index: %.00f\n" +
+                        "0-2 - OK, Green\n" +
+                        "3-5 - Yellow, recommended to be inside\n" +
+                        "6-7 - Orange\n" +
+                        "8-10 - Red\n" +
+                        "11+ - Violet, Dangerous",
+                        current.getUvIndex()
+                )
+        );
         iv = getTooltipImage(imgUvIndex.getImage(), 100);
         tooltipUv.setGraphic(iv);
         lbUvIdx.setTooltip(tooltipUv);
