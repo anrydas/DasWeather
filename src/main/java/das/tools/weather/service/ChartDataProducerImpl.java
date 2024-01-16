@@ -77,8 +77,8 @@ public class ChartDataProducerImpl implements ChartDataProducer {
                 series.getData().add(data);
                 Node dataNode = data.getNode();
                 if (dataNode != null) {
-                    dataNode.setOnMouseEntered(event -> dataNode.getStyleClass().add("onHover"));
-                    dataNode.setOnMouseExited(event -> dataNode.getStyleClass().remove("onHover"));
+                    dataNode.setOnMouseEntered(event -> dataNode.getStyleClass().add("chart-on-hover"));
+                    dataNode.setOnMouseExited(event -> dataNode.getStyleClass().remove("chart-on-hover"));
                     installTooltipOnNode(data, dataHolder);
                 }
             }
