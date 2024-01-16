@@ -5,6 +5,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 public interface GuiController {
+    String APPLICATION_TITLE = "Das Weather: %s %s";
+    int MINIMAL_UPDATE_INTERVAL = 1800000;
+    DateTimeFormatter DATE_FORMATTER_FOR_RESPONSE = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    DateTimeFormatter DATE_FORMATTER_FOR_VIEW = DateTimeFormatter.ofPattern("dd-MMM-yyyy");
+    DateTimeFormatter TIME_FORMATTER_FOR_VIEW = DateTimeFormatter.ofPattern("HH:mm");
+    GuiControllerImpl.RemoteDataHolder dataHolder = GuiControllerImpl.RemoteDataHolder.builder().build();
     DateTimeFormatter TIME_FORMATTER_FOR_RESPONSE = DateTimeFormatter.ofPattern("hh:mm a");
     String IMAGE_CONFIGURE_PNG = "/images/configure.png";
     String IMAGE_WIND_ARROW_PNG = "/images/wind_arrow.png";
