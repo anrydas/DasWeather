@@ -25,8 +25,12 @@ public class WeatherHour {
     float dewPoint;
     @JsonProperty("feelslike_c")
     float fillsLike;
+    @JsonProperty("feelslike_f")
+    float fillsLikeF;
     @JsonProperty("gust_kph")
     float gustKmh;
+    @JsonProperty("gust_mph")
+    float gustMph;
     @JsonProperty("humidity")
     int humidity;
     @JsonProperty("is_day")
@@ -37,6 +41,8 @@ public class WeatherHour {
     float pressure;
     @JsonProperty("temp_c")
     float temperature;
+    @JsonProperty("temp_f")
+    float temperatureF;
     @JsonProperty("time")
     String time;
     @JsonProperty("time_epoch")
@@ -55,4 +61,6 @@ public class WeatherHour {
     String windDirection;
     @JsonProperty("wind_kph")
     float windKmh;
+    @JsonProperty("wind_mph")
+    float windMph;
 }

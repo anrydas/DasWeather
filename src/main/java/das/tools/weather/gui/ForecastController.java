@@ -11,5 +11,7 @@ public interface ForecastController {
     public static final Map<String,String> FILE_FORMAT_NAMES = new HashMap<>();
     void onShowing();
 
+    void onShow();
+
     void setData(ForecastWeatherResponse data);
 }
