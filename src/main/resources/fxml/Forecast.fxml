@@ -3,11 +3,11 @@
 <?import javafx.scene.chart.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="das.tools.weather.gui.ForecastControllerImpl">
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="das.tools.weather.gui.ForecastControllerImpl">
     <TabPane fx:id="tabPane" prefHeight="344.0" prefWidth="578.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
         <Tab text="Temperature">
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                <LineChart fx:id="chTemperature" layoutX="57.0" layoutY="14.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
+                <LineChart fx:id="chTemperature" layoutX="57.0" layoutY="14.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0" stylesheets="@/css/chart.css">
                     <xAxis>
                         <CategoryAxis label="Time" side="BOTTOM" />
                     </xAxis>
@@ -19,7 +19,7 @@
         </Tab>
         <Tab text="Pressure">
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                <LineChart fx:id="chPressure" layoutX="57.0" layoutY="14.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
+                <LineChart fx:id="chPressure" layoutX="57.0" layoutY="14.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0" stylesheets="@/css/chart.css">
                     <xAxis>
                         <CategoryAxis label="Time" side="BOTTOM" />
                     </xAxis>
@@ -31,7 +31,7 @@
         </Tab>
         <Tab text="Humidity">
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                <LineChart fx:id="chHumidity" layoutX="57.0" layoutY="14.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
+                <LineChart fx:id="chHumidity" layoutX="57.0" layoutY="14.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0" stylesheets="@/css/chart.css">
                     <xAxis>
                         <CategoryAxis label="Time" side="BOTTOM" />
                     </xAxis>
@@ -43,7 +43,7 @@
         </Tab>
         <Tab text="Cloud">
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                <LineChart fx:id="chCloud" layoutX="57.0" layoutY="14.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
+                <LineChart fx:id="chCloud" layoutX="57.0" layoutY="14.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0" stylesheets="@/css/chart.css">
                     <xAxis>
                         <CategoryAxis label="Time" side="BOTTOM" />
                     </xAxis>
@@ -55,7 +55,7 @@
         </Tab>
         <Tab text="Wind">
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                <LineChart fx:id="chWind" layoutX="57.0" layoutY="14.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
+                <LineChart fx:id="chWind" layoutX="57.0" layoutY="14.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0" stylesheets="@/css/chart.css">
                     <xAxis>
                         <CategoryAxis label="Time" side="BOTTOM" />
                     </xAxis>

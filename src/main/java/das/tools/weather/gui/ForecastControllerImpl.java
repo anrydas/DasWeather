@@ -15,6 +15,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.imageio.ImageIO;
@@ -37,6 +38,8 @@ public class ForecastControllerImpl implements ForecastController {
     private ForecastWeatherResponse data;
     private File saveFileInitialDirectory = new File(System.getProperty("user.dir"));
     private static final Map<String,XYChart<String,Number>> TABS_TO_CHART_MAP = new LinkedHashMap<>();
+
+    @Autowired private ChartDataProducer chartDataProducer;
 
     static {
         Map<Integer,String> map = TAB_NAMES;
@@ -126,6 +129,10 @@ public class ForecastControllerImpl implements ForecastController {
     public void onShowing() {
         fillGraphics();
     }
+    @Override
+    public void onShow() {
+        fillGraphics();
+    }
 
     @Override
     public void setData(ForecastWeatherResponse data) {
@@ -138,17 +145,17 @@ public class ForecastControllerImpl implements ForecastController {
     }
 
     private void fillGraphics() {
-        ChartDataProducer chartsData = new ChartDataProducer(this.data.getForecast().getDayForecast());
-        chartsData.fillChart(chTemperature, TAB_NAMES.get(1));
-        chartsData.fillChart(chPressure, TAB_NAMES.get(2));
-        chartsData.fillChart(chHumidity, TAB_NAMES.get(3));
-        chartsData.fillChart(chCloud, TAB_NAMES.get(4));
-        chartsData.fillChart(chWind, TAB_NAMES.get(5));
+        chartDataProducer.initChartsData(this.data.getForecast().getDayForecast());
+        chartDataProducer.fillChart(chTemperature, TAB_NAMES.get(1));
+        chartDataProducer.fillChart(chPressure, TAB_NAMES.get(2));
+        chartDataProducer.fillChart(chHumidity, TAB_NAMES.get(3));
+        chartDataProducer.fillChart(chCloud, TAB_NAMES.get(4));
+        chartDataProducer.fillChart(chWind, TAB_NAMES.get(5));
 
-        chartsData.makeLegendClickable(chTemperature);
-        chartsData.makeLegendClickable(chPressure);
-        chartsData.makeLegendClickable(chHumidity);
-        chartsData.makeLegendClickable(chCloud);
-        chartsData.makeLegendClickable(chWind);
+        chartDataProducer.makeLegendClickable(chTemperature);
+        chartDataProducer.makeLegendClickable(chPressure);
+        chartDataProducer.makeLegendClickable(chHumidity);
+        chartDataProducer.makeLegendClickable(chCloud);
+        chartDataProducer.makeLegendClickable(chWind);
     }
 }

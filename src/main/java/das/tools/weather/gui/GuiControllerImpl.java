@@ -288,7 +288,7 @@ public class GuiControllerImpl implements GuiController {
         Tooltip.install(imgPressure, tooltip);
     }
 
-    private ImageView getTooltipImage(Image image, int width) {
+    public static ImageView getTooltipImage(Image image, int width) {
         ImageView iv = new ImageView(image);
         iv.setPreserveRatio(true);
         iv.setFitWidth(width);
@@ -313,7 +313,7 @@ public class GuiControllerImpl implements GuiController {
 
         imgWindDirection.setRotate(current.getWindDegree());
         Tooltip tooltip = getTooltip(
-                String.format("Wind direction: %s - %s wind (%d degree)\nSpeed: %.0f km/h  %.0f mp/h\nGists: %.0f km/h  %.0f mp/h",
+                String.format("Wind direction: %s - %s wind (%d degree)\nSpeed: %.0f km/h  %.0f mph\nGists: %.0f km/h  %.0f mph",
                         current.getWindDirection(),
                         getWindDirection(current.getWindDirection()),
                         current.getWindDegree(),
@@ -498,10 +498,9 @@ public class GuiControllerImpl implements GuiController {
         stage.setScene(forecastScene);
         stage.setMinHeight(400);
         stage.setMinWidth(600);
-        //stage.initModality(Modality.APPLICATION_MODAL);
         stage.setOnShowing(windowEvent -> forecastController.onShowing());
         forecastController.setData(this.dataHolder.getResponse());
-        stage.showAndWait();
+        stage.show();
     }
 
     private static Tooltip getTooltip(String caption) {
@@ -555,17 +554,14 @@ public class GuiControllerImpl implements GuiController {
                 dataHolder.setResponse(weatherService.getForecastWeather());
                 updateProgress(20, MAX_VALUE);
                 Thread.sleep(10);
-                //dataHolder.setImage(weatherService.getRemoteImage(dataHolder.getResponse().getCurrent().getCondition().getIcon()));
                 dataHolder.setImage(weatherService.getWeatherIcon(dataHolder.getResponse().getCurrent().getCondition().getCode(), dataHolder.getResponse().getCurrent().isDay()));
                 dataHolder.setLastUpdatedTimestamp(Instant.now());
                 updateProgress(30, MAX_VALUE);
                 Thread.sleep(10);
-                //dataHolder.setImageForecast1(weatherService.getRemoteImage(dataHolder.getResponse().getForecast().getDayForecast()[1].getDay().getCondition().getIcon()));
                 dataHolder.setImageForecast1(weatherService.getWeatherIcon(
                         dataHolder.getResponse().getForecast().getDayForecast()[1].getDay().getCondition().getCode(), true));
                 updateProgress(40, MAX_VALUE);
                 Thread.sleep(10);
-                //dataHolder.setImageForecast2(weatherService.getRemoteImage(dataHolder.getResponse().getForecast().getDayForecast()[2].getDay().getCondition().getIcon()));
                 dataHolder.setImageForecast2(weatherService.getWeatherIcon(
                         dataHolder.getResponse().getForecast().getDayForecast()[2].getDay().getCondition().getCode(), true));
                 updateProgress(60, MAX_VALUE);
