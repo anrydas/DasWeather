@@ -8,7 +8,7 @@ import java.util.Map;
 
 public interface ForecastController {
     Map<Integer,String> TAB_NAMES = new LinkedHashMap<>();
-    public static final Map<String,String> FILE_FORMAT_NAMES = new HashMap<>();
+    Map<String,String> FILE_FORMAT_NAMES = new HashMap<>();
     void onShowing();
 
     void onShow();

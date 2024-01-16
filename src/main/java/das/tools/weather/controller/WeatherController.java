@@ -21,9 +21,7 @@ public class WeatherController {
     public void updateWeather() {
         // New thread needs to prevent IllegalStateException:
         // This operation is permitted on the event thread only; currentThread = task-1
-        Thread t = new Thread(() -> {
-            Platform.runLater(guiController::updateWeatherData);
-        });
+        Thread t = new Thread(() -> Platform.runLater(guiController::updateWeatherData));
         t.start();
     }
 }

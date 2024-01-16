@@ -575,9 +575,7 @@ public class GuiControllerImpl implements GuiController {
                 return null;
             }
         };
-        task.setOnSucceeded(e -> {
-            updateControls();
-        });
+        task.setOnSucceeded(e -> updateControls());
         task.setOnFailed(e -> {
             pb.setVisible(false);
             btUpdate.setDisable(false);
