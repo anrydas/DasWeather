@@ -25,9 +25,10 @@ import java.util.Map;
 public class ChartDataProducerImpl implements ChartDataProducer {
     private List<DataHolder> dataList;
 
-    @Autowired private WeatherService weatherService;
+    private final WeatherService weatherService;
 
-    public ChartDataProducerImpl() {
+    public ChartDataProducerImpl(WeatherService weatherService) {
+        this.weatherService = weatherService;
     }
 
     @Override
