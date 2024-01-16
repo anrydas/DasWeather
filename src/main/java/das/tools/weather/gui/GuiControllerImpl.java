@@ -123,7 +123,6 @@ public class GuiControllerImpl implements GuiController {
 
     @FXML
     private void initialize() {
-        btUpdate.setStyle("-fx-background-color: #457ecd; -fx-text-fill: #ffffff;");
         btUpdate.setOnAction(event -> updateWeatherData());
         btConfig.setTooltip(getTooltip("Configure Application"));
         btConfig.setOnAction(actionEvent -> showConfigWindow());

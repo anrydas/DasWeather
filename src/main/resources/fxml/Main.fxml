@@ -5,6 +5,7 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
+
 <AnchorPane prefHeight="510.0" prefWidth="521.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="das.tools.weather.gui.GuiControllerImpl">
     <VBox layoutX="10.0" layoutY="14.0" prefHeight="414.0" prefWidth="501.0" spacing="4.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="14.0">
         <HBox id="HBox" alignment="CENTER_LEFT" prefHeight="38.0" prefWidth="250.0" spacing="5.0">
@@ -198,33 +199,31 @@
             </VBox>
         </HBox>
     </VBox>
-    <VBox alignment="TOP_CENTER" layoutX="10.0" layoutY="223.0" prefHeight="58.0" prefWidth="408.0" spacing="5.0"
-          AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
+    <VBox alignment="TOP_CENTER" layoutX="10.0" layoutY="223.0" prefHeight="58.0" prefWidth="408.0" spacing="5.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
         <BorderPane prefHeight="62.0" prefWidth="494.0">
             <center>
-                <Button fx:id="btUpdate" defaultButton="true" prefHeight="24.0" prefWidth="90.0" text="Update"
-                        BorderPane.alignment="CENTER"/>
+                <Button fx:id="btUpdate" defaultButton="true" prefHeight="26.0" prefWidth="100.0" text="Update" BorderPane.alignment="CENTER" />
             </center>
             <right>
                 <Button fx:id="btConfig" prefHeight="32.0" prefWidth="32.0" BorderPane.alignment="CENTER">
                     <graphic>
-                        <ImageView fx:id="imgConfigure" fitHeight="32.0" fitWidth="32.0" preserveRatio="true"/>
+                        <ImageView fx:id="imgConfigure" fitHeight="32.0" fitWidth="32.0" preserveRatio="true" />
                     </graphic>
                 </Button>
             </right>
             <bottom>
                 <HBox alignment="CENTER">
                     <BorderPane.margin>
-                        <Insets top="10.0"/>
+                        <Insets top="10.0" />
                     </BorderPane.margin>
-                    <ProgressBar fx:id="pb" prefHeight="18.0" prefWidth="387.0" progress="0.0" visible="false"/>
+                    <ProgressBar fx:id="pb" prefHeight="18.0" prefWidth="387.0" progress="0.0" visible="false" />
                 </HBox>
             </bottom>
             <VBox.margin>
-                <Insets/>
+                <Insets />
             </VBox.margin>
             <padding>
-                <Insets top="10.0"/>
+                <Insets top="10.0" />
             </padding>
         </BorderPane>
     </VBox>
