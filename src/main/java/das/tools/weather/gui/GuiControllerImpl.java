@@ -31,7 +31,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Date;
 import java.util.Map;
@@ -51,6 +50,8 @@ public class GuiControllerImpl implements GuiController {
     @Autowired private GuiConfig.ViewHolder guiForecastView;
     @Autowired private ForecastController forecastController;
 
+    @FXML private ImageView imgDayLength;
+    @FXML private Label lbDayLength;
     @FXML private ImageView imgAirQuality;
     @FXML private ImageView imgWindGists;
     @FXML private ImageView imgVisibility;
@@ -162,7 +163,8 @@ public class GuiControllerImpl implements GuiController {
 
         fillWind();
 
-        fillVisibilityAndUv();
+        fillVisibilityAndUvAndDayLen();
+        fillDayLength();
 
         fillAirQuality();
 
@@ -190,7 +192,7 @@ public class GuiControllerImpl implements GuiController {
         Tooltip.install(imgAirQuality, tooltip);
     }
 
-    private void fillVisibilityAndUv() {
+    private void fillVisibilityAndUvAndDayLen() {
         WeatherCurrent current = this.dataHolder.getResponse().getCurrent();
         lbVisibility.setText(String.format("%.0f km", current.getVisibilityKm()));
         Tooltip tooltipVisibility = getTooltip(String.format("Visibility: %.0f km", current.getVisibilityKm()));
@@ -429,6 +431,16 @@ public class GuiControllerImpl implements GuiController {
                 dayForecasts[2].getDay().getMaxTempC(),
                 dayForecasts[2].getDay().getMinTempC()
         ));
+    }
+
+    private void fillDayLength() {
+        WeatherAstro currentAstro = this.dataHolder.getResponse().getForecast().getDayForecast()[0].getAstro();
+        String dayLength = getTimeLength(currentAstro.getSunRise(), currentAstro.getSunSet());
+        lbDayLength.setText(dayLength);
+        Tooltip tooltip = getTooltip(String.format("Day length: %s", dayLength));
+        tooltip.setGraphic(getTooltipImage(imgDayLength.getImage(), 100));
+        lbDayLength.setTooltip(tooltip);
+        Tooltip.install(imgDayLength, tooltip);
     }
 
     private void fillAstro() {
