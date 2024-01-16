@@ -40,12 +40,6 @@ import java.util.Objects;
 @Component
 @Slf4j
 public class GuiControllerImpl implements GuiController {
-    public static final String APPLICATION_TITLE = "Das Weather: %s %s";
-    protected static final int MINIMAL_UPDATE_INTERVAL = 1800000;
-    protected static final DateTimeFormatter DATE_FORMATTER_FOR_RESPONSE = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    protected static final DateTimeFormatter DATE_FORMATTER_FOR_VIEW = DateTimeFormatter.ofPattern("dd-MMM-yyyy");
-    protected static final DateTimeFormatter TIME_FORMATTER_FOR_VIEW = DateTimeFormatter.ofPattern("HH:mm");
-    private final RemoteDataHolder dataHolder = RemoteDataHolder.builder().build();
     private Scene configScene;
     private Scene forecastScene;
 
@@ -125,9 +119,6 @@ public class GuiControllerImpl implements GuiController {
         mapDirection.put("WNW", "West-Northwest");
         mapDirection.put("NW", "Northwest");
         mapDirection.put("NNW", "North-Northwest");
-    }
-
-    public GuiControllerImpl() {
     }
 
     @FXML

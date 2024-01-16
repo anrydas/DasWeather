@@ -17,8 +17,7 @@ import java.util.regex.Matcher;
 @Component
 @Slf4j
 public class ConfigControllerImpl implements ConfigController {
-    @Autowired
-    private GuiConfigService configService;
+    @Autowired private GuiConfigService configService;
     private Properties appProps;
     private boolean isConfigChanged;
 
