@@ -96,10 +96,12 @@ public class ChartDataProducerImpl implements ChartDataProducer {
 
     private String getTooltipText(WeatherHour hour) {
         return String.format(
-                "%s, %.0f℃ (%.0f°F), Fills like %.0f℃ (%.0f°F)\n" +
+                "%s\n" +
+                        "%s, %.0f℃ (%.0f°F), Fills like %.0f℃ (%.0f°F)\n" +
                         "Humidity: %d％\n" +
                         "Pressure: %.0f mmHg  %.0f mBar\n" +
                         "Wind: %s %.0f km/h (%.0f mph) upto %.0f km/h (%.0f mph)",
+                hour.getTime(),
                 hour.getCondition().getText(),
                 hour.getTemperature(), hour.getTemperatureF(), hour.getFillsLike(), hour.getFillsLikeF(),
                 hour.getHumidity(),
