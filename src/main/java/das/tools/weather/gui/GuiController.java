@@ -4,7 +4,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
-public interface GuiController {
+public interface GuiController extends Localized {
     String APPLICATION_TITLE = "Das Weather: %s %s";
     int MINIMAL_UPDATE_INTERVAL = 1800000;
     DateTimeFormatter DATE_FORMATTER_FOR_RESPONSE = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -30,6 +30,7 @@ public interface GuiController {
     Map<String,String> WIND_DIRECTIONS = new HashMap<>();
     String IMAGE_WEATHER_DEFAULT_ICON_PNG = "/images/weather-default-01.png";
 
+    void onShowingStage();
     void updateWeatherData();
     void updateWeatherDataForce();
 }
