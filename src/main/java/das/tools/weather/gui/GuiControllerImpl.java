@@ -106,23 +106,33 @@ public class GuiControllerImpl implements GuiController {
 
     @Override
     public void initLocale() {
-        Map<String,String> mapDirection = WIND_DIRECTIONS;
-        mapDirection.put("N", localizeService.getLocalizedResource("wind.n"));
-        mapDirection.put("NNE", localizeService.getLocalizedResource("wind.nne"));
-        mapDirection.put("NE", localizeService.getLocalizedResource("wind.ne"));
-        mapDirection.put("ENE", localizeService.getLocalizedResource("wind.ene"));
-        mapDirection.put("E", localizeService.getLocalizedResource("wind.e"));
-        mapDirection.put("ESE", localizeService.getLocalizedResource("wind.ese"));
-        mapDirection.put("SE", localizeService.getLocalizedResource("wind.se"));
-        mapDirection.put("SSE", localizeService.getLocalizedResource("wind.sse"));
-        mapDirection.put("S", localizeService.getLocalizedResource("wind.s"));
-        mapDirection.put("SSW", localizeService.getLocalizedResource("wind.ssw"));
-        mapDirection.put("SW", localizeService.getLocalizedResource("wind.sw"));
-        mapDirection.put("WSW", localizeService.getLocalizedResource("wind.wsw"));
-        mapDirection.put("W", localizeService.getLocalizedResource("wind.w"));
-        mapDirection.put("WNW", localizeService.getLocalizedResource("wind.wnw"));
-        mapDirection.put("NW", localizeService.getLocalizedResource("wind.nw"));
-        mapDirection.put("NNW", localizeService.getLocalizedResource("wind.nnw"));
+        Map<String,String> map = WIND_DIRECTIONS;
+        map.put("N", localizeService.getLocalizedResource("wind.n"));
+        map.put("NNE", localizeService.getLocalizedResource("wind.nne"));
+        map.put("NE", localizeService.getLocalizedResource("wind.ne"));
+        map.put("ENE", localizeService.getLocalizedResource("wind.ene"));
+        map.put("E", localizeService.getLocalizedResource("wind.e"));
+        map.put("ESE", localizeService.getLocalizedResource("wind.ese"));
+        map.put("SE", localizeService.getLocalizedResource("wind.se"));
+        map.put("SSE", localizeService.getLocalizedResource("wind.sse"));
+        map.put("S", localizeService.getLocalizedResource("wind.s"));
+        map.put("SSW", localizeService.getLocalizedResource("wind.ssw"));
+        map.put("SW", localizeService.getLocalizedResource("wind.sw"));
+        map.put("WSW", localizeService.getLocalizedResource("wind.wsw"));
+        map.put("W", localizeService.getLocalizedResource("wind.w"));
+        map.put("WNW", localizeService.getLocalizedResource("wind.wnw"));
+        map.put("NW", localizeService.getLocalizedResource("wind.nw"));
+        map.put("NNW", localizeService.getLocalizedResource("wind.nnw"));
+
+        map = MOON_PHASES;
+        map.put("new-moon", localizeService.getLocalizedResource("moon.new-moon"));
+        map.put("waxing-crescent", localizeService.getLocalizedResource("moon.waxing-crescent"));
+        map.put("waning-gibbous", localizeService.getLocalizedResource("moon.waning-gibbous"));
+        map.put("first-quarter", localizeService.getLocalizedResource("moon.first-quarter"));
+        map.put("full-moon", localizeService.getLocalizedResource("moon.full-moon"));
+        map.put("waxing-gibbous", localizeService.getLocalizedResource("moon.waxing-gibbous"));
+        map.put("last-quarter", localizeService.getLocalizedResource("moon.last-quarter"));
+        map.put("waning-crescent", localizeService.getLocalizedResource("moon.waning-crescent"));
     }
 
     @FXML
@@ -450,11 +460,13 @@ public class GuiControllerImpl implements GuiController {
         Tooltip.install(imgSunRise, dayLength);
         Tooltip.install(imgSunSet, dayLength);
 
+        String moonPhase = currentAstro.getMoonPhase();
+        String moonPhaseLocalized = MOON_PHASES.get(getMoonPhaseAcronim(moonPhase));
         lbMoonRise.setText(getProperlyFormattedTime(currentAstro.getMoonRise()));
-        imgMoonPhase.setImage(new Image(getMoonPhaseImageName(currentAstro.getMoonPhase())));
-        lbMoonPhase.setText(currentAstro.getMoonPhase());
+        imgMoonPhase.setImage(new Image(getMoonPhaseImageName(moonPhase)));
+        lbMoonPhase.setText(moonPhaseLocalized);
         lbMoonSet.setText(getProperlyFormattedTime(currentAstro.getMoonSet()));
-        Tooltip moonPhaseTooltip = getTooltip(currentAstro.getMoonPhase());
+        Tooltip moonPhaseTooltip = getTooltip(moonPhaseLocalized);
         Tooltip.install(imgMoonPhase, moonPhaseTooltip);
         lbMoonPhase.setTooltip(moonPhaseTooltip);
     }
@@ -482,7 +494,11 @@ public class GuiControllerImpl implements GuiController {
     }
 
     private String getMoonPhaseImageName(String phase) {
-        return "/images/moon/" + phase.toLowerCase().replace(" ", "-") + ".png";
+        return "/images/moon/" + getMoonPhaseAcronim(phase) + ".png";
+    }
+
+    private String getMoonPhaseAcronim(String phase) {
+        return phase.toLowerCase().replace(" ", "-");
     }
 
     private void showConfigWindow() {
