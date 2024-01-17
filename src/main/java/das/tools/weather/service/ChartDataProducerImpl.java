@@ -16,19 +16,22 @@ import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class ChartDataProducerImpl implements ChartDataProducer {
     private List<DataHolder> dataList;
 
     private final WeatherService weatherService;
+    private final LocalizeResourcesService localizeService;
 
-    public ChartDataProducerImpl(WeatherService weatherService) {
+    public ChartDataProducerImpl(WeatherService weatherService, LocalizeResourcesService localizeService) {
         this.weatherService = weatherService;
+        this.localizeService = localizeService;
+    }
+
+    @Override
+    public void initLocale(ResourceBundle locale) {
     }
 
     @Override
@@ -96,11 +99,7 @@ public class ChartDataProducerImpl implements ChartDataProducer {
 
     private String getTooltipText(WeatherHour hour) {
         return String.format(
-                "%s\n" +
-                        "%s, %.0f℃ (%.0f°F), Fills like %.0f℃ (%.0f°F)\n" +
-                        "Humidity: %d％\n" +
-                        "Pressure: %.0f mmHg  %.0f mBar\n" +
-                        "Wind: %s %.0f km/h (%.0f mph) upto %.0f km/h (%.0f mph)",
+                localizeService.getLocalizedResource("point.tooltip"),
                 hour.getTime(),
                 hour.getCondition().getText(),
                 hour.getTemperature(), hour.getTemperatureF(), hour.getFillsLike(), hour.getFillsLikeF(),
@@ -120,9 +119,7 @@ public class ChartDataProducerImpl implements ChartDataProducer {
                         if (series.getName().equals(legendItem.getText())) {
                             Node item = legendItem.getSymbol();
                             item.setCursor(Cursor.HAND);
-                            Tooltip.install(item, new Tooltip("Click to toggle chart\n" +
-                                    "Click with Ctrl to toggle cart's line but points aren't\n" +
-                                    "It could be also used to toggle points on chart"));
+                            Tooltip.install(item, new Tooltip(localizeService.getLocalizedResource("legend.tooltip")));
                             item.setOnMouseClicked(event -> {
                                 if (event.getButton() == MouseButton.PRIMARY) {
                                     series.getNode().setVisible(!series.getNode().isVisible());

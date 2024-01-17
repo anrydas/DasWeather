@@ -2,6 +2,7 @@ package das.tools.weather.gui;
 
 import das.tools.weather.entity.ForecastWeatherResponse;
 import das.tools.weather.service.ChartDataProducer;
+import das.tools.weather.service.LocalizeResourcesService;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.scene.SnapshotParameters;
@@ -9,6 +10,7 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.image.WritableImage;
 import javafx.stage.FileChooser;
@@ -24,6 +26,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.ResourceBundle;
+
 @Component
 @Slf4j
 public class ForecastControllerImpl implements ForecastController {
@@ -36,25 +40,30 @@ public class ForecastControllerImpl implements ForecastController {
     @FXML private LineChart<String, Number> chWind;
     @FXML private TabPane tabPane;
     private ForecastWeatherResponse data;
+    private ResourceBundle locale;
     private File saveFileInitialDirectory = new File(System.getProperty("user.dir"));
     private static final Map<String,XYChart<String,Number>> TABS_TO_CHART_MAP = new LinkedHashMap<>();
 
     @Autowired private ChartDataProducer chartDataProducer;
+    @Autowired private LocalizeResourcesService localizeService;
 
     static {
-        Map<Integer,String> map = TAB_NAMES;
-        map.put(1, "Temperature");
-        map.put(2, "Pressure");
-        map.put(3, "Humidity");
-        map.put(4, "Cloud");
-        map.put(5, "Wind");
-
         Map<String,String> extMap = FILE_FORMAT_NAMES;
         extMap.put("PNG", "PNG");
         extMap.put("JPG", "JPEG");
         extMap.put("JPEG", "JPEG");
         extMap.put("GIF", "GIF");
         extMap.put("BMP", "BMP");
+    }
+
+    @Override
+    public void initLocale() {
+        Map<Integer,String> map = TAB_NAMES;
+        map.put(1, localizeService.getLocalizedResource("chart.tab.1"));
+        map.put(2, localizeService.getLocalizedResource("chart.tab.2"));
+        map.put(3, localizeService.getLocalizedResource("chart.tab.3"));
+        map.put(4, localizeService.getLocalizedResource("chart.tab.4"));
+        map.put(5, localizeService.getLocalizedResource("chart.tab.5"));
     }
 
     @FXML
@@ -71,7 +80,7 @@ public class ForecastControllerImpl implements ForecastController {
 
     private File selectFileToSaveChart() {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Chose file name to save the Chart");
+        fileChooser.setTitle(localizeService.getLocalizedResource("file.dialog.title"));
         fileChooser.setInitialDirectory(this.saveFileInitialDirectory);
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("PNG Files", "*.png"),
@@ -106,12 +115,13 @@ public class ForecastControllerImpl implements ForecastController {
                 }
                 this.saveFileInitialDirectory = file.getParentFile();
                 Alert alert = new Alert(Alert.AlertType.INFORMATION,
-                        String.format("Chart was saved into '%s' file", file.getName()));
+                        String.format(localizeService.getLocalizedResource("alert.saveFile.ok"), file.getName()));
                 alert.showAndWait();
             } catch (IOException e) {
                 log.error("Couldn't save chart into file", e);
                 Alert alert = new Alert(Alert.AlertType.ERROR,
-                        String.format("Couldn't save chart into '%s' file:\n%s", file.getName(), e.getLocalizedMessage()));
+                        String.format(localizeService.getLocalizedResource("alert.saveFile.error"),
+                                file.getName(), e.getLocalizedMessage()));
                 alert.showAndWait();
             }
         }
@@ -127,11 +137,16 @@ public class ForecastControllerImpl implements ForecastController {
 
     @Override
     public void onShowing() {
+        setTabNames();
         fillGraphics();
     }
-    @Override
-    public void onShow() {
-        fillGraphics();
+
+    private void setTabNames() {
+        int i = 1;
+        for (Tab tab : tabPane.getTabs()) {
+            tab.setText(TAB_NAMES.get(i));
+            i++;
+        }
     }
 
     @Override
@@ -145,6 +160,7 @@ public class ForecastControllerImpl implements ForecastController {
     }
 
     private void fillGraphics() {
+        chartDataProducer.initLocale(this.locale);
         chartDataProducer.initChartsData(this.data.getForecast().getDayForecast());
         chartDataProducer.fillChart(chTemperature, TAB_NAMES.get(1));
         chartDataProducer.fillChart(chPressure, TAB_NAMES.get(2));

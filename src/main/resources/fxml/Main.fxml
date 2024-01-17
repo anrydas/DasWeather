@@ -34,7 +34,7 @@
                     <Font size="18.0" />
                 </font>
             </Label>
-            <Label alignment="TOP_RIGHT" contentDisplay="CENTER" prefHeight="18.0" prefWidth="60.0" text="Fills like: " textAlignment="CENTER" />
+            <Label fx:id="lbFillsLikeText" alignment="TOP_RIGHT" contentDisplay="CENTER" prefHeight="18.0" prefWidth="99.0" text="Fills like: " textAlignment="CENTER" />
             <Label fx:id="lbFills" contentDisplay="CENTER" prefHeight="27.0" prefWidth="71.0" text="20 C" textAlignment="CENTER">
                 <font>
                     <Font size="18.0" />

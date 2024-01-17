@@ -3,11 +3,12 @@
 <?import javafx.scene.chart.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+
 <AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="das.tools.weather.gui.ForecastControllerImpl">
     <TabPane fx:id="tabPane" prefHeight="344.0" prefWidth="578.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
-        <Tab text="Temperature">
+        <Tab fx:id="tab1" text="Temperature">
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                <LineChart fx:id="chTemperature" layoutX="57.0" layoutY="14.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0" stylesheets="@/css/chart.css">
+                <LineChart fx:id="chTemperature" layoutX="57.0" layoutY="14.0" stylesheets="@/css/chart.css" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
                     <xAxis>
                         <CategoryAxis label="Time" side="BOTTOM" />
                     </xAxis>
@@ -17,9 +18,9 @@
                 </LineChart>
             </AnchorPane>
         </Tab>
-        <Tab text="Pressure">
+        <Tab fx:id="tab2" text="Pressure">
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                <LineChart fx:id="chPressure" layoutX="57.0" layoutY="14.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0" stylesheets="@/css/chart.css">
+                <LineChart fx:id="chPressure" layoutX="57.0" layoutY="14.0" stylesheets="@/css/chart.css" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
                     <xAxis>
                         <CategoryAxis label="Time" side="BOTTOM" />
                     </xAxis>
@@ -29,9 +30,9 @@
                 </LineChart>
             </AnchorPane>
         </Tab>
-        <Tab text="Humidity">
+        <Tab fx:id="tab3" text="Humidity">
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                <LineChart fx:id="chHumidity" layoutX="57.0" layoutY="14.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0" stylesheets="@/css/chart.css">
+                <LineChart fx:id="chHumidity" layoutX="57.0" layoutY="14.0" stylesheets="@/css/chart.css" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
                     <xAxis>
                         <CategoryAxis label="Time" side="BOTTOM" />
                     </xAxis>
@@ -41,9 +42,9 @@
                 </LineChart>
             </AnchorPane>
         </Tab>
-        <Tab text="Cloud">
+        <Tab fx:id="tab4" text="Cloud">
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                <LineChart fx:id="chCloud" layoutX="57.0" layoutY="14.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0" stylesheets="@/css/chart.css">
+                <LineChart fx:id="chCloud" layoutX="57.0" layoutY="14.0" stylesheets="@/css/chart.css" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
                     <xAxis>
                         <CategoryAxis label="Time" side="BOTTOM" />
                     </xAxis>
@@ -53,9 +54,9 @@
                 </LineChart>
             </AnchorPane>
         </Tab>
-        <Tab text="Wind">
+        <Tab fx:id="tab5" text="Wind">
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                <LineChart fx:id="chWind" layoutX="57.0" layoutY="14.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0" stylesheets="@/css/chart.css">
+                <LineChart fx:id="chWind" layoutX="57.0" layoutY="14.0" stylesheets="@/css/chart.css" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
                     <xAxis>
                         <CategoryAxis label="Time" side="BOTTOM" />
                     </xAxis>

@@ -3,6 +3,7 @@ package das.tools.weather;
 import das.tools.weather.config.GuiConfig;
 import das.tools.weather.gui.GuiController;
 import das.tools.weather.service.GuiConfigService;
+import das.tools.weather.service.LocalizeResourcesService;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
@@ -27,10 +28,10 @@ import java.util.Optional;
 @EnableScheduling
 @EnableAsync
 public class DasWeatherApplication extends AbstractJavaFxApplicationSupport {
-    @Autowired
-    private GuiConfig.ViewHolder guiMainView;
-    @Autowired
-    private GuiConfigService guiConfig;
+    @Autowired private GuiConfig.ViewHolder guiMainView;
+    @Autowired private GuiConfigService guiConfig;
+    @Autowired private GuiController guiController;
+    @Autowired private LocalizeResourcesService localizeService;
 
     @Override
     public void start(Stage stage) {
@@ -44,8 +45,8 @@ public class DasWeatherApplication extends AbstractJavaFxApplicationSupport {
                 boolean isConfirmExit = Boolean.parseBoolean(guiConfig.getConfigStringValue(GuiConfigService.GUI_CONFIG_CONFIRM_EXIT_KEY, "true"));
                 if (isConfirmExit) {
                     Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
-                            "Do you really want exit?");
-                    alert.setTitle("Confirm");
+                            localizeService.getLocalizedResource("alert.app.exit.text"));
+                    alert.setTitle(localizeService.getLocalizedResource("alert.app.exit.title"));
                     alert.setHeaderText("Das Weather Application");
                     Optional<ButtonType> option = alert.showAndWait();
                     if (ButtonType.CANCEL.equals(option.orElse(null))) {
@@ -56,16 +57,11 @@ public class DasWeatherApplication extends AbstractJavaFxApplicationSupport {
                 Platform.exit();
                 System.exit(0);
             });
-
+        stage.setOnShowing(event -> guiController.onShowingStage());
         stage.show();
     }
 
     public static void main(String[] args) {
         launchApp(DasWeatherApplication.class, args);
-    }
-
-    @Bean
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
     }
 }
