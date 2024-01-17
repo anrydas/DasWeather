@@ -151,33 +151,33 @@ public class GuiControllerImpl implements GuiController {
                 current.getLastUpdate()
         ));
 
-        fillConditions();
-        fillLocation();
+        fillConditions(current);
+        fillLocation(current);
 
-        fillTemperature();
-        fillHumidity();
+        fillTemperature(current);
+        fillHumidity(current);
 
-        fillCloud();
-        fillPrecipitation();
-        fillPressure();
+        WeatherDayForecast[] dayForecasts = this.dataHolder.getResponse().getForecast().getDayForecast();
+        fillCloud(current);
+        fillPrecipitation(dayForecasts[0].getDay());
+        fillPressure(current);
 
-        fillWind();
+        fillWind(current);
 
-        fillVisibilityAndUvAndDayLen();
-        fillDayLength();
+        fillVisibilityAndUvAndDayLen(current);
+        fillDayLength(dayForecasts[0].getAstro());
 
-        fillAirQuality();
+        fillAirQuality(current);
 
-        fillAstro();
-        fillForecast();
+        fillAstro(dayForecasts[0].getAstro());
+        fillForecast(dayForecasts);
 
         btUpdate.setTooltip(getTooltip(String.format("Last Time updated %s",
                 new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm").format(Date.from(dataHolder.getLastUpdatedTimestamp()))
         )));
     }
 
-    private void fillAirQuality() {
-        WeatherCurrent current = this.dataHolder.getResponse().getCurrent();
+    private void fillAirQuality(WeatherCurrent current) {
         String MSG_AIR_QUALITY = "CO=%.00f,   NO2=%.00f,   O3=%.00f,   SO2=%.00f";
         lbAirQuality.setText(String.format(MSG_AIR_QUALITY,
                 current.getAirQuality().getCo(),
@@ -192,8 +192,7 @@ public class GuiControllerImpl implements GuiController {
         Tooltip.install(imgAirQuality, tooltip);
     }
 
-    private void fillVisibilityAndUvAndDayLen() {
-        WeatherCurrent current = this.dataHolder.getResponse().getCurrent();
+    private void fillVisibilityAndUvAndDayLen(WeatherCurrent current) {
         lbVisibility.setText(String.format("%.0f km", current.getVisibilityKm()));
         Tooltip tooltipVisibility = getTooltip(String.format("Visibility: %.0f km", current.getVisibilityKm()));
         ImageView iv = getTooltipImage(imgVisibility.getImage(), 100);
@@ -218,8 +217,7 @@ public class GuiControllerImpl implements GuiController {
         Tooltip.install(imgUvIndex, tooltipUv);
     }
 
-    private void fillLocation() {
-        WeatherCurrent current = this.dataHolder.getResponse().getCurrent();
+    private void fillLocation(WeatherCurrent current) {
         String updateDate = current.getLastUpdate().split(" ")[0];
         String updateTime = current.getLastUpdate().split(" ")[1];
         lbLocation.setText(String.format("%s %s at %s",
@@ -239,8 +237,7 @@ public class GuiControllerImpl implements GuiController {
         lbLocation.setTooltip(tooltip);
     }
 
-    private void fillConditions() {
-        WeatherCurrent current = this.dataHolder.getResponse().getCurrent();
+    private void fillConditions(WeatherCurrent current) {
         imgWeather.setImage(this.dataHolder.getImage());
         String conditionText = current.getCondition().getText();
         Tooltip.install(imgWeather, getTooltip(conditionText));
@@ -248,8 +245,7 @@ public class GuiControllerImpl implements GuiController {
         lbCondition.setTooltip(getTooltip(conditionText));
     }
 
-    private void fillTemperature() {
-        WeatherCurrent current = this.dataHolder.getResponse().getCurrent();
+    private void fillTemperature(WeatherCurrent current) {
         lbTemperature.setText(String.format("%.0f℃", current.getTemperatureC()));
         lbFills.setText(String.format("%.0f℃", current.getFeelsLike()));
         String imageName = current.getTemperatureC() > 0 ? IMAGE_TEMP_HOT_PNG : IMAGE_TEMP_COLD_PNG;
@@ -270,8 +266,7 @@ public class GuiControllerImpl implements GuiController {
         Tooltip.install(imgTemperature, tooltip);
     }
 
-    private void fillHumidity() {
-        WeatherCurrent current = this.dataHolder.getResponse().getCurrent();
+    private void fillHumidity(WeatherCurrent current) {
         lbHumidity.setText(String.format("%d％", current.getHumidity()));
         ImageView iv = getTooltipImage(imgHumidity.getImage(), 100);
         Tooltip tooltip = getTooltip(String.format("Humidity: %d％", current.getHumidity()));
@@ -280,8 +275,7 @@ public class GuiControllerImpl implements GuiController {
         Tooltip.install(imgHumidity, tooltip);
     }
 
-    private void fillPressure() {
-        WeatherCurrent current = this.dataHolder.getResponse().getCurrent();
+    private void fillPressure(WeatherCurrent current) {
         lbPressure.setText(String.format("%.0f mmHg", millibarToMmHg(current.getPressureMb())));
         Tooltip tooltip = getTooltip(String.format("Pressure:\n%.0f mmHg\n%.0f mBar", millibarToMmHg(current.getPressureMb()), current.getPressureMb()));
         tooltip.setGraphic(getTooltipImage(imgPressure.getImage(), 100));
@@ -296,8 +290,7 @@ public class GuiControllerImpl implements GuiController {
         return iv;
     }
 
-    private void fillCloud() {
-        WeatherCurrent current = this.dataHolder.getResponse().getCurrent();
+    private void fillCloud(WeatherCurrent current) {
         lbCloud.setText(String.format("%d％", current.getCloud()));
         Tooltip tooltip = getTooltip(String.format("Cloud: %d％", current.getCloud()));
         tooltip.setGraphic(getTooltipImage(imgCloud.getImage(), 100));
@@ -305,9 +298,7 @@ public class GuiControllerImpl implements GuiController {
         Tooltip.install(imgCloud, tooltip);
     }
 
-    private void fillWind() {
-        WeatherCurrent current = this.dataHolder.getResponse().getCurrent();
-
+    private void fillWind(WeatherCurrent current) {
         lbWindDirection.setText(current.getWindDirection());
         lbWindSpeed.setText(String.format("%.0f km/h", current.getWindKmh()));
         lbWindGists.setText(String.format("%.0f km/h", current.getGust()));
@@ -339,9 +330,7 @@ public class GuiControllerImpl implements GuiController {
         return WIND_DIRECTIONS.get(s);
     }
 
-    private void fillPrecipitation() {
-        WeatherDay day = this.dataHolder.getResponse().getForecast().getDayForecast()[0].getDay();
-
+    private void fillPrecipitation(WeatherDay day) {
         float totalPrecipitation = day.getTotalPrecipitation();
         float totalSnow = day.getTotalSnow();
         imgPrecipitation.setImage(null);
@@ -381,12 +370,11 @@ public class GuiControllerImpl implements GuiController {
         return res;
     }
 
-    private void fillForecast() {
+    private void fillForecast(WeatherDayForecast[] dayForecasts) {
         imgForecast01.setImage(this.dataHolder.getImage());
         imgForecast02.setImage(this.dataHolder.getImageForecast1());
         imgForecast03.setImage(this.dataHolder.getImageForecast2());
 
-        WeatherDayForecast[] dayForecasts = this.dataHolder.getResponse().getForecast().getDayForecast();
         lbForecast01.setText(DATE_FORMATTER_FOR_VIEW.format(LocalDate.now()));
         LocalDate dt1 = LocalDate.parse(dayForecasts[1].getDate(), DATE_FORMATTER_FOR_RESPONSE);
         lbgForecast02.setText(DATE_FORMATTER_FOR_VIEW.format(dt1));
@@ -433,8 +421,7 @@ public class GuiControllerImpl implements GuiController {
         ));
     }
 
-    private void fillDayLength() {
-        WeatherAstro currentAstro = this.dataHolder.getResponse().getForecast().getDayForecast()[0].getAstro();
+    private void fillDayLength(WeatherAstro currentAstro) {
         String dayLength = getTimeLength(currentAstro.getSunRise(), currentAstro.getSunSet());
         lbDayLength.setText(dayLength);
         Tooltip tooltip = getTooltip(String.format("Day length: %s", dayLength));
@@ -443,8 +430,7 @@ public class GuiControllerImpl implements GuiController {
         Tooltip.install(imgDayLength, tooltip);
     }
 
-    private void fillAstro() {
-        WeatherAstro currentAstro = this.dataHolder.getResponse().getForecast().getDayForecast()[0].getAstro();
+    private void fillAstro(WeatherAstro currentAstro) {
         lbSunRise.setText(getProperlyFormattedTime(currentAstro.getSunRise()));
         lbSunSet.setText(getProperlyFormattedTime(currentAstro.getSunSet()));
         Tooltip dayLength = getTooltip(String.format("Day length: %s", getTimeLength(currentAstro.getSunRise(), currentAstro.getSunSet())));
