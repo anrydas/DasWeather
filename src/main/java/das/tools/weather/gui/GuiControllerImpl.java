@@ -51,6 +51,7 @@ public class GuiControllerImpl implements GuiController {
     @Autowired private ResourceBundle.Control utf8Control;
     @Autowired private LocalizeResourcesService localizeService;
 
+    @FXML private Label lbWindSpeedText;
     @FXML private Label lbFillsLikeText;
     @FXML private ImageView imgDayLength;
     @FXML private Label lbDayLength;
@@ -163,6 +164,7 @@ public class GuiControllerImpl implements GuiController {
         btUpdate.setText(localizeService.getLocalizedResource("button.update.text"));
         btConfig.setTooltip(getTooltip(localizeService.getLocalizedResource("button.configure.tooltip")));
         lbFillsLikeText.setText(localizeService.getLocalizedResource("label.fillsLikeText.text"));
+        lbWindSpeedText.setText(localizeService.getLocalizedResource("label.windSpeed.text"));
     }
 
     private void updateControls() {
