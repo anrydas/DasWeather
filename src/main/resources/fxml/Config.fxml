@@ -1,46 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<AnchorPane prefHeight="280.0" prefWidth="510.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="das.tools.weather.gui.ConfigControllerImpl">
-   <VBox layoutY="2.0" prefHeight="227.0" prefWidth="490.0" spacing="5.0" AnchorPane.leftAnchor="10.0"
-         AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="2.0">
+
+<AnchorPane prefHeight="280.0" prefWidth="510.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="das.tools.weather.gui.ConfigControllerImpl">
+   <VBox layoutY="2.0" prefHeight="227.0" prefWidth="490.0" spacing="5.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="2.0">
       <HBox alignment="CENTER_LEFT" layoutX="14.0" layoutY="14.0" prefHeight="46.0" prefWidth="487.0" spacing="10.0">
-         <Label text="API Key"/>
-         <TextField fx:id="edApiKey" prefHeight="24.0" prefWidth="405.0" promptText="Your API Key"/>
+         <Label fx:id="lbApiKey" text="API Key" />
+         <TextField fx:id="edApiKey" prefHeight="24.0" prefWidth="405.0" promptText="Your API Key" />
       </HBox>
       <HBox alignment="CENTER_LEFT" layoutX="14.0" layoutY="14.0" prefHeight="46.0" prefWidth="487.0" spacing="10.0">
-         <Label text="Forecast URL"/>
-         <TextField fx:id="edForecastUrl" prefHeight="24.0" prefWidth="369.0" promptText="Weather Forecast URL"/>
+         <Label fx:id="lbUrl" text="Forecast URL" />
+         <TextField fx:id="edForecastUrl" prefHeight="24.0" prefWidth="369.0" promptText="Weather Forecast URL" />
       </HBox>
       <HBox alignment="CENTER_LEFT" layoutX="14.0" layoutY="14.0" prefHeight="46.0" prefWidth="487.0" spacing="10.0">
-         <Label text="Location"/>
-         <TextField fx:id="edLocation" prefHeight="24.0" prefWidth="288.0" promptText="Name or Lattitude,Longitude"/>
+         <Label fx:id="lbLocation" text="Location" />
+         <TextField fx:id="edLocation" prefHeight="24.0" prefWidth="288.0" promptText="Name or Lattitude,Longitude" />
       </HBox>
       <HBox alignment="CENTER_LEFT" layoutX="14.0" layoutY="14.0" prefHeight="46.0" prefWidth="487.0" spacing="10.0">
-         <Label text="Update Interval"/>
-         <Spinner fx:id="spUpdateInterval" amountToStepBy="10" max="360" min="60" prefHeight="24.0"
-                  prefWidth="81.0"/>
-         <Label text="min."/>
+         <Label fx:id="lbInterval" text="Update Interval" />
+         <Spinner fx:id="spUpdateInterval" amountToStepBy="10" max="360" min="60" prefHeight="24.0" prefWidth="81.0" />
+         <Label text="min." />
       </HBox>
       <HBox alignment="CENTER_LEFT" layoutX="14.0" layoutY="14.0" prefHeight="36.0" prefWidth="490.0" spacing="10.0">
          <padding>
-            <Insets bottom="5.0" top="5.0"/>
+            <Insets bottom="5.0" top="5.0" />
          </padding>
-         <Label text="Weather Condition Language"/>
-         <ComboBox fx:id="cbCondLang" prefHeight="24.0" prefWidth="147.0"/>
+         <Label fx:id="lbLanguage" text="Weather Condition Language" />
+         <ComboBox fx:id="cbCondLang" prefHeight="26.0" prefWidth="170.0" />
       </HBox>
       <HBox alignment="CENTER_LEFT" layoutX="14.0" layoutY="14.0" prefHeight="46.0" prefWidth="487.0" spacing="10.0">
-         <CheckBox fx:id="chbConfirmExit" mnemonicParsing="false" text="Confirm Application Exit"/>
+         <CheckBox fx:id="chbConfirmExit" mnemonicParsing="false" text="Confirm Application Exit" />
       </HBox>
    </VBox>
-   <HBox alignment="CENTER" layoutX="10.0" layoutY="177.0" prefHeight="46.0" prefWidth="490.0" spacing="20.0"
-         AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
-      <Button fx:id="btOk" defaultButton="true" mnemonicParsing="false" prefHeight="24.0" prefWidth="70.0"
-              text="OK"/>
-      <Button fx:id="btCancel" cancelButton="true" mnemonicParsing="false" prefHeight="24.0" prefWidth="70.0"
-              text="Cancel"/>
+   <HBox alignment="CENTER" layoutX="10.0" layoutY="177.0" prefHeight="46.0" prefWidth="490.0" spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
+      <Button fx:id="btOk" defaultButton="true" mnemonicParsing="false" prefHeight="24.0" prefWidth="94.0" text="OK" />
+      <Button fx:id="btCancel" cancelButton="true" mnemonicParsing="false" prefHeight="24.0" prefWidth="94.0" text="Cancel" />
    </HBox>
 </AnchorPane>
