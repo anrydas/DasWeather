@@ -1,16 +1,15 @@
 package das.tools.weather.gui;
 
-import das.tools.weather.config.GuiConfig;
+import das.tools.weather.DasWeatherApplication;
 import das.tools.weather.entity.ForecastWeatherResponse;
 import das.tools.weather.entity.current.WeatherCurrent;
 import das.tools.weather.entity.forecast.WeatherAstro;
 import das.tools.weather.entity.forecast.WeatherDay;
 import das.tools.weather.entity.forecast.WeatherDayForecast;
-import das.tools.weather.service.GuiConfigService;
-import das.tools.weather.service.LocalizeResourcesService;
-import das.tools.weather.service.WeatherService;
+import das.tools.weather.service.*;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -23,33 +22,25 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.info.BuildProperties;
-import org.springframework.stereotype.Component;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
-import java.util.*;
+import java.util.Date;
+import java.util.Map;
+import java.util.Objects;
 
-@Component
 @Slf4j
 public class GuiControllerImpl implements GuiController {
-    private Scene configScene;
-    private Scene forecastScene;
-
-    @Autowired private GuiConfigService configService;
-    @Autowired private BuildProperties buildProperties;
-    @Autowired private WeatherService weatherService;
-    @Autowired private ConfigController configController;
-    @Autowired private GuiConfig.ViewHolder guiConfigView;
-    @Autowired private GuiConfig.ViewHolder guiForecastView;
-    @Autowired private ForecastController forecastController;
-    @Autowired private ResourceBundle.Control utf8Control;
-    @Autowired private LocalizeResourcesService localizeService;
+    private static volatile GuiController instance;
+    private GuiConfigService configService = GuiConfigServiceImpl.getInstance();
+    private WeatherService weatherService = WeatherServiceImpl.getInstance();
+    private LocalizeResourcesService localizeService = LocalizeResourcesServiceImpl.getInstance();
 
     @FXML private Label lbWindSpeedText;
     @FXML private Label lbFillsLikeText;
@@ -104,6 +95,17 @@ public class GuiControllerImpl implements GuiController {
     @FXML private ProgressBar pb;
     @FXML private ImageView imgConfigure;
     @FXML public ImageView imgWindDirection;
+
+    public static GuiController getInstance() {
+        if (instance == null) {
+            synchronized (GuiControllerImpl.class) {
+                if (instance == null) {
+                    instance = new GuiControllerImpl();
+                }
+            }
+        }
+        return instance;
+    }
 
     @Override
     public void initLocale() {
@@ -504,33 +506,47 @@ public class GuiControllerImpl implements GuiController {
     }
 
     private void showConfigWindow() {
-        configScene = configScene == null ? new Scene(guiConfigView.getView()) : configScene;
-        Stage stage = new Stage();
-        stage.setTitle(String.format("Das Weather Config (v.%s)", buildProperties.getVersion()));
-        stage.setScene(configScene);
-        stage.setResizable(false);
-        stage.initModality(Modality.APPLICATION_MODAL);
-        stage.setOnShowing(windowEvent -> configController.onShowingStage());
-        configController.initLocale();
-        stage.showAndWait();
-        if (configController.isConfigChanged()) {
-            localizeService.initLocale();
-            setLocalizedResources();
-            updateWeatherDataForce();
+        try(InputStream fxmlStream = getClass().getClassLoader().getResourceAsStream("fxml/Config.fxml")) {
+            FXMLLoader loader = new FXMLLoader();
+            loader.load(fxmlStream);
+            Scene scene = new Scene(loader.getRoot());
+            Stage stage = new Stage();
+            stage.setTitle(String.format("Das Weather Config (v.%s)", DasWeatherApplication.APP_VERSION));
+            stage.setScene(scene);
+            stage.setResizable(false);
+            stage.initModality(Modality.APPLICATION_MODAL);
+            ConfigController controller = loader.getController();
+            stage.setOnShowing(windowEvent -> controller.onShowingStage());
+            controller.initLocale();
+            stage.showAndWait();
+            if (controller.isConfigChanged()) {
+                localizeService.initLocale();
+                setLocalizedResources();
+                updateWeatherDataForce();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
     private void showForecastWindow() {
-        forecastScene = forecastScene == null ? new Scene(guiForecastView.getView()) : forecastScene;
-        Stage stage = new Stage();
-        stage.setTitle(String.format("Das Weather Forecast (v.%s)", buildProperties.getVersion()));
-        stage.setScene(forecastScene);
-        stage.setMinHeight(400);
-        stage.setMinWidth(600);
-        stage.setOnShowing(windowEvent -> forecastController.onShowing());
-        forecastController.initLocale();
-        forecastController.setData(this.dataHolder.getResponse());
-        stage.show();
+        try(InputStream fxmlStream = getClass().getClassLoader().getResourceAsStream("fxml/Forecast.fxml")) {
+            FXMLLoader loader = new FXMLLoader();
+            loader.load(fxmlStream);
+            Scene scene = new Scene(loader.getRoot());
+            Stage stage = new Stage();
+            stage.setTitle(String.format("Das Weather Forecast (v.%s)", DasWeatherApplication.APP_VERSION));
+            stage.setScene(scene);
+            stage.setMinHeight(600);
+            stage.setMinWidth(800);
+            ForecastController controller = loader.getController();
+            stage.setOnShowing(windowEvent -> controller.onShowing());
+            controller.initLocale();
+            controller.setData(this.dataHolder.getResponse());
+            stage.show();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private static Tooltip getTooltip(String caption) {

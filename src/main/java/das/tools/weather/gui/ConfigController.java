@@ -1,6 +1,5 @@
 package das.tools.weather.gui;
 
-import java.util.ResourceBundle;
 import java.util.regex.Pattern;
 
 public interface ConfigController extends Localized {

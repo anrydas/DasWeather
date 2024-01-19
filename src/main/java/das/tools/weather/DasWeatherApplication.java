@@ -1,48 +1,42 @@
 package das.tools.weather;
 
-import das.tools.weather.config.GuiConfig;
+import das.tools.weather.controller.UpdateWeatherController;
 import das.tools.weather.gui.GuiController;
 import das.tools.weather.service.GuiConfigService;
+import das.tools.weather.service.GuiConfigServiceImpl;
 import das.tools.weather.service.LocalizeResourcesService;
+import das.tools.weather.service.LocalizeResourcesServiceImpl;
+import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.event.EventHandler;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Timer;
 
-@SpringBootApplication
-@Lazy
-@EnableScheduling
-@EnableAsync
-public class DasWeatherApplication extends AbstractJavaFxApplicationSupport {
-    @Autowired private GuiConfig.ViewHolder guiMainView;
-    @Autowired private GuiConfigService guiConfig;
-    @Autowired private GuiController guiController;
-    @Autowired private LocalizeResourcesService localizeService;
+public class DasWeatherApplication extends Application {
+    public static final String APP_VERSION = "3.0.0-RELEASE";
+    private final LocalizeResourcesService localizeService = LocalizeResourcesServiceImpl.getInstance();
 
     @Override
     public void start(Stage stage) {
-        Scene scene = new Scene(guiMainView.getView());
-        stage.getIcons().add(new Image(Objects.requireNonNull(DasWeatherApplication.class.getResourceAsStream(GuiController.IMAGE_WEATHER_DEFAULT_ICON_PNG))));
-        stage.setTitle("Das Weather");
-        stage.setResizable(false);
-        stage.setScene(scene);
-
+        try(InputStream fxmlStream = getClass().getClassLoader().getResourceAsStream("fxml/Main.fxml")) {
+            FXMLLoader loader = new FXMLLoader();
+            loader.load(fxmlStream);
+            Scene scene = new Scene(loader.getRoot());
+            stage.getIcons().add(new Image(Objects.requireNonNull(DasWeatherApplication.class.getResourceAsStream(GuiController.IMAGE_WEATHER_DEFAULT_ICON_PNG))));
+            stage.setTitle("Das Weather");
+            stage.setResizable(false);
+            stage.setScene(scene);
             stage.setOnCloseRequest(event -> {
-                boolean isConfirmExit = Boolean.parseBoolean(guiConfig.getConfigStringValue(GuiConfigService.GUI_CONFIG_CONFIRM_EXIT_KEY, "true"));
+                boolean isConfirmExit = Boolean.parseBoolean(GuiConfigServiceImpl.getInstance().getConfigStringValue(GuiConfigService.GUI_CONFIG_CONFIRM_EXIT_KEY, "true"));
                 if (isConfirmExit) {
                     Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
                             localizeService.getLocalizedResource("alert.app.exit.text"));
@@ -57,11 +51,19 @@ public class DasWeatherApplication extends AbstractJavaFxApplicationSupport {
                 Platform.exit();
                 System.exit(0);
             });
-        stage.setOnShowing(event -> guiController.onShowingStage());
-        stage.show();
+            GuiController guiController = loader.getController();
+            stage.setOnShowing(event -> guiController.onShowingStage());
+            stage.show();
+            guiController.updateWeatherData();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(UpdateWeatherController.getInstance(), 10000, 600000);
     }
 
     public static void main(String[] args) {
-        launchApp(DasWeatherApplication.class, args);
+        Application.launch(args);
     }
 }
