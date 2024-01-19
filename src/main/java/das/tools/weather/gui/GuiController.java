@@ -4,8 +4,14 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
-public interface GuiController {
-    public static final DateTimeFormatter TIME_FORMATTER_FOR_RESPONSE = DateTimeFormatter.ofPattern("hh:mm a");
+public interface GuiController extends Localized {
+    String APPLICATION_TITLE = "Das Weather: %s %s";
+    int MINIMAL_UPDATE_INTERVAL = 1800000;
+    DateTimeFormatter DATE_FORMATTER_FOR_RESPONSE = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    DateTimeFormatter DATE_FORMATTER_FOR_VIEW = DateTimeFormatter.ofPattern("dd-MMM-yyyy");
+    DateTimeFormatter TIME_FORMATTER_FOR_VIEW = DateTimeFormatter.ofPattern("HH:mm");
+    GuiControllerImpl.RemoteDataHolder dataHolder = GuiControllerImpl.RemoteDataHolder.builder().build();
+    DateTimeFormatter TIME_FORMATTER_FOR_RESPONSE = DateTimeFormatter.ofPattern("hh:mm a");
     String IMAGE_CONFIGURE_PNG = "/images/configure.png";
     String IMAGE_WIND_ARROW_PNG = "/images/wind_arrow.png";
     String IMAGE_SUNRISE_PNG = "/images/sunrise.png";
@@ -22,8 +28,10 @@ public interface GuiController {
     String IMAGE_AIR_QUALITY_PNG = "/images/AirQuality.png";
     String IMAGE_AIR_QUALITY_HINT_PNG = "/images/AirQualityHint.png";
     Map<String,String> WIND_DIRECTIONS = new HashMap<>();
+    Map<String,String> MOON_PHASES = new HashMap<>();
     String IMAGE_WEATHER_DEFAULT_ICON_PNG = "/images/weather-default-01.png";
 
+    void onShowingStage();
     void updateWeatherData();
     void updateWeatherDataForce();
 }

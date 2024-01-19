@@ -1,6 +1,7 @@
 package das.tools.weather.gui;
 
 import das.tools.weather.service.GuiConfigService;
+import das.tools.weather.service.LocalizeResourcesService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -12,33 +13,34 @@ import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.Properties;
+import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 
 @Component
 @Slf4j
 public class ConfigControllerImpl implements ConfigController {
-    @Autowired
-    private GuiConfigService configService;
+    @Autowired private GuiConfigService configService;
+    @Autowired private LocalizeResourcesService localizeService;
     private Properties appProps;
     private boolean isConfigChanged;
-
-    @FXML
-    private TextField edApiKey;
-    @FXML
-    private TextField edForecastUrl;
-    @FXML
-    private TextField edLocation;
-    @FXML
-    private Spinner<Integer> spUpdateInterval;
-    @FXML
-    private ComboBox<String> cbCondLang;
-    @FXML
-    private CheckBox chbConfirmExit;
-    @FXML
-    private Button btOk;
-    @FXML
-    private Button btCancel;
+    @FXML private Label lbApiKey;
+    @FXML private Label lbUrl;
+    @FXML private Label lbLocation;
+    @FXML private Label lbInterval;
+    @FXML private Label lbLanguage;
+    @FXML private TextField edApiKey;
+    @FXML private TextField edForecastUrl;
+    @FXML private TextField edLocation;
+    @FXML private Spinner<Integer> spUpdateInterval;
+    @FXML private ComboBox<String> cbCondLang;
+    @FXML private CheckBox chbConfirmExit;
+    @FXML private Button btOk;
+    @FXML private Button btCancel;
     public ConfigControllerImpl() {
+    }
+
+    @Override
+    public void initLocale() {
     }
 
     @FXML
@@ -49,6 +51,7 @@ public class ConfigControllerImpl implements ConfigController {
 
     @Override
     public void onShowingStage() {
+        setLabelNames();
         appProps = configService.getCurrentConfig();
         edApiKey.setText(appProps.getProperty(GuiConfigService.GUI_CONFIG_API_KEY_KEY,
                 configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_API_KEY_KEY)));
@@ -74,6 +77,16 @@ public class ConfigControllerImpl implements ConfigController {
                 )
         );
         cbCondLang.getSelectionModel().select(langName);
+    }
+
+    private void setLabelNames() {
+        lbApiKey.setText(localizeService.getLocalizedResource("label.key"));
+        lbUrl.setText(localizeService.getLocalizedResource("label.url"));
+        lbLocation.setText(localizeService.getLocalizedResource("label.location"));
+        lbInterval.setText(localizeService.getLocalizedResource("label.interval"));
+        lbLanguage.setText(localizeService.getLocalizedResource("label.language"));
+        chbConfirmExit.setText(localizeService.getLocalizedResource("box.confirm.exit"));
+        btCancel.setText(localizeService.getLocalizedResource( "button.close"));
     }
 
     @Override

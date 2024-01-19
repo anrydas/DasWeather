@@ -46,5 +46,6 @@
 ### 🐞 Known issues
 - On Windows 11 after Hibernation the [Main window](#MainWin) may not be updated for couple minutes
   - **_Resolving:_** Press **Update** button
+- Unexpected behavior of Forecast window's controls in case when opened more than one window.
 
 ###### _Made by -=:dAs:=-_
