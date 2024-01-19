@@ -6,7 +6,7 @@ import javafx.scene.chart.XYChart;
 import java.util.ResourceBundle;
 
 public interface ChartDataProducer {
-    void initLocale(ResourceBundle locale);
+    void initLocale();
 
     void initChartsData(WeatherDayForecast[] dayForecasts);
 

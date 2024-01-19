@@ -40,7 +40,7 @@ public class ChartDataProducerImpl implements ChartDataProducer {
     }
 
     @Override
-    public void initLocale(ResourceBundle locale) {
+    public void initLocale() {
     }
 
     @Override

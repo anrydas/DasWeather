@@ -7,6 +7,8 @@ import das.tools.weather.service.LocalizeResourcesService;
 import das.tools.weather.service.LocalizeResourcesServiceImpl;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
@@ -39,9 +41,7 @@ public class ForecastControllerImpl implements ForecastController {
     @FXML private LineChart<String, Number> chWind;
     @FXML private TabPane tabPane;
     private ForecastWeatherResponse data;
-    private ResourceBundle locale;
     private File saveFileInitialDirectory = new File(System.getProperty("user.dir"));
-    private static final Map<String,XYChart<String,Number>> TABS_TO_CHART_MAP = new LinkedHashMap<>();
 
     private final ChartDataProducer chartDataProducer;
     private final LocalizeResourcesService localizeService;
@@ -72,12 +72,6 @@ public class ForecastControllerImpl implements ForecastController {
 
     @FXML
     private void initialize() {
-        TABS_TO_CHART_MAP.put(TAB_NAMES.get(1), chTemperature);
-        TABS_TO_CHART_MAP.put(TAB_NAMES.get(2), chPressure);
-        TABS_TO_CHART_MAP.put(TAB_NAMES.get(3), chHumidity);
-        TABS_TO_CHART_MAP.put(TAB_NAMES.get(4), chCloud);
-        TABS_TO_CHART_MAP.put(TAB_NAMES.get(5), chWind);
-
         btClose.setOnAction(actionEvent -> ((Stage) btClose.getScene().getWindow()).close());
         btSave.setOnAction(actionEvent -> saveChartToFile());
     }
@@ -160,11 +154,17 @@ public class ForecastControllerImpl implements ForecastController {
     }
 
     private XYChart<String, Number> getActiveCart() {
-        return TABS_TO_CHART_MAP.get(tabPane.getSelectionModel().getSelectedItem().getText());
+        XYChart<String, Number> res = null;
+        for (Node node: ((Parent) tabPane.getSelectionModel().getSelectedItem().getContent()).getChildrenUnmodifiable()) {
+            if (node instanceof XYChart) {
+                res = (XYChart<String, Number>) node;
+                break;
+            }
+        };
+        return res;
     }
 
     private void fillGraphics() {
-        chartDataProducer.initLocale(this.locale);
         chartDataProducer.initChartsData(this.data.getForecast().getDayForecast());
         chartDataProducer.fillChart(chTemperature, TAB_NAMES.get(1));
         chartDataProducer.fillChart(chPressure, TAB_NAMES.get(2));
