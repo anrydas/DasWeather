@@ -2,7 +2,9 @@ package das.tools.weather.gui;
 
 import das.tools.weather.entity.ForecastWeatherResponse;
 import das.tools.weather.service.ChartDataProducer;
+import das.tools.weather.service.ChartDataProducerImpl;
 import das.tools.weather.service.LocalizeResourcesService;
+import das.tools.weather.service.LocalizeResourcesServiceImpl;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.scene.SnapshotParameters;
@@ -17,8 +19,6 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -28,7 +28,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-@Component
 @Slf4j
 public class ForecastControllerImpl implements ForecastController {
     @FXML private Button btClose;
@@ -44,8 +43,8 @@ public class ForecastControllerImpl implements ForecastController {
     private File saveFileInitialDirectory = new File(System.getProperty("user.dir"));
     private static final Map<String,XYChart<String,Number>> TABS_TO_CHART_MAP = new LinkedHashMap<>();
 
-    @Autowired private ChartDataProducer chartDataProducer;
-    @Autowired private LocalizeResourcesService localizeService;
+    private final ChartDataProducer chartDataProducer;
+    private final LocalizeResourcesService localizeService;
 
     static {
         Map<String,String> extMap = FILE_FORMAT_NAMES;
@@ -54,6 +53,11 @@ public class ForecastControllerImpl implements ForecastController {
         extMap.put("JPEG", "JPEG");
         extMap.put("GIF", "GIF");
         extMap.put("BMP", "BMP");
+    }
+
+    public ForecastControllerImpl() {
+        localizeService = LocalizeResourcesServiceImpl.getInstance();
+        chartDataProducer = ChartDataProducerImpl.getInstance();
     }
 
     @Override

@@ -1,33 +1,45 @@
 package das.tools.weather.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import das.tools.weather.entity.CurrenWeatherResponse;
 import das.tools.weather.entity.ForecastWeatherResponse;
-import das.tools.weather.exceptions.RestTemplateResponseErrorHandler;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-@Service
 @Slf4j
 public class WeatherServiceImpl implements WeatherService {
-
-    private final RestTemplate restTemplate;
     private final GuiConfigService configService;
-    private final RestTemplateResponseErrorHandler responseErrorHandler;
+    private static volatile WeatherServiceImpl instance;
+
+    public static WeatherServiceImpl getInstance() {
+        if (instance == null) {
+            synchronized (WeatherServiceImpl.class) {
+                if (instance == null) {
+                    instance = new WeatherServiceImpl();
+                }
+            }
+        }
+        return instance;
+    }
 
     static {
         Map<Integer,Integer> map = WEATHER_CODE_CONDITION_IMAGES;
@@ -81,12 +93,8 @@ public class WeatherServiceImpl implements WeatherService {
         map.put(1282, 395);
     }
 
-    public WeatherServiceImpl(RestTemplateBuilder restTemplateBuilder, GuiConfigService configService, RestTemplateResponseErrorHandler responseErrorHandler) {
-        this.restTemplate = restTemplateBuilder
-                .errorHandler(responseErrorHandler)
-                .build();
-        this.configService = configService;
-        this.responseErrorHandler = responseErrorHandler;
+    private WeatherServiceImpl() {
+        configService = GuiConfigServiceImpl.getInstance();
     }
 
     @Override
@@ -98,40 +106,61 @@ public class WeatherServiceImpl implements WeatherService {
     public ForecastWeatherResponse getForecastWeather() {
         Properties props = configService.getCurrentConfig();
         ForecastWeatherResponse response = null;
-        String url = ServletUriComponentsBuilder.fromHttpUrl(props.getProperty(GuiConfigService.GUI_CONFIG_FORECAST_URL_KEY,
-                        configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_FORECAST_URL_KEY)))
-                .queryParam("key", props.getProperty(GuiConfigService.GUI_CONFIG_API_KEY_KEY,
-                        configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_API_KEY_KEY)))
-                .queryParam("q", props.getProperty(GuiConfigService.GUI_CONFIG_WEATHER_LOCATION_KEY,
-                        configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_WEATHER_LOCATION_KEY)))
-                .queryParam("aqi", "yes")
-                .queryParam("lang", props.getProperty(GuiConfigService.GUI_CONFIG_CONDITION_LANGUAGE_KEY,
-                        configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_CONDITION_LANGUAGE_KEY)))
-                .queryParam("days", "3")
-                .toUriString();
-        if(log.isDebugEnabled()) log.debug("[WeatherService].getForecastWeather: got url={}", url);
-
         try {
-            response = getResponseAsync(url);
+            URIBuilder uri = new URIBuilder(props.getProperty(GuiConfigService.GUI_CONFIG_FORECAST_URL_KEY,
+                    configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_FORECAST_URL_KEY)));
+            uri.addParameter("key", props.getProperty(GuiConfigService.GUI_CONFIG_API_KEY_KEY,
+                    configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_API_KEY_KEY)));
+            uri.addParameter("q", props.getProperty(GuiConfigService.GUI_CONFIG_WEATHER_LOCATION_KEY,
+                    configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_WEATHER_LOCATION_KEY)));
+            uri.addParameter("aqi", "yes");
+            uri.addParameter("lang", props.getProperty(GuiConfigService.GUI_CONFIG_CONDITION_LANGUAGE_KEY,
+                    configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_CONDITION_LANGUAGE_KEY)));
+            uri.addParameter("days", "3");
+            String url = uri.toString();
+            if(log.isDebugEnabled()) log.debug("[WeatherService].getForecastWeather: got url={}", url);
+
+            response = getConvertedResponse(url);
             if(log.isDebugEnabled()) log.debug("[WeatherService].getForecastWeather: response={}", response);
             log.info("Weather was updated");
-        } catch (HttpClientErrorException e) {
+        } catch (URISyntaxException e) {
             log.error("Couldn't get response from server: ", e);
             throw new RuntimeException(e);
         }
-
         return response;
     }
 
-    private ForecastWeatherResponse getResponseAsync(String url) {
-        CompletableFuture<ForecastWeatherResponse> completableFuture =
-                CompletableFuture.supplyAsync(() -> restTemplate.getForObject(url, ForecastWeatherResponse.class));
-        ForecastWeatherResponse res = null;
-        try {
-            res = completableFuture.get();
-        } catch (InterruptedException | ExecutionException e) {
-            log.error("Error getting response from server: ", e);
-            throw new RuntimeException(e);
+    private ForecastWeatherResponse getConvertedResponse(String url) {
+        if (log.isDebugEnabled()) log.debug("getConvertedResponse Thread="+ Thread.currentThread().getName());
+        String response = apiRequest(url);
+        ForecastWeatherResponse res = ForecastWeatherResponse.builder().build();
+        if (!"".equals(response)) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            try {
+                res = objectMapper.readValue(response, ForecastWeatherResponse.class);
+                if (log.isDebugEnabled()) log.debug("got converted response={}", res);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return res;
+    }
+
+    private String apiRequest(String url) {
+        String res = "";
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            HttpGet request = new HttpGet(url);
+            try (CloseableHttpResponse response = httpClient.execute(request)) {
+                if (log.isDebugEnabled()) log.debug("API Request Thread="+ Thread.currentThread().getName());
+                HttpEntity entity = response.getEntity();
+                if (entity != null) {
+                    res = EntityUtils.toString(entity);
+                }
+            } catch (IOException e) {
+                log.error("Error 1: Couldn't get data from {}", url, e);
+            }
+        } catch (IOException e) {
+            log.error("Error 2: Couldn't get data from {}", url, e);
         }
         return res;
     }

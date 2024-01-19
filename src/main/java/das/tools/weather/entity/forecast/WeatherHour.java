@@ -1,5 +1,6 @@
 package das.tools.weather.entity.forecast;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRootName;
 import das.tools.weather.entity.current.WeatherCondition;
@@ -12,6 +13,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonIgnoreProperties(ignoreUnknown = true)
 @JsonRootName("hour")
 public class WeatherHour {
     WeatherCondition condition;
