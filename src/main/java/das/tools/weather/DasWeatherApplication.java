@@ -2,10 +2,7 @@ package das.tools.weather;
 
 import das.tools.weather.controller.UpdateWeatherController;
 import das.tools.weather.gui.GuiController;
-import das.tools.weather.service.GuiConfigService;
-import das.tools.weather.service.GuiConfigServiceImpl;
-import das.tools.weather.service.LocalizeResourcesService;
-import das.tools.weather.service.LocalizeResourcesServiceImpl;
+import das.tools.weather.service.*;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -31,7 +28,7 @@ public class DasWeatherApplication extends Application {
             FXMLLoader loader = new FXMLLoader();
             loader.load(fxmlStream);
             Scene scene = new Scene(loader.getRoot());
-            stage.getIcons().add(new Image(Objects.requireNonNull(DasWeatherApplication.class.getResourceAsStream(GuiController.IMAGE_WEATHER_DEFAULT_ICON_PNG))));
+            stage.getIcons().add(LoadingService.getInstance().getResourceImage(GuiController.IMAGE_WEATHER_DEFAULT_ICON_PNG));
             stage.setTitle("Das Weather");
             stage.setResizable(false);
             stage.setScene(scene);
