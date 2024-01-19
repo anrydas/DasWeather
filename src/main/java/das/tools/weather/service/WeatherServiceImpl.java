@@ -181,7 +181,7 @@ public class WeatherServiceImpl implements WeatherService {
         String path = "/images/conditions" + (isDay ? "/day" : "/night");
         String url = path + "/" + WEATHER_CODE_CONDITION_IMAGES.get(weatherCode) + ".png";
         if (log.isDebugEnabled()) log.debug("got image file url={}", url);
-        return new Image(url);
+        return LoadingService.getInstance().getResourceImage(url);
     }
 
     private BufferedImage getImageAsync(String urlString) {
