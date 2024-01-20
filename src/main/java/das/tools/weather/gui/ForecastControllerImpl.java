@@ -136,7 +136,6 @@ public class ForecastControllerImpl implements ForecastController {
     @Override
     public void onShowing() {
         setTabNames();
-        fillGraphics();
     }
 
     private void setTabNames() {
