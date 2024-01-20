@@ -23,9 +23,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.ResourceBundle;
 
 @Slf4j
 public class ForecastControllerImpl implements ForecastController {
@@ -97,10 +95,10 @@ public class ForecastControllerImpl implements ForecastController {
     private void saveChartToFile() {
         File file = selectFileToSaveChart();
         if (file != null) {
-            XYChart<String, Number> activeCart = getActiveCart();
-            WritableImage image = activeCart.snapshot(
+            XYChart<String, Number> activeChart = getActiveChart();
+            WritableImage image = activeChart.snapshot(
                     new SnapshotParameters(),
-                    new WritableImage((int) activeCart.getWidth(), (int) activeCart.getHeight())
+                    new WritableImage((int) activeChart.getWidth(), (int) activeChart.getHeight())
             );
             try {
                 String fileFormatName = getFileFormatName(file);
@@ -155,7 +153,7 @@ public class ForecastControllerImpl implements ForecastController {
         fillGraphics();
     }
 
-    private XYChart<String, Number> getActiveCart() {
+    private XYChart<String, Number> getActiveChart() {
         XYChart<String, Number> res = null;
         for (Node node: ((Parent) tabPane.getSelectionModel().getSelectedItem().getContent()).getChildrenUnmodifiable()) {
             if (node instanceof XYChart) {
