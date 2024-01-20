@@ -1,10 +1,7 @@
 package das.tools.weather.gui;
 
 import das.tools.weather.entity.ForecastWeatherResponse;
-import das.tools.weather.service.ChartDataProducer;
-import das.tools.weather.service.ChartDataProducerImpl;
-import das.tools.weather.service.LocalizeResourcesService;
-import das.tools.weather.service.LocalizeResourcesServiceImpl;
+import das.tools.weather.service.*;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -74,6 +71,11 @@ public class ForecastControllerImpl implements ForecastController {
     private void initialize() {
         btClose.setOnAction(actionEvent -> ((Stage) btClose.getScene().getWindow()).close());
         btSave.setOnAction(actionEvent -> saveChartToFile());
+        LoadingService.getInstance().addStyleToChart(chTemperature, "/css/chart.css");
+        LoadingService.getInstance().addStyleToChart(chPressure, "/css/chart.css");
+        LoadingService.getInstance().addStyleToChart(chWind, "/css/chart.css");
+        LoadingService.getInstance().addStyleToChart(chHumidity, "/css/chart.css");
+        LoadingService.getInstance().addStyleToChart(chCloud, "/css/chart.css");
     }
 
     private File selectFileToSaveChart() {
