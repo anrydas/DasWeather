@@ -288,8 +288,8 @@ public class GuiControllerImpl implements GuiController {
     }
 
     private void fillTemperature(WeatherCurrent current) {
-        lbTemperature.setText(String.format("%.0f℃", current.getTemperatureC()));
-        lbFills.setText(String.format("%.0f℃", current.getFeelsLike()));
+        lbTemperature.setText(String.format("%.0f\u00B0C", current.getTemperatureC()));
+        lbFills.setText(String.format("%.0f\u00B0C", current.getFeelsLike()));
         String imageName = current.getTemperatureC() > 0 ? IMAGE_TEMP_HOT_PNG : IMAGE_TEMP_COLD_PNG;
         Image image = LoadingService.getInstance().getResourceImage(imageName);
         imgTemperature.setImage(image);
@@ -309,7 +309,7 @@ public class GuiControllerImpl implements GuiController {
     }
 
     private void fillHumidity(WeatherCurrent current) {
-        lbHumidity.setText(String.format("%d％", current.getHumidity()));
+        lbHumidity.setText(String.format("%d%%", current.getHumidity()));
         ImageView iv = getTooltipImage(imgHumidity.getImage(), 100);
         Tooltip tooltip = getTooltip(String.format(localizeService.getLocalizedResource("humidity.tooltip"), current.getHumidity()));
         tooltip.setGraphic(iv);
@@ -333,7 +333,7 @@ public class GuiControllerImpl implements GuiController {
     }
 
     private void fillCloud(WeatherCurrent current) {
-        lbCloud.setText(String.format("%d％", current.getCloud()));
+        lbCloud.setText(String.format("%d%%", current.getCloud()));
         Tooltip tooltip = getTooltip(String.format(localizeService.getLocalizedResource("cloud.tooltip"), current.getCloud()));
         tooltip.setGraphic(getTooltipImage(imgCloud.getImage(), 100));
         lbCloud.setTooltip(tooltip);
