@@ -4,7 +4,7 @@ SCRIPTPATH=$( cd -- $(dirname $0) >/dev/null 2>&1 ; pwd -P )
 cd $SCRIPTPATH
 
 JAVA_PARAMS="
-  -Dspring.profiles.active=default
+  -Dprofiles.active=default
   -Dlogging.file.name=logs/DasWeather.log
 "
 

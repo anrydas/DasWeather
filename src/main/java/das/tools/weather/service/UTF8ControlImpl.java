@@ -1,7 +1,5 @@
 package das.tools.weather.service;
 
-import org.springframework.stereotype.Component;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -12,7 +10,6 @@ import java.util.Locale;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 
-@Component
 public class UTF8ControlImpl extends ResourceBundle.Control implements UTF8Control {
     @Override
     public ResourceBundle newBundle(String baseName, Locale locale,

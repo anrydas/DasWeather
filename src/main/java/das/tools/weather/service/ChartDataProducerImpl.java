@@ -13,25 +13,34 @@ import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.util.*;
 
-@Component
 public class ChartDataProducerImpl implements ChartDataProducer {
     private List<DataHolder> dataList;
 
     private final WeatherService weatherService;
     private final LocalizeResourcesService localizeService;
+    private static volatile ChartDataProducerImpl instance;
 
-    public ChartDataProducerImpl(WeatherService weatherService, LocalizeResourcesService localizeService) {
-        this.weatherService = weatherService;
-        this.localizeService = localizeService;
+    public static ChartDataProducerImpl getInstance() {
+        if (instance == null) {
+            synchronized (ChartDataProducerImpl.class) {
+                if (instance == null) {
+                    instance = new ChartDataProducerImpl();
+                }
+            }
+        }
+        return instance;
+    }
+
+    private ChartDataProducerImpl() {
+        this.weatherService = WeatherServiceImpl.getInstance();
+        this.localizeService = LocalizeResourcesServiceImpl.getInstance();
     }
 
     @Override
-    public void initLocale(ResourceBundle locale) {
+    public void initLocale() {
     }
 
     @Override
@@ -140,8 +149,7 @@ public class ChartDataProducerImpl implements ChartDataProducer {
         }
     }
 
-    @Getter
-    @Setter
+    @Getter @Setter
     private static class DataHolder {
         private String name;
         private Map<String,Number[]> tabAndValues;
