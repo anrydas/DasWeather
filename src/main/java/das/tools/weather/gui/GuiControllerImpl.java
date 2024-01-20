@@ -560,8 +560,8 @@ public class GuiControllerImpl implements GuiController {
             ForecastController controller = loader.getController();
             stage.setOnShowing(windowEvent -> controller.onShowing());
             controller.initLocale();
-            controller.setData(this.dataHolder.getResponse());
             stage.show();
+            controller.setData(this.dataHolder.getResponse());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
