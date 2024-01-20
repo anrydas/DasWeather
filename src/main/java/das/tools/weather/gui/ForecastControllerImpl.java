@@ -1,10 +1,11 @@
 package das.tools.weather.gui;
 
 import das.tools.weather.entity.ForecastWeatherResponse;
-import das.tools.weather.service.ChartDataProducer;
-import das.tools.weather.service.LocalizeResourcesService;
+import das.tools.weather.service.*;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
@@ -17,18 +18,13 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.ResourceBundle;
 
-@Component
 @Slf4j
 public class ForecastControllerImpl implements ForecastController {
     @FXML private Button btClose;
@@ -40,12 +36,10 @@ public class ForecastControllerImpl implements ForecastController {
     @FXML private LineChart<String, Number> chWind;
     @FXML private TabPane tabPane;
     private ForecastWeatherResponse data;
-    private ResourceBundle locale;
     private File saveFileInitialDirectory = new File(System.getProperty("user.dir"));
-    private static final Map<String,XYChart<String,Number>> TABS_TO_CHART_MAP = new LinkedHashMap<>();
 
-    @Autowired private ChartDataProducer chartDataProducer;
-    @Autowired private LocalizeResourcesService localizeService;
+    private final ChartDataProducer chartDataProducer;
+    private final LocalizeResourcesService localizeService;
 
     static {
         Map<String,String> extMap = FILE_FORMAT_NAMES;
@@ -54,6 +48,11 @@ public class ForecastControllerImpl implements ForecastController {
         extMap.put("JPEG", "JPEG");
         extMap.put("GIF", "GIF");
         extMap.put("BMP", "BMP");
+    }
+
+    public ForecastControllerImpl() {
+        localizeService = LocalizeResourcesServiceImpl.getInstance();
+        chartDataProducer = ChartDataProducerImpl.getInstance();
     }
 
     @Override
@@ -68,14 +67,13 @@ public class ForecastControllerImpl implements ForecastController {
 
     @FXML
     private void initialize() {
-        TABS_TO_CHART_MAP.put(TAB_NAMES.get(1), chTemperature);
-        TABS_TO_CHART_MAP.put(TAB_NAMES.get(2), chPressure);
-        TABS_TO_CHART_MAP.put(TAB_NAMES.get(3), chHumidity);
-        TABS_TO_CHART_MAP.put(TAB_NAMES.get(4), chCloud);
-        TABS_TO_CHART_MAP.put(TAB_NAMES.get(5), chWind);
-
         btClose.setOnAction(actionEvent -> ((Stage) btClose.getScene().getWindow()).close());
         btSave.setOnAction(actionEvent -> saveChartToFile());
+        LoadingService.getInstance().addStyleToChart(chTemperature, "/css/chart.css");
+        LoadingService.getInstance().addStyleToChart(chPressure, "/css/chart.css");
+        LoadingService.getInstance().addStyleToChart(chWind, "/css/chart.css");
+        LoadingService.getInstance().addStyleToChart(chHumidity, "/css/chart.css");
+        LoadingService.getInstance().addStyleToChart(chCloud, "/css/chart.css");
     }
 
     private File selectFileToSaveChart() {
@@ -97,10 +95,10 @@ public class ForecastControllerImpl implements ForecastController {
     private void saveChartToFile() {
         File file = selectFileToSaveChart();
         if (file != null) {
-            XYChart<String, Number> activeCart = getActiveCart();
-            WritableImage image = activeCart.snapshot(
+            XYChart<String, Number> activeChart = getActiveChart();
+            WritableImage image = activeChart.snapshot(
                     new SnapshotParameters(),
-                    new WritableImage((int) activeCart.getWidth(), (int) activeCart.getHeight())
+                    new WritableImage((int) activeChart.getWidth(), (int) activeChart.getHeight())
             );
             try {
                 String fileFormatName = getFileFormatName(file);
@@ -138,7 +136,6 @@ public class ForecastControllerImpl implements ForecastController {
     @Override
     public void onShowing() {
         setTabNames();
-        fillGraphics();
     }
 
     private void setTabNames() {
@@ -155,12 +152,18 @@ public class ForecastControllerImpl implements ForecastController {
         fillGraphics();
     }
 
-    private XYChart<String, Number> getActiveCart() {
-        return TABS_TO_CHART_MAP.get(tabPane.getSelectionModel().getSelectedItem().getText());
+    private XYChart<String, Number> getActiveChart() {
+        XYChart<String, Number> res = null;
+        for (Node node: ((Parent) tabPane.getSelectionModel().getSelectedItem().getContent()).getChildrenUnmodifiable()) {
+            if (node instanceof XYChart) {
+                res = (XYChart<String, Number>) node;
+                break;
+            }
+        };
+        return res;
     }
 
     private void fillGraphics() {
-        chartDataProducer.initLocale(this.locale);
         chartDataProducer.initChartsData(this.data.getForecast().getDayForecast());
         chartDataProducer.fillChart(chTemperature, TAB_NAMES.get(1));
         chartDataProducer.fillChart(chPressure, TAB_NAMES.get(2));
