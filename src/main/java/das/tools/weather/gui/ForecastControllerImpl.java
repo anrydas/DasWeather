@@ -167,7 +167,6 @@ public class ForecastControllerImpl implements ForecastController {
         chartDataProducer.initChartsData(this.data.getForecast().getDayForecast());
         chTemperature.setAnimated(false); // to prevent Time axis to be unreadable
         chartDataProducer.fillChart(chTemperature, TAB_NAMES.get(1));
-        chTemperature.setAnimated(true);
         chartDataProducer.fillChart(chPressure, TAB_NAMES.get(2));
         chartDataProducer.fillChart(chHumidity, TAB_NAMES.get(3));
         chartDataProducer.fillChart(chCloud, TAB_NAMES.get(4));
