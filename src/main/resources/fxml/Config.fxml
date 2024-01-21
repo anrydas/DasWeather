@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<AnchorPane prefHeight="280.0" prefWidth="510.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1" fx:controller="das.tools.weather.gui.ConfigControllerImpl">
+
+<AnchorPane prefHeight="280.0" prefWidth="510.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="das.tools.weather.gui.ConfigControllerImpl">
    <VBox layoutY="2.0" prefHeight="227.0" prefWidth="490.0" spacing="5.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="2.0">
       <HBox alignment="CENTER_LEFT" layoutX="14.0" layoutY="14.0" prefHeight="46.0" prefWidth="487.0" spacing="10.0">
          <Label fx:id="lbApiKey" text="API Key" />
@@ -15,7 +16,8 @@
       </HBox>
       <HBox alignment="CENTER_LEFT" layoutX="14.0" layoutY="14.0" prefHeight="46.0" prefWidth="487.0" spacing="10.0">
          <Label fx:id="lbLocation" text="Location" />
-         <TextField fx:id="edLocation" prefHeight="24.0" prefWidth="288.0" promptText="Name or Lattitude,Longitude" />
+         <TextField fx:id="edLocation" prefHeight="24.0" prefWidth="273.0" promptText="Name" />
+         <Button fx:id="btSearchLocation" mnemonicParsing="false" text="Search" />
       </HBox>
       <HBox alignment="CENTER_LEFT" layoutX="14.0" layoutY="14.0" prefHeight="46.0" prefWidth="487.0" spacing="10.0">
          <Label fx:id="lbInterval" text="Update Interval" />

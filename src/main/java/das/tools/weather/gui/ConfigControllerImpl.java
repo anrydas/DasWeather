@@ -1,5 +1,6 @@
 package das.tools.weather.gui;
 
+import das.tools.weather.DasWeatherApplication;
 import das.tools.weather.service.GuiConfigService;
 import das.tools.weather.service.GuiConfigServiceImpl;
 import das.tools.weather.service.LocalizeResourcesService;
@@ -7,10 +8,14 @@ import das.tools.weather.service.LocalizeResourcesServiceImpl;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Properties;
 import java.util.regex.Matcher;
@@ -34,6 +39,7 @@ public class ConfigControllerImpl implements ConfigController {
     @FXML private CheckBox chbConfirmExit;
     @FXML private Button btOk;
     @FXML private Button btCancel;
+    @FXML private Button btSearchLocation;
     public ConfigControllerImpl() {
     }
 
@@ -41,12 +47,32 @@ public class ConfigControllerImpl implements ConfigController {
     public void initLocale() {
         localizeService = LocalizeResourcesServiceImpl.getInstance();
         configService = GuiConfigServiceImpl.getInstance();
+        btSearchLocation.setText(localizeService.getLocalizedResource("button.search"));
+        btSearchLocation.setTooltip(new Tooltip(localizeService.getLocalizedResource("button.search.tooltip")));
     }
 
     @FXML
     private void initialize() {
         btOk.setOnAction(actionEvent -> saveConfigAndClose());
         btCancel.setOnAction(actionEvent -> closeStage());
+        btSearchLocation.setOnAction(actionEvent -> showCheckWindow());
+    }
+
+    private void showCheckWindow() {
+        try(InputStream fxmlStream = getClass().getClassLoader().getResourceAsStream("fxml/CheckLocation.fxml")) {
+            FXMLLoader loader = new FXMLLoader();
+            loader.load(fxmlStream);
+            Scene scene = new Scene(loader.getRoot());
+            Stage stage = new Stage();
+            stage.setTitle(String.format("Search Location (v.%s)", DasWeatherApplication.APP_VERSION));
+            stage.setScene(scene);
+            CheckLocationController controller = loader.getController();
+            controller.initLocale();
+            controller.setLocation(edLocation.getText());
+            stage.show();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
