@@ -19,7 +19,7 @@ import java.util.Optional;
 import java.util.Timer;
 
 public class DasWeatherApplication extends Application {
-    public static final String APP_VERSION = "3.3.2-RELEASE";
+    public static final String APP_VERSION = "3.3.3-RELEASE";
     private final LocalizeResourcesService localizeService = LocalizeResourcesServiceImpl.getInstance();
 
     @Override

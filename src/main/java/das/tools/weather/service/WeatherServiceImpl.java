@@ -1,9 +1,12 @@
 package das.tools.weather.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import das.tools.weather.entity.CurrenWeatherResponse;
 import das.tools.weather.entity.ForecastWeatherResponse;
+import das.tools.weather.entity.SearchLocationResponse;
+import das.tools.weather.entity.current.WeatherLocation;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import lombok.extern.slf4j.Slf4j;
@@ -20,8 +23,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -161,6 +163,41 @@ public class WeatherServiceImpl implements WeatherService {
             }
         } catch (IOException e) {
             log.error("Error 2: Couldn't get data from {}", url, e);
+        }
+        return res;
+    }
+
+    @Override
+    public WeatherLocation[] getLocations(String location) {
+        Properties props = configService.getCurrentConfig();
+        List<WeatherLocation> res = null;
+        try {
+            URIBuilder uri = new URIBuilder("http://api.weatherapi.com/v1/search.json");
+            uri.addParameter("key", props.getProperty(GuiConfigService.GUI_CONFIG_API_KEY_KEY,
+                    configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_API_KEY_KEY)));
+            uri.addParameter("q", location);
+            String url = uri.toString();
+            if(log.isDebugEnabled()) log.debug("[WeatherService].getLocation: got url={}", url);
+            res = getLocationResponse(url);
+            if(log.isDebugEnabled()) log.debug("[WeatherService].getLocations: result={}", Arrays.toString(new List[]{res}));
+        } catch (URISyntaxException e) {
+            log.error("Couldn't get response from server: ", e);
+            throw new RuntimeException(e);
+        }
+        return res.toArray(new WeatherLocation[0]);
+    }
+
+    private List<WeatherLocation> getLocationResponse(String url) {
+        String response = apiRequest(url);
+        List<WeatherLocation> res = new ArrayList<>();
+        if (!"".equals(response)) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            try {
+                res = objectMapper.readValue(response, new TypeReference<List<WeatherLocation>>() {});
+                if (log.isDebugEnabled()) log.debug("got converted location response={}", res);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
         }
         return res;
     }

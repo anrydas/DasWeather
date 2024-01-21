@@ -59,7 +59,8 @@ public class GuiConfigServiceImpl implements GuiConfigService {
     }
 
     private GuiConfigServiceImpl() {
-        configFile = readAppProperties().getProperty("app.config", GUI_CONFIG_DEFAULT_FILE_NAME_KEY);
+        Properties properties = readAppProperties();
+        this.configFile = properties.getProperty("app.config", GUI_CONFIG_DEFAULT_FILE_NAME_KEY);
     }
 
     private String getConfigFileName() {
