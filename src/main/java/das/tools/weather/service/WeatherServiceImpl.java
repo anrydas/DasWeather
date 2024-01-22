@@ -154,6 +154,10 @@ public class WeatherServiceImpl implements WeatherService {
             HttpGet request = new HttpGet(url);
             try (CloseableHttpResponse response = httpClient.execute(request)) {
                 if (log.isDebugEnabled()) log.debug("API Request Thread="+ Thread.currentThread().getName());
+                if (response.getStatusLine().getStatusCode() != 200) {
+                    AlertService.getInstance().showError("Error getting response", response.getStatusLine().toString());
+                    return "";
+                }
                 HttpEntity entity = response.getEntity();
                 if (entity != null) {
                     res = EntityUtils.toString(entity);

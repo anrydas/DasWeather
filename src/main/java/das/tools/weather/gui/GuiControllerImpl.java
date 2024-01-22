@@ -643,10 +643,7 @@ public class GuiControllerImpl implements GuiController {
         task.setOnFailed(e -> {
             pb.setVisible(false);
             btUpdate.setDisable(false);
-            Alert alert = new Alert(Alert.AlertType.ERROR,
-                    task.getException().getCause().getLocalizedMessage(),
-                    ButtonType.OK);
-            alert.show();
+            AlertService.getInstance().showError(task.getException().getCause().getLocalizedMessage(), "");
         });
         return task;
     }

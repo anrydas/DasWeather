@@ -112,15 +112,12 @@ public class ForecastControllerImpl implements ForecastController {
                     ImageIO.write(img, fileFormatName, file);
                 }
                 this.saveFileInitialDirectory = file.getParentFile();
-                Alert alert = new Alert(Alert.AlertType.INFORMATION,
-                        String.format(localizeService.getLocalizedResource("alert.saveFile.ok"), file.getName()));
-                alert.showAndWait();
+                AlertService.getInstance().showInfo(String.format(localizeService.getLocalizedResource("alert.saveFile.ok"), file.getName()), "");
             } catch (IOException e) {
                 log.error("Couldn't save chart into file", e);
-                Alert alert = new Alert(Alert.AlertType.ERROR,
-                        String.format(localizeService.getLocalizedResource("alert.saveFile.error"),
-                                file.getName(), e.getLocalizedMessage()));
-                alert.showAndWait();
+                AlertService.getInstance().showError(
+                        String.format(localizeService.getLocalizedResource("alert.saveFile.error"), file.getName(), e.getLocalizedMessage()),
+                        e.getLocalizedMessage());
             }
         }
     }

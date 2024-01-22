@@ -1,10 +1,7 @@
 package das.tools.weather.gui;
 
 import das.tools.weather.DasWeatherApplication;
-import das.tools.weather.service.GuiConfigService;
-import das.tools.weather.service.GuiConfigServiceImpl;
-import das.tools.weather.service.LocalizeResourcesService;
-import das.tools.weather.service.LocalizeResourcesServiceImpl;
+import das.tools.weather.service.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -198,10 +195,6 @@ public class ConfigControllerImpl implements ConfigController {
     }
 
     private void showError(String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR,
-                message,
-                ButtonType.OK);
-        alert.setTitle("Configuration error");
-        alert.showAndWait();
+        AlertService.getInstance().showError("Configuration error", message);
     }
 }
