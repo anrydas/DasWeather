@@ -167,34 +167,36 @@ public class ConfigControllerImpl implements ConfigController {
     }
 
     private boolean isFieldsValid() {
-        String msgEmpty = "%s couldn't be empty";
-        String msgNotValid = "%s is not valid";
+        String msgEmpty = localizeService.getLocalizedResource("alert.app.config.empty.message");
+        String msgNotValid = localizeService.getLocalizedResource("alert.app.config.valid.message");
         if ("".equals(edApiKey.getText())) {
-            showError(String.format(msgEmpty, "API key"));
+            showError(String.format(msgEmpty, localizeService.getLocalizedResource("alert.app.config.field.key")));
             return false;
         }
         if ("".equals(edLocation.getText())) {
-            showError(String.format(msgEmpty, "Location"));
+            showError(String.format(msgEmpty, localizeService.getLocalizedResource("alert.app.config.field.location")));
             return false;
         }
         if ("".equals(edForecastUrl.getText())) {
-            showError(String.format(msgEmpty, "Forecast URL"));
+            showError(String.format(msgEmpty, localizeService.getLocalizedResource("alert.app.config.field.url")));
             return false;
         }
         Matcher matchKey = API_KEY_PATTERN.matcher(edApiKey.getText());
         if (!matchKey.find()) {
-            showError(String.format(msgNotValid, "API key"));
+            showError(String.format(msgNotValid, localizeService.getLocalizedResource("alert.app.config.field.key")));
             return false;
         }
         matchKey = FORECAST_URL_PATTERN.matcher(edForecastUrl.getText());
         if (!matchKey.find()) {
-            showError(String.format(msgNotValid, "Forecast URL"));
+            showError(String.format(msgNotValid, localizeService.getLocalizedResource("alert.app.config.field.location")));
             return false;
         }
         return true;
     }
 
     private void showError(String message) {
-        AlertService.getInstance().showError("Configuration error", message);
+        AlertService.getInstance().showError(
+                localizeService.getLocalizedResource("alert.app.config.header"),
+                message);
     }
 }

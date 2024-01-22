@@ -22,7 +22,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class DasWeatherApplication extends Application {
-    public static final String APP_VERSION = "3.3.5-RELEASE";
+    public static final String APP_VERSION = "3.3.6-RELEASE";
     private final LocalizeResourcesService localizeService = LocalizeResourcesServiceImpl.getInstance();
     private ScheduledExecutorService scheduler;
 
