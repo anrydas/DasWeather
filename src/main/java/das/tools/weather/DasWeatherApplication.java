@@ -22,7 +22,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class DasWeatherApplication extends Application {
-    public static final String APP_VERSION = "3.3.4-RELEASE";
+    public static final String APP_VERSION = "3.3.5-RELEASE";
     private final LocalizeResourcesService localizeService = LocalizeResourcesServiceImpl.getInstance();
     private ScheduledExecutorService scheduler;
 
@@ -39,11 +39,9 @@ public class DasWeatherApplication extends Application {
             stage.setOnCloseRequest(event -> {
                 boolean isConfirmExit = Boolean.parseBoolean(GuiConfigServiceImpl.getInstance().getConfigStringValue(GuiConfigService.GUI_CONFIG_CONFIRM_EXIT_KEY, "true"));
                 if (isConfirmExit) {
-                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
-                            localizeService.getLocalizedResource("alert.app.exit.text"));
-                    alert.setTitle(localizeService.getLocalizedResource("alert.app.exit.title"));
-                    alert.setHeaderText("Das Weather Application");
-                    Optional<ButtonType> option = alert.showAndWait();
+                    Optional<ButtonType> option = AlertService.getInstance().showConfirm(localizeService.getLocalizedResource("alert.app.exit.text"),
+                            localizeService.getLocalizedResource("alert.app.exit.title"),
+                            "Das Weather Application");
                     if (ButtonType.CANCEL.equals(option.orElse(null))) {
                         event.consume();
                         return;
