@@ -89,7 +89,7 @@ public class DasWeatherApplication extends Application {
                     .withIdentity("UpdateTrigger", "group1")
                     .startAt(startTime)
                     .withSchedule(
-                            simpleSchedule().withIntervalInSeconds(20).repeatForever()
+                            simpleSchedule().withIntervalInMinutes(10).repeatForever()
                     )
                     .build();
             scheduler.scheduleJob(job, trigger);
