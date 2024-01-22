@@ -4,12 +4,12 @@ import das.tools.weather.gui.GuiController;
 import das.tools.weather.gui.GuiControllerImpl;
 import javafx.application.Platform;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.TimerTask;
+import org.quartz.Job;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
 
 @Slf4j
-public class UpdateWeatherController extends TimerTask {
-    private boolean isFistRun = true;
+public class UpdateWeatherController implements Job {
     private static volatile UpdateWeatherController instance;
 
     public static UpdateWeatherController getInstance() {
@@ -26,16 +26,6 @@ public class UpdateWeatherController extends TimerTask {
     public UpdateWeatherController() {
     }
 
-    @Override
-    public void run() {
-        if (!isFistRun) {
-            updateWeather();
-        } else {
-            isFistRun = false;
-            if (log.isDebugEnabled()) log.debug("[UpdateWeatherController] skipped first run");
-        }
-    }
-
     public void updateWeather() {
         if (log.isDebugEnabled()) log.debug("[UpdateWeatherController] started updating");
         GuiController guiController = GuiControllerImpl.getInstance();
@@ -43,5 +33,10 @@ public class UpdateWeatherController extends TimerTask {
         // This operation is permitted on the event thread only; currentThread = task-1
         Thread t = new Thread(() -> Platform.runLater(guiController::updateWeatherData));
         t.start();
+    }
+
+    @Override
+    public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
+        updateWeather();
     }
 }
