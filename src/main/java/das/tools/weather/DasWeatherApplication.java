@@ -17,10 +17,14 @@ import java.io.InputStream;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Timer;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class DasWeatherApplication extends Application {
-    public static final String APP_VERSION = "3.3.3-RELEASE";
+    public static final String APP_VERSION = "3.3.4-RELEASE";
     private final LocalizeResourcesService localizeService = LocalizeResourcesServiceImpl.getInstance();
+    private ScheduledExecutorService scheduler;
 
     @Override
     public void start(Stage stage) {
@@ -56,8 +60,8 @@ public class DasWeatherApplication extends Application {
             throw new RuntimeException(e);
         }
 
-        Timer timer = new Timer();
-        timer.scheduleAtFixedRate(UpdateWeatherController.getInstance(), 10000, 600000);
+        scheduler = Executors.newScheduledThreadPool(1);
+        scheduler.scheduleAtFixedRate(UpdateWeatherController.getInstance(), 5000, 600000, TimeUnit.MILLISECONDS);
     }
 
     public static void main(String[] args) {
