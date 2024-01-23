@@ -1,45 +1,50 @@
 package das.tools.weather;
 
-import das.tools.weather.controller.UpdateWeatherController;
+import das.tools.weather.config.GuiConfig;
 import das.tools.weather.gui.GuiController;
-import das.tools.weather.service.*;
-import javafx.application.Application;
+import das.tools.weather.service.AlertService;
+import das.tools.weather.service.GuiConfigService;
+import das.tools.weather.service.LocalizeResourcesService;
 import javafx.application.Platform;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Timer;
 
-public class DasWeatherApplication extends Application {
-    public static final String APP_VERSION = "3.2.0-RELEASE";
-    private final LocalizeResourcesService localizeService = LocalizeResourcesServiceImpl.getInstance();
+@SpringBootApplication
+@Lazy
+@EnableScheduling
+@EnableAsync
+public class DasWeatherApplication extends AbstractJavaFxApplicationSupport {
+    @Autowired private GuiConfig.ViewHolder guiMainView;
+    @Autowired private GuiConfigService guiConfig;
+    @Autowired private GuiController guiController;
+    @Autowired private LocalizeResourcesService localizeService;
+    @Autowired private AlertService alertService;
 
     @Override
     public void start(Stage stage) {
-        try(InputStream fxmlStream = getClass().getClassLoader().getResourceAsStream("fxml/Main.fxml")) {
-            FXMLLoader loader = new FXMLLoader();
-            loader.load(fxmlStream);
-            Scene scene = new Scene(loader.getRoot());
-            stage.getIcons().add(LoadingService.getInstance().getResourceImage(GuiController.IMAGE_WEATHER_DEFAULT_ICON_PNG));
-            stage.setTitle("Das Weather");
-            stage.setResizable(false);
-            stage.setScene(scene);
+        Scene scene = new Scene(guiMainView.getView());
+        stage.getIcons().add(new Image(Objects.requireNonNull(DasWeatherApplication.class.getResourceAsStream(GuiController.IMAGE_WEATHER_DEFAULT_ICON_PNG))));
+        stage.setTitle("Das Weather");
+        stage.setResizable(false);
+        stage.setScene(scene);
+
             stage.setOnCloseRequest(event -> {
-                boolean isConfirmExit = Boolean.parseBoolean(GuiConfigServiceImpl.getInstance().getConfigStringValue(GuiConfigService.GUI_CONFIG_CONFIRM_EXIT_KEY, "true"));
+                boolean isConfirmExit = Boolean.parseBoolean(guiConfig.getConfigStringValue(GuiConfigService.GUI_CONFIG_CONFIRM_EXIT_KEY, "true"));
                 if (isConfirmExit) {
-                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
-                            localizeService.getLocalizedResource("alert.app.exit.text"));
-                    alert.setTitle(localizeService.getLocalizedResource("alert.app.exit.title"));
-                    alert.setHeaderText("Das Weather Application");
-                    Optional<ButtonType> option = alert.showAndWait();
+                    Optional<ButtonType> option = alertService.showConfirm(
+                            localizeService.getLocalizedResource("alert.app.exit.text"),
+                            localizeService.getLocalizedResource("alert.app.exit.title"),
+                            "Das Weather Application");
                     if (ButtonType.CANCEL.equals(option.orElse(null))) {
                         event.consume();
                         return;
@@ -48,19 +53,11 @@ public class DasWeatherApplication extends Application {
                 Platform.exit();
                 System.exit(0);
             });
-            GuiController guiController = loader.getController();
-            stage.setOnShowing(event -> guiController.onShowingStage());
-            stage.show();
-            guiController.updateWeatherData();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        Timer timer = new Timer();
-        timer.scheduleAtFixedRate(UpdateWeatherController.getInstance(), 10000, 600000);
+        stage.setOnShowing(event -> guiController.onShowingStage());
+        stage.show();
     }
 
     public static void main(String[] args) {
-        Application.launch(args);
+        launchApp(DasWeatherApplication.class, args);
     }
 }

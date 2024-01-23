@@ -3,8 +3,6 @@ package das.tools.weather.service;
 import das.tools.weather.entity.forecast.WeatherDayForecast;
 import javafx.scene.chart.XYChart;
 
-import java.util.ResourceBundle;
-
 public interface ChartDataProducer {
     void initLocale();
 

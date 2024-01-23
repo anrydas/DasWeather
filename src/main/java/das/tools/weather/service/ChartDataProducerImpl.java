@@ -13,30 +13,23 @@ import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
+@Component
 public class ChartDataProducerImpl implements ChartDataProducer {
     private List<DataHolder> dataList;
 
     private final WeatherService weatherService;
     private final LocalizeResourcesService localizeService;
-    private static volatile ChartDataProducerImpl instance;
 
-    public static ChartDataProducerImpl getInstance() {
-        if (instance == null) {
-            synchronized (ChartDataProducerImpl.class) {
-                if (instance == null) {
-                    instance = new ChartDataProducerImpl();
-                }
-            }
-        }
-        return instance;
-    }
-
-    private ChartDataProducerImpl() {
-        this.weatherService = WeatherServiceImpl.getInstance();
-        this.localizeService = LocalizeResourcesServiceImpl.getInstance();
+    public ChartDataProducerImpl(WeatherService weatherService, LocalizeResourcesService localizeService) {
+        this.weatherService = weatherService;
+        this.localizeService = localizeService;
     }
 
     @Override
@@ -149,7 +142,8 @@ public class ChartDataProducerImpl implements ChartDataProducer {
         }
     }
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private static class DataHolder {
         private String name;
         private Map<String,Number[]> tabAndValues;

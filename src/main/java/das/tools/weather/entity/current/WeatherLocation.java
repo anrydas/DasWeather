@@ -1,6 +1,5 @@
 package das.tools.weather.entity.current;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRootName;
 import lombok.*;
@@ -12,7 +11,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@JsonIgnoreProperties(ignoreUnknown = true)
 @JsonRootName("location")
 public class WeatherLocation {
     String country;
@@ -25,4 +23,6 @@ public class WeatherLocation {
     String region;
     @JsonProperty("tz_id")
     String timeZone;
+    long id;
+    String url;
 }
