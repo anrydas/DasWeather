@@ -12,14 +12,17 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.Properties;
 
+@Component
 @Slf4j
 public class CheckLocationControllerImpl implements CheckLocationController {
-    private WeatherService weatherService;
-    private LocalizeResourcesService localizeService;
-    private GuiConfigService configService;
+    @Autowired private LocalizeResourcesService localizeService;
+    @Autowired private WeatherService weatherService;
+    @Autowired private GuiConfigService configService;
     private WeatherLocation[] foundLocations;
 
     @FXML private Label lbLocationName;
@@ -37,6 +40,7 @@ public class CheckLocationControllerImpl implements CheckLocationController {
         btOk.setOnAction(actionEvent -> saveLocation());
         btSearch.setDisable(edLocationName.getText().isEmpty());
         btOk.setDisable(true);
+        btCancel.setOnAction(actionEvent -> ((Stage) btCancel.getScene().getWindow()).close());
         lstLocations.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
@@ -65,9 +69,6 @@ public class CheckLocationControllerImpl implements CheckLocationController {
 
     @Override
     public void initLocale() {
-        weatherService = WeatherServiceImpl.getInstance();
-        localizeService = LocalizeResourcesServiceImpl.getInstance();
-        configService = GuiConfigServiceImpl.getInstance();
         lbLocationName.setText(localizeService.getLocalizedResource("label.location.name"));
         lbLocationsList.setText(localizeService.getLocalizedResource("label.locations.list"));
         btSearch.setText(localizeService.getLocalizedResource("button.search.location"));

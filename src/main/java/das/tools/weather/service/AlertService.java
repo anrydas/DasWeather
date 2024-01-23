@@ -1,59 +1,17 @@
 package das.tools.weather.service;
 
-import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 
 import java.util.Optional;
 
-public class AlertService {
-    private static volatile AlertService instance;
+public interface AlertService {
+    void showError(String header, String content);
 
-    public static AlertService getInstance() {
-        if (instance == null) {
-            synchronized (AlertService.class) {
-                if (instance == null) {
-                    instance = new AlertService();
-                }
-            }
-        }
-        return instance;
-    }
+    void showError(String title, String header, String content);
 
-    public AlertService() {
-    }
+    void showInfo(String header, String content);
 
-    public void showError(String header, String content) {
-        showDialog(Alert.AlertType.ERROR, "Error", header, content);
-    }
-    public void showError(String title, String header, String content) {
-        showDialog(Alert.AlertType.ERROR, title, header, content);
-    }
+    void showInfo(String title, String header, String content);
 
-    public void showInfo(String header, String content) {
-        showDialog(Alert.AlertType.INFORMATION, "Information", header, content);
-    }
-
-    public void showInfo(String title, String header, String content) {
-        showDialog(Alert.AlertType.INFORMATION, title, header, content);
-    }
-
-    public Optional<ButtonType> showConfirm(String title, String header, String content) {
-        return showDialogAndWait(Alert.AlertType.CONFIRMATION, title, header, content);
-    }
-
-    private void showDialog(Alert.AlertType type, String title, String header, String content) {
-        Alert alert = new Alert(type);
-        alert.setHeaderText(header);
-        alert.setTitle(title);
-        alert.setContentText(content);
-        alert.showAndWait();
-    }
-
-    private Optional<ButtonType> showDialogAndWait(Alert.AlertType type, String title, String header, String content) {
-        Alert alert = new Alert(type);
-        alert.setHeaderText(header);
-        alert.setTitle(title);
-        alert.setContentText(content);
-        return alert.showAndWait();
-    }
+    Optional<ButtonType> showConfirm(String title, String header, String content);
 }
