@@ -97,7 +97,8 @@ public class ConfigControllerImpl implements ConfigController {
         Stage stage = new Stage();
         stage.setTitle(String.format("Das Weather Location (v.%s)", buildProperties.getVersion()));
         stage.setScene(locationScene);
-        stage.initModality(Modality.WINDOW_MODAL);
+        stage.setResizable(false);
+        stage.initModality(Modality.APPLICATION_MODAL);
         locationController.initLocale();
         locationController.setLocation(edLocation.getText());
         stage.showAndWait();
