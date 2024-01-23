@@ -1,7 +1,9 @@
 package das.tools.weather.gui;
 
 import das.tools.weather.entity.ForecastWeatherResponse;
-import das.tools.weather.service.*;
+import das.tools.weather.service.AlertService;
+import das.tools.weather.service.ChartDataProducer;
+import das.tools.weather.service.LocalizeResourcesService;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -18,6 +20,8 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -25,6 +29,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
+@Component
 @Slf4j
 public class ForecastControllerImpl implements ForecastController {
     @FXML private Button btClose;
@@ -38,8 +43,9 @@ public class ForecastControllerImpl implements ForecastController {
     private ForecastWeatherResponse data;
     private File saveFileInitialDirectory = new File(System.getProperty("user.dir"));
 
-    private final ChartDataProducer chartDataProducer;
-    private final LocalizeResourcesService localizeService;
+    @Autowired private ChartDataProducer chartDataProducer;
+    @Autowired private LocalizeResourcesService localizeService;
+    @Autowired private AlertService alertService;
 
     static {
         Map<String,String> extMap = FILE_FORMAT_NAMES;
@@ -48,11 +54,6 @@ public class ForecastControllerImpl implements ForecastController {
         extMap.put("JPEG", "JPEG");
         extMap.put("GIF", "GIF");
         extMap.put("BMP", "BMP");
-    }
-
-    public ForecastControllerImpl() {
-        localizeService = LocalizeResourcesServiceImpl.getInstance();
-        chartDataProducer = ChartDataProducerImpl.getInstance();
     }
 
     @Override
@@ -69,11 +70,6 @@ public class ForecastControllerImpl implements ForecastController {
     private void initialize() {
         btClose.setOnAction(actionEvent -> ((Stage) btClose.getScene().getWindow()).close());
         btSave.setOnAction(actionEvent -> saveChartToFile());
-        LoadingService.getInstance().addStyleToChart(chTemperature, "/css/chart.css");
-        LoadingService.getInstance().addStyleToChart(chPressure, "/css/chart.css");
-        LoadingService.getInstance().addStyleToChart(chWind, "/css/chart.css");
-        LoadingService.getInstance().addStyleToChart(chHumidity, "/css/chart.css");
-        LoadingService.getInstance().addStyleToChart(chCloud, "/css/chart.css");
     }
 
     private File selectFileToSaveChart() {
@@ -95,10 +91,10 @@ public class ForecastControllerImpl implements ForecastController {
     private void saveChartToFile() {
         File file = selectFileToSaveChart();
         if (file != null) {
-            XYChart<String, Number> activeChart = getActiveChart();
-            WritableImage image = activeChart.snapshot(
+            XYChart<String, Number> activeCart = getActiveChart();
+            WritableImage image = activeCart.snapshot(
                     new SnapshotParameters(),
-                    new WritableImage((int) activeChart.getWidth(), (int) activeChart.getHeight())
+                    new WritableImage((int) activeCart.getWidth(), (int) activeCart.getHeight())
             );
             try {
                 String fileFormatName = getFileFormatName(file);
@@ -112,11 +108,15 @@ public class ForecastControllerImpl implements ForecastController {
                     ImageIO.write(img, fileFormatName, file);
                 }
                 this.saveFileInitialDirectory = file.getParentFile();
-                AlertService.getInstance().showInfo(String.format(localizeService.getLocalizedResource("alert.saveFile.ok"), file.getName()), "");
+                alertService.showInfo(
+                        String.format(localizeService.getLocalizedResource("alert.saveFile.ok"), file.getName()),
+                        "");
             } catch (IOException e) {
                 log.error("Couldn't save chart into file", e);
-                AlertService.getInstance().showError(
-                        String.format(localizeService.getLocalizedResource("alert.saveFile.error"), file.getName(), e.getLocalizedMessage()),
+                alertService.showError(
+                        String.format(localizeService.getLocalizedResource("alert.saveFile.error"),
+                                file.getName(),
+                                e.getLocalizedMessage()),
                         e.getLocalizedMessage());
             }
         }
@@ -162,7 +162,6 @@ public class ForecastControllerImpl implements ForecastController {
 
     private void fillGraphics() {
         chartDataProducer.initChartsData(this.data.getForecast().getDayForecast());
-        chTemperature.setAnimated(false); // to prevent Time axis to be unreadable
         chartDataProducer.fillChart(chTemperature, TAB_NAMES.get(1));
         chartDataProducer.fillChart(chPressure, TAB_NAMES.get(2));
         chartDataProducer.fillChart(chHumidity, TAB_NAMES.get(3));

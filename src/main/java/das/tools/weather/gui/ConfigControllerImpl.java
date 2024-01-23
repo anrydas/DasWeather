@@ -1,28 +1,42 @@
 package das.tools.weather.gui;
 
 import das.tools.weather.DasWeatherApplication;
-import das.tools.weather.service.*;
+import das.tools.weather.config.GuiConfig;
+import das.tools.weather.service.AlertService;
+import das.tools.weather.service.GuiConfigService;
+import das.tools.weather.service.LocalizeResourcesService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.info.BuildProperties;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Properties;
+import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 
+@Component
 @Slf4j
 public class ConfigControllerImpl implements ConfigController {
-    private GuiConfigService configService;
-    private LocalizeResourcesService localizeService;
+    @Autowired private GuiConfigService configService;
+    @Autowired private LocalizeResourcesService localizeService;
+    @Autowired private BuildProperties buildProperties;
+    @Autowired private AlertService alertService;
+    @Autowired private GuiConfig.ViewHolder guiLocationView;
+    @Autowired private CheckLocationController locationController;
     private Properties appProps;
     private boolean isConfigChanged;
+    private Scene locationScene;
     @FXML private Label lbApiKey;
     @FXML private Label lbUrl;
     @FXML private Label lbLocation;
@@ -42,8 +56,6 @@ public class ConfigControllerImpl implements ConfigController {
 
     @Override
     public void initLocale() {
-        localizeService = LocalizeResourcesServiceImpl.getInstance();
-        configService = GuiConfigServiceImpl.getInstance();
         btSearchLocation.setText(localizeService.getLocalizedResource("button.search"));
         btSearchLocation.setTooltip(new Tooltip(localizeService.getLocalizedResource("button.search.tooltip")));
     }
@@ -53,23 +65,6 @@ public class ConfigControllerImpl implements ConfigController {
         btOk.setOnAction(actionEvent -> saveConfigAndClose());
         btCancel.setOnAction(actionEvent -> closeStage());
         btSearchLocation.setOnAction(actionEvent -> showCheckWindow());
-    }
-
-    private void showCheckWindow() {
-        try(InputStream fxmlStream = getClass().getClassLoader().getResourceAsStream("fxml/CheckLocation.fxml")) {
-            FXMLLoader loader = new FXMLLoader();
-            loader.load(fxmlStream);
-            Scene scene = new Scene(loader.getRoot());
-            Stage stage = new Stage();
-            stage.setTitle(String.format("Search Location (v.%s)", DasWeatherApplication.APP_VERSION));
-            stage.setScene(scene);
-            CheckLocationController controller = loader.getController();
-            controller.initLocale();
-            controller.setLocation(edLocation.getText());
-            stage.show();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     @Override
@@ -100,6 +95,17 @@ public class ConfigControllerImpl implements ConfigController {
                 )
         );
         cbCondLang.getSelectionModel().select(langName);
+    }
+
+    private void showCheckWindow() {
+        locationScene = locationScene == null ? new Scene(guiLocationView.getView()) : locationScene;
+        Stage stage = new Stage();
+        stage.setTitle(String.format("Das Weather Location (v.%s)", buildProperties.getVersion()));
+        stage.setScene(locationScene);
+        stage.initModality(Modality.WINDOW_MODAL);
+        locationController.initLocale();
+        locationController.setLocation(edLocation.getText());
+        stage.showAndWait();
     }
 
     private void setLabelNames() {
@@ -195,8 +201,6 @@ public class ConfigControllerImpl implements ConfigController {
     }
 
     private void showError(String message) {
-        AlertService.getInstance().showError(
-                localizeService.getLocalizedResource("alert.app.config.header"),
-                message);
+        alertService.showError("Configuration error", message);
     }
 }
