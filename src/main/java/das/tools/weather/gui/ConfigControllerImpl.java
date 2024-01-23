@@ -9,6 +9,8 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
@@ -46,11 +48,13 @@ public class ConfigControllerImpl implements ConfigController {
     @FXML private Button btOk;
     @FXML private Button btCancel;
     @FXML private Button btSearchLocation;
+    @FXML private ImageView imgConfirmed;
     public ConfigControllerImpl() {
     }
 
     @Override
     public void initLocale() {
+        setLabelNames();
         btSearchLocation.setText(localizeService.getLocalizedResource("button.search"));
         btSearchLocation.setTooltip(new Tooltip(localizeService.getLocalizedResource("button.search.tooltip")));
     }
@@ -64,7 +68,6 @@ public class ConfigControllerImpl implements ConfigController {
 
     @Override
     public void onShowingStage() {
-        setLabelNames();
         appProps = configService.getCurrentConfig();
         edApiKey.setText(appProps.getProperty(GuiConfigService.GUI_CONFIG_API_KEY_KEY,
                 configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_API_KEY_KEY)));
@@ -90,6 +93,27 @@ public class ConfigControllerImpl implements ConfigController {
                 )
         );
         cbCondLang.getSelectionModel().select(langName);
+        setLocationConfirmation();
+    }
+
+    @Override
+    public void setLocationConfirmation() {
+        boolean locationConfirmed = isLocationConfirmed();
+        String msg = locationConfirmed ?
+                localizeService.getLocalizedResource("location.confirm.tooltip") :
+                localizeService.getLocalizedResource("location.unConfirm.tooltip");
+        String img = locationConfirmed ?
+                GuiController.IMAGE_LOCATION_CONFIRMED_PNG :
+                GuiController.IMAGE_LOCATION_UN_CONFIRMED_PNG;
+        imgConfirmed.setImage(new Image(img));
+        Tooltip tooltip = new Tooltip(msg);
+        Tooltip.install(imgConfirmed, tooltip);
+    }
+
+    private boolean isLocationConfirmed() {
+        appProps = configService.getCurrentConfig();
+        String locationId = appProps.getProperty(GuiConfigService.GUI_CONFIG_WEATHER_LOCATION_ID_KEY, "");
+        return locationId != null && !"".equals(locationId);
     }
 
     private void showCheckWindow() {
@@ -102,6 +126,7 @@ public class ConfigControllerImpl implements ConfigController {
         locationController.initLocale();
         locationController.setLocation(edLocation.getText());
         stage.showAndWait();
+        setLocationConfirmation();
     }
 
     private void setLabelNames() {
