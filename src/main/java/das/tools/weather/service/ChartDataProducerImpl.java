@@ -13,10 +13,12 @@ import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 @Component
 public class ChartDataProducerImpl implements ChartDataProducer {

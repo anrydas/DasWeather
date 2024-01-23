@@ -4,8 +4,6 @@ import das.tools.weather.gui.CheckLocationController;
 import das.tools.weather.gui.ConfigController;
 import das.tools.weather.gui.ForecastController;
 import das.tools.weather.gui.GuiController;
-import das.tools.weather.service.GuiConfigService;
-import das.tools.weather.service.UTF8Control;
 import das.tools.weather.service.UTF8ControlImpl;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -13,7 +11,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -21,7 +18,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Locale;
 import java.util.ResourceBundle;
 
 
