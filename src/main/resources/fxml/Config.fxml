@@ -3,6 +3,8 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
 <AnchorPane prefHeight="280.0" prefWidth="510.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="das.tools.weather.gui.ConfigControllerImpl">
    <VBox layoutY="2.0" prefHeight="227.0" prefWidth="490.0" spacing="5.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="2.0">
       <HBox alignment="CENTER_LEFT" layoutX="14.0" layoutY="14.0" prefHeight="46.0" prefWidth="487.0" spacing="10.0">
@@ -16,6 +18,9 @@
       <HBox alignment="CENTER_LEFT" layoutX="14.0" layoutY="14.0" prefHeight="46.0" prefWidth="487.0" spacing="10.0">
          <Label fx:id="lbLocation" text="Location" />
          <TextField fx:id="edLocation" prefHeight="24.0" prefWidth="273.0" promptText="Name" />
+         <ImageView fx:id="imgConfirmed" fitHeight="32.0" fitWidth="32.0" preserveRatio="true">
+            <Image url="@/images/gui/confirmUn.png" />
+         </ImageView>
          <Button fx:id="btSearchLocation" mnemonicParsing="false" text="Search" />
       </HBox>
       <HBox alignment="CENTER_LEFT" layoutX="14.0" layoutY="14.0" prefHeight="46.0" prefWidth="487.0" spacing="10.0">

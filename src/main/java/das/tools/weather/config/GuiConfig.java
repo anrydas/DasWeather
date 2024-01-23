@@ -1,6 +1,6 @@
 package das.tools.weather.config;
 
-import das.tools.weather.gui.CheckLocationController;
+import das.tools.weather.gui.LocationController;
 import das.tools.weather.gui.ConfigController;
 import das.tools.weather.gui.ForecastController;
 import das.tools.weather.gui.GuiController;
@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -22,6 +23,7 @@ import java.util.ResourceBundle;
 
 
 @Configuration
+@Slf4j
 public class GuiConfig {
     @Bean
     public RestTemplate restTemplate() {
@@ -63,21 +65,26 @@ public class GuiConfig {
     }
 
     @Bean(name = "guiLocationView")
-    public ViewHolder getSearchView() throws IOException {
-        return loadView("fxml/CheckLocation.fxml");
+    public ViewHolder getLocationView() throws IOException {
+        return loadView("fxml/Location.fxml");
     }
 
     @Bean @Primary
-    public CheckLocationController geLocationController() throws IOException {
-        return (CheckLocationController) getSearchView().getController();
+    public LocationController geLocationController() throws IOException {
+        return (LocationController) getLocationView().getController();
     }
 
     protected ViewHolder loadView(String url) throws IOException {
+        if (log.isDebugEnabled()) log.debug("loading view for url={}", url);
         try (InputStream fxmlStream = getClass().getClassLoader().getResourceAsStream(url)) {
             FXMLLoader loader = new FXMLLoader();
             loader.load(fxmlStream);
             return new ViewHolder(loader.getRoot(), loader.getController());
         }
+    }
+
+    private ViewHolder getLoadedView(ViewHolder holder, String url) throws IOException {
+        return holder != null ? holder : loadView(url);
     }
 
     @Getter @Setter @AllArgsConstructor @Builder

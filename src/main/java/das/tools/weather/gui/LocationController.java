@@ -1,5 +1,5 @@
 package das.tools.weather.gui;
 
-public interface CheckLocationController extends Localized {
+public interface LocationController extends Localized {
     void setLocation(String location);
 }
