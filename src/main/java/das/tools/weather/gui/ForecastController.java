@@ -5,6 +5,7 @@ import das.tools.weather.entity.ForecastWeatherResponse;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 public interface ForecastController extends Localized {
     Map<Integer,String> TAB_NAMES = new LinkedHashMap<>();
