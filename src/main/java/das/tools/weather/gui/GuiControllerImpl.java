@@ -533,7 +533,7 @@ public class GuiControllerImpl implements GuiController {
         stage.setScene(forecastScene);
         stage.setMinHeight(400);
         stage.setMinWidth(600);
-        stage.initModality(Modality.WINDOW_MODAL);
+        stage.initModality(Modality.APPLICATION_MODAL);
         stage.setOnShowing(windowEvent -> forecastController.onShowing());
         forecastController.initLocale();
         forecastController.setData(this.dataHolder.getResponse());
