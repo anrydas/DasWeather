@@ -28,7 +28,7 @@ public class ConfigControllerImpl implements ConfigController {
     @Autowired private BuildProperties buildProperties;
     @Autowired private AlertService alertService;
     @Autowired private GuiConfig.ViewHolder guiLocationView;
-    @Autowired private CheckLocationController locationController;
+    @Autowired private LocationController locationController;
     private Properties appProps;
     private boolean isConfigChanged;
     private Scene locationScene;

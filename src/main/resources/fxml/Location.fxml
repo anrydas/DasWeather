@@ -2,7 +2,7 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<AnchorPane prefHeight="372.0" prefWidth="523.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="das.tools.weather.gui.CheckLocationControllerImpl">
+<AnchorPane prefHeight="372.0" prefWidth="523.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="das.tools.weather.gui.LocationControllerImpl">
     <VBox prefHeight="200.0" prefWidth="523.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <HBox alignment="CENTER" prefHeight="46.0" prefWidth="523.0" spacing="10.0">
             <Label fx:id="lbLocationName" text="Name" />
