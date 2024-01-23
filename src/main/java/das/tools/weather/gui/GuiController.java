@@ -26,6 +26,8 @@ public interface GuiController extends Localized {
     String IMAGE_RAIN_PNG = "/images/precip/rain.png";
     String IMAGE_NO_PRECIPITATION_PNG = "/images/precip/no_precipitation_1.png";
     String IMAGE_AIR_QUALITY_PNG = "/images/AirQuality.png";
+    String IMAGE_LOCATION_CONFIRMED_PNG = "/images/gui/confirmOk.png";
+    String IMAGE_LOCATION_UN_CONFIRMED_PNG = "/images/gui/confirmUn.png";
     String IMAGE_AIR_QUALITY_HINT_PNG = "/images/AirQualityHint.png";
     Map<String,String> WIND_DIRECTIONS = new HashMap<>();
     Map<String,String> MOON_PHASES = new HashMap<>();

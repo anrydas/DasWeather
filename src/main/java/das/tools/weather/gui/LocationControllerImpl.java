@@ -21,7 +21,7 @@ import java.util.Properties;
 
 @Component
 @Slf4j
-public class CheckLocationControllerImpl implements CheckLocationController {
+public class LocationControllerImpl implements LocationController {
     @Autowired private LocalizeResourcesService localizeService;
     @Autowired private WeatherService weatherService;
     @Autowired private GuiConfigService configService;
@@ -37,10 +37,9 @@ public class CheckLocationControllerImpl implements CheckLocationController {
 
     @FXML
     private void initialize() {
-        edLocationName.setOnKeyPressed(keyEvent -> locationNamePressed());
+        edLocationName.setOnKeyReleased(keyEvent -> locationNamePressed());
         btSearch.setOnAction(actionEvent -> searchForLocations());
         btOk.setOnAction(actionEvent -> saveLocation());
-        btSearch.setDisable(edLocationName.getText().isEmpty());
         btOk.setDisable(true);
         btCancel.setOnAction(actionEvent -> ((Stage) btCancel.getScene().getWindow()).close());
         lstLocations.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -66,7 +65,7 @@ public class CheckLocationControllerImpl implements CheckLocationController {
     }
 
     private void locationNamePressed() {
-        btSearch.setDisable(edLocationName.getText().isEmpty());
+        btSearch.setDisable(!(edLocationName.getText().length() > 0));
     }
 
     @Override
@@ -80,6 +79,7 @@ public class CheckLocationControllerImpl implements CheckLocationController {
     @Override
     public void setLocation(String location) {
         edLocationName.setText(location);
+        locationNamePressed();
     }
 
     private void searchForLocations() {
