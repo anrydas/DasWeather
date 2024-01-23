@@ -7,5 +7,7 @@ public interface ConfigController extends Localized {
     Pattern API_KEY_PATTERN = Pattern.compile("^[a-fA-F0-9]+$");
     void onShowingStage();
 
+    void setLocationConfirmation();
+
     boolean isConfigChanged();
 }
