@@ -1,17 +1,22 @@
 package das.tools.weather.gui;
 
-import das.tools.weather.DasWeatherApplication;
+import das.tools.weather.config.GuiConfig;
 import das.tools.weather.entity.ForecastWeatherResponse;
 import das.tools.weather.entity.current.WeatherCurrent;
 import das.tools.weather.entity.forecast.WeatherAstro;
 import das.tools.weather.entity.forecast.WeatherDay;
 import das.tools.weather.entity.forecast.WeatherDayForecast;
-import das.tools.weather.service.*;
+import das.tools.weather.service.AlertService;
+import das.tools.weather.service.GuiConfigService;
+import das.tools.weather.service.LocalizeResourcesService;
+import das.tools.weather.service.WeatherService;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.TextAlignment;
@@ -22,9 +27,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.info.BuildProperties;
+import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
@@ -35,12 +41,21 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
 
+@Component
 @Slf4j
 public class GuiControllerImpl implements GuiController {
-    private static volatile GuiController instance;
-    private GuiConfigService configService = GuiConfigServiceImpl.getInstance();
-    private WeatherService weatherService = WeatherServiceImpl.getInstance();
-    private LocalizeResourcesService localizeService = LocalizeResourcesServiceImpl.getInstance();
+    private Scene configScene;
+    private Scene forecastScene;
+
+    @Autowired private GuiConfigService configService;
+    @Autowired private BuildProperties buildProperties;
+    @Autowired private WeatherService weatherService;
+    @Autowired private ConfigController configController;
+    @Autowired private GuiConfig.ViewHolder guiConfigView;
+    @Autowired private GuiConfig.ViewHolder guiForecastView;
+    @Autowired private ForecastController forecastController;
+    @Autowired private LocalizeResourcesService localizeService;
+    @Autowired private AlertService alertService;
 
     @FXML private Label lbWindSpeedText;
     @FXML private Label lbFillsLikeText;
@@ -96,17 +111,6 @@ public class GuiControllerImpl implements GuiController {
     @FXML private ImageView imgConfigure;
     @FXML public ImageView imgWindDirection;
 
-    public static GuiController getInstance() {
-        if (instance == null) {
-            synchronized (GuiControllerImpl.class) {
-                if (instance == null) {
-                    instance = new GuiControllerImpl();
-                }
-            }
-        }
-        return instance;
-    }
-
     @Override
     public void initLocale() {
         Map<String,String> map = WIND_DIRECTIONS;
@@ -142,35 +146,17 @@ public class GuiControllerImpl implements GuiController {
     private void initialize() {
         btUpdate.setOnAction(event -> updateWeatherData());
         btConfig.setOnAction(actionEvent -> showConfigWindow());
-        loadAllImages();
+
+        imgConfigure.setImage(new Image(IMAGE_CONFIGURE_PNG));
+        imgWindDirection.setImage(new Image(IMAGE_WIND_ARROW_PNG));
+        imgSunRise.setImage(new Image(IMAGE_SUNRISE_PNG));
+        imgSunSet.setImage(new Image(IMAGE_SUNSET_PNG));
+        imgMoonRise.setImage(new Image(IMAGE_MOONRISE_PNG));
+        imgMoonSet.setImage(new Image(IMAGE_MOONSET_PNG));
+
         imgForecast01.setOnMouseClicked(mouseEvent -> showForecastWindow());
         imgForecast02.setOnMouseClicked(mouseEvent -> showForecastWindow());
         imgForecast03.setOnMouseClicked(mouseEvent -> showForecastWindow());
-    }
-
-    private void loadAllImages() {
-        LoadingService loading = LoadingService.getInstance();
-        imgConfigure.setImage(loading.getResourceImage(IMAGE_CONFIGURE_PNG));
-        imgWindDirection.setImage(loading.getResourceImage(IMAGE_WIND_ARROW_PNG));
-        imgSunRise.setImage(loading.getResourceImage(IMAGE_SUNRISE_PNG));
-        imgSunSet.setImage(loading.getResourceImage(IMAGE_SUNSET_PNG));
-        imgMoonRise.setImage(loading.getResourceImage(IMAGE_MOONRISE_PNG));
-        imgMoonSet.setImage(loading.getResourceImage(IMAGE_MOONSET_PNG));
-
-        imgWeather.setImage(loading.getResourceImage(IMAGE_WEATHER_DEFAULT_ICON_PNG));
-        imgTemperature.setImage(loading.getResourceImage(IMAGE_TEMP_HOT_PNG));
-        imgHumidity.setImage(loading.getResourceImage(IMAGE_HUMIDITY_PNG));
-        imgCloud.setImage(loading.getResourceImage(IMAGE_CLOUD_PNG));
-        imgPrecipitation.setImage(loading.getResourceImage(IMAGE_SNOW_PNG));
-        imgPressure.setImage(loading.getResourceImage(IMAGE_PRESSURE_PNG));
-        imgWind.setImage(loading.getResourceImage(IMAGE_WIND_PNG));
-        imgWindDirection.setImage(loading.getResourceImage(IMAGE_WIND_ARROW_PNG));
-        imgWindDirection.setImage(loading.getResourceImage(IMAGE_WIND_ARROW_PNG));
-        imgWindGists.setImage(loading.getResourceImage(IMAGE_WIND_GIST_PNG));
-        imgVisibility.setImage(loading.getResourceImage(IMAGE_VISIBILITY_PNG));
-        imgUvIndex.setImage(loading.getResourceImage(IMAGE_UV_INDEX_PNG));
-        imgDayLength.setImage(loading.getResourceImage(IMAGE_DAY_LENGTH_PNG));
-        imgAirQuality.setImage(loading.getResourceImage(IMAGE_AIR_QUALITY_PNG));
     }
 
     @Override
@@ -233,7 +219,7 @@ public class GuiControllerImpl implements GuiController {
                 current.getAirQuality().getSo2())
         );
         Tooltip tooltip = getTooltip(String.format(localizeService.getLocalizedResource("airQuality.tooltip"), lbAirQuality.getText()));
-        ImageView iv = getTooltipImage(LoadingService.getInstance().getResourceImage(IMAGE_AIR_QUALITY_HINT_PNG), 100);
+        ImageView iv = getTooltipImage(new Image(IMAGE_AIR_QUALITY_HINT_PNG), 100);
         tooltip.setGraphic(iv);
         lbAirQuality.setTooltip(tooltip);
         Tooltip.install(imgAirQuality, tooltip);
@@ -288,10 +274,10 @@ public class GuiControllerImpl implements GuiController {
     }
 
     private void fillTemperature(WeatherCurrent current) {
-        lbTemperature.setText(String.format("%.0f\u00B0C", current.getTemperatureC()));
-        lbFills.setText(String.format("%.0f\u00B0C", current.getFeelsLike()));
+        lbTemperature.setText(String.format("%.0f℃", current.getTemperatureC()));
+        lbFills.setText(String.format("%.0f℃", current.getFeelsLike()));
         String imageName = current.getTemperatureC() > 0 ? IMAGE_TEMP_HOT_PNG : IMAGE_TEMP_COLD_PNG;
-        Image image = LoadingService.getInstance().getResourceImage(imageName);
+        Image image = new Image(Objects.requireNonNull(this.getClass().getResourceAsStream(imageName)));
         imgTemperature.setImage(image);
         ImageView iv = getTooltipImage(image, 100);
         Tooltip tooltip = getTooltip(
@@ -309,7 +295,7 @@ public class GuiControllerImpl implements GuiController {
     }
 
     private void fillHumidity(WeatherCurrent current) {
-        lbHumidity.setText(String.format("%d%%", current.getHumidity()));
+        lbHumidity.setText(String.format("%d％", current.getHumidity()));
         ImageView iv = getTooltipImage(imgHumidity.getImage(), 100);
         Tooltip tooltip = getTooltip(String.format(localizeService.getLocalizedResource("humidity.tooltip"), current.getHumidity()));
         tooltip.setGraphic(iv);
@@ -333,7 +319,7 @@ public class GuiControllerImpl implements GuiController {
     }
 
     private void fillCloud(WeatherCurrent current) {
-        lbCloud.setText(String.format("%d%%", current.getCloud()));
+        lbCloud.setText(String.format("%d％", current.getCloud()));
         Tooltip tooltip = getTooltip(String.format(localizeService.getLocalizedResource("cloud.tooltip"), current.getCloud()));
         tooltip.setGraphic(getTooltipImage(imgCloud.getImage(), 100));
         lbCloud.setTooltip(tooltip);
@@ -357,7 +343,7 @@ public class GuiControllerImpl implements GuiController {
                         current.getGustMph()
                 )
         );
-        ImageView iv = getTooltipImage(LoadingService.getInstance().getResourceImage(IMAGE_COMPASS_ARROW_PNG), 40);
+        ImageView iv = getTooltipImage(new Image(Objects.requireNonNull(this.getClass().getResourceAsStream(IMAGE_COMPASS_ARROW_PNG))), 40);
         iv.setRotate(current.getWindDegree());
         tooltip.setGraphic(iv);
         lbWindDirection.setTooltip(tooltip);
@@ -376,7 +362,7 @@ public class GuiControllerImpl implements GuiController {
         float totalPrecipitation = day.getTotalPrecipitation();
         float totalSnow = day.getTotalSnow();
         imgPrecipitation.setImage(null);
-        Image image = LoadingService.getInstance().getResourceImage(getPrecipitationImageResourceFileName(day));
+        Image image = new Image(Objects.requireNonNull(this.getClass().getResourceAsStream(getPrecipitationImageResourceFileName(day))));
         imgPrecipitation.setImage(image);
 
         if (totalPrecipitation > 0 && totalSnow > 0) {
@@ -485,7 +471,7 @@ public class GuiControllerImpl implements GuiController {
         String moonPhase = currentAstro.getMoonPhase();
         String moonPhaseLocalized = MOON_PHASES.get(getMoonPhaseAcronim(moonPhase));
         lbMoonRise.setText(getProperlyFormattedTime(currentAstro.getMoonRise()));
-        imgMoonPhase.setImage(LoadingService.getInstance().getResourceImage(getMoonPhaseImageName(moonPhase)));
+        imgMoonPhase.setImage(new Image(getMoonPhaseImageName(moonPhase)));
         lbMoonPhase.setText(moonPhaseLocalized);
         lbMoonSet.setText(getProperlyFormattedTime(currentAstro.getMoonSet()));
         Tooltip moonPhaseTooltip = getTooltip(moonPhaseLocalized);
@@ -524,47 +510,34 @@ public class GuiControllerImpl implements GuiController {
     }
 
     private void showConfigWindow() {
-        try(InputStream fxmlStream = getClass().getClassLoader().getResourceAsStream("fxml/Config.fxml")) {
-            FXMLLoader loader = new FXMLLoader();
-            loader.load(fxmlStream);
-            Scene scene = new Scene(loader.getRoot());
-            Stage stage = new Stage();
-            stage.setTitle(String.format("Das Weather Config (v.%s)", DasWeatherApplication.APP_VERSION));
-            stage.setScene(scene);
-            stage.setResizable(false);
-            stage.initModality(Modality.APPLICATION_MODAL);
-            ConfigController controller = loader.getController();
-            stage.setOnShowing(windowEvent -> controller.onShowingStage());
-            controller.initLocale();
-            stage.showAndWait();
-            if (controller.isConfigChanged()) {
-                localizeService.initLocale();
-                setLocalizedResources();
-                updateWeatherDataForce();
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        configScene = configScene == null ? new Scene(guiConfigView.getView()) : configScene;
+        Stage stage = new Stage();
+        stage.setTitle(String.format("Das Weather Config (v.%s)", buildProperties.getVersion()));
+        stage.setScene(configScene);
+        stage.setResizable(false);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setOnShowing(windowEvent -> configController.onShowingStage());
+        configController.initLocale();
+        stage.showAndWait();
+        if (configController.isConfigChanged()) {
+            localizeService.initLocale();
+            setLocalizedResources();
+            updateWeatherDataForce();
         }
     }
 
     private void showForecastWindow() {
-        try(InputStream fxmlStream = getClass().getClassLoader().getResourceAsStream("fxml/Forecast.fxml")) {
-            FXMLLoader loader = new FXMLLoader();
-            loader.load(fxmlStream);
-            Scene scene = new Scene(loader.getRoot());
-            Stage stage = new Stage();
-            stage.setTitle(String.format("Das Weather Forecast (v.%s)", DasWeatherApplication.APP_VERSION));
-            stage.setScene(scene);
-            stage.setMinHeight(600);
-            stage.setMinWidth(800);
-            ForecastController controller = loader.getController();
-            stage.setOnShowing(windowEvent -> controller.onShowing());
-            controller.initLocale();
-            controller.setData(this.dataHolder.getResponse());
-            stage.show();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        forecastScene = forecastScene == null ? new Scene(guiForecastView.getView()) : forecastScene;
+        Stage stage = new Stage();
+        stage.setTitle(String.format("Das Weather Forecast (v.%s)", buildProperties.getVersion()));
+        stage.setScene(forecastScene);
+        stage.setMinHeight(400);
+        stage.setMinWidth(600);
+        stage.initModality(Modality.WINDOW_MODAL);
+        stage.setOnShowing(windowEvent -> forecastController.onShowing());
+        forecastController.initLocale();
+        forecastController.setData(this.dataHolder.getResponse());
+        stage.showAndWait(); // ToDo: find possibility to show many forecast windows
     }
 
     private static Tooltip getTooltip(String caption) {
@@ -643,10 +616,7 @@ public class GuiControllerImpl implements GuiController {
         task.setOnFailed(e -> {
             pb.setVisible(false);
             btUpdate.setDisable(false);
-            Alert alert = new Alert(Alert.AlertType.ERROR,
-                    task.getException().getCause().getLocalizedMessage(),
-                    ButtonType.OK);
-            alert.show();
+            alertService.showError(task.getException().getCause().getLocalizedMessage(), "");
         });
         return task;
     }

@@ -2,6 +2,7 @@ package das.tools.weather.service;
 
 import das.tools.weather.entity.CurrenWeatherResponse;
 import das.tools.weather.entity.ForecastWeatherResponse;
+import das.tools.weather.entity.current.WeatherLocation;
 import javafx.scene.image.Image;
 
 import java.util.HashMap;
@@ -13,6 +14,8 @@ public interface WeatherService {
     CurrenWeatherResponse getCurrentWeather();
 
     ForecastWeatherResponse getForecastWeather();
+
+    WeatherLocation[] getLocations(String location);
 
     Image getRemoteImage(String imageUrl);
 

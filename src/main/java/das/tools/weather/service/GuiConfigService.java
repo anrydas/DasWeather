@@ -10,6 +10,11 @@ public interface GuiConfigService {
     String GUI_CONFIG_CONFIRM_EXIT_KEY = "app.confirm-exit";
     String GUI_CONFIG_API_KEY_KEY = "app.api-key";
     String GUI_CONFIG_WEATHER_LOCATION_KEY = "app.weather.location";
+    String GUI_CONFIG_WEATHER_LOCATION_ID_KEY = "app.weather.location.id";
+    String GUI_CONFIG_WEATHER_LOCATION_LATITUDE_KEY = "app.weather.location.lat";
+    String GUI_CONFIG_WEATHER_LOCATION_LONGITUDE_KEY = "app.weather.location.lon";
+    String GUI_CONFIG_WEATHER_LOCATION_URL_KEY = "app.weather.location.url";
+    String GUI_CONFIG_WEATHER_LOCATION_COUNTRY_KEY = "app.weather.location.country";
     String GUI_CONFIG_CONDITION_LANGUAGE_KEY = "app.weather.condition.lang";
     String GUI_CONFIG_FORECAST_URL_KEY = "app.weather.forecast.url";
     Map<String,String> GUI_SUPPORTED_CONDITION_LANGUAGES = new HashMap<>();

@@ -1,6 +1,5 @@
 package das.tools.weather.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import das.tools.weather.entity.current.WeatherCurrent;
 import das.tools.weather.entity.current.WeatherLocation;
 import das.tools.weather.entity.forecast.WeatherForecast;
@@ -13,7 +12,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class ForecastWeatherResponse {
     WeatherCurrent current;
     WeatherForecast forecast;
