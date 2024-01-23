@@ -23,4 +23,6 @@ public class WeatherLocation {
     String region;
     @JsonProperty("tz_id")
     String timeZone;
+    long id;
+    String url;
 }

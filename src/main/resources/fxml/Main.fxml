@@ -132,7 +132,7 @@
             <ImageView fx:id="imgAirQuality" fitHeight="32.0" fitWidth="32.0" preserveRatio="true">
                 <Image url="@/images/AirQuality.png" />
             </ImageView>
-            <Label fx:id="lbAirQuality" alignment="CENTER" prefHeight="27.0" prefWidth="315.0" text="100" textAlignment="CENTER">
+            <Label fx:id="lbAirQuality" alignment="CENTER" prefHeight="27.0" prefWidth="375.0" text="100" textAlignment="CENTER">
                 <font>
                     <Font size="18.0" />
                 </font>

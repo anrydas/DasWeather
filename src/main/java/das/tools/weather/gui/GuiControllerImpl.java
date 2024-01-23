@@ -6,6 +6,7 @@ import das.tools.weather.entity.current.WeatherCurrent;
 import das.tools.weather.entity.forecast.WeatherAstro;
 import das.tools.weather.entity.forecast.WeatherDay;
 import das.tools.weather.entity.forecast.WeatherDayForecast;
+import das.tools.weather.service.AlertService;
 import das.tools.weather.service.GuiConfigService;
 import das.tools.weather.service.LocalizeResourcesService;
 import das.tools.weather.service.WeatherService;
@@ -48,8 +49,8 @@ public class GuiControllerImpl implements GuiController {
     @Autowired private GuiConfig.ViewHolder guiConfigView;
     @Autowired private GuiConfig.ViewHolder guiForecastView;
     @Autowired private ForecastController forecastController;
-    @Autowired private ResourceBundle.Control utf8Control;
     @Autowired private LocalizeResourcesService localizeService;
+    @Autowired private AlertService alertService;
 
     @FXML private Label lbWindSpeedText;
     @FXML private Label lbFillsLikeText;
@@ -527,10 +528,11 @@ public class GuiControllerImpl implements GuiController {
         stage.setScene(forecastScene);
         stage.setMinHeight(400);
         stage.setMinWidth(600);
+        stage.initModality(Modality.WINDOW_MODAL);
         stage.setOnShowing(windowEvent -> forecastController.onShowing());
         forecastController.initLocale();
         forecastController.setData(this.dataHolder.getResponse());
-        stage.show();
+        stage.showAndWait(); // ToDo: find possibility to show many forecast windows
     }
 
     private static Tooltip getTooltip(String caption) {
@@ -609,10 +611,7 @@ public class GuiControllerImpl implements GuiController {
         task.setOnFailed(e -> {
             pb.setVisible(false);
             btUpdate.setDisable(false);
-            Alert alert = new Alert(Alert.AlertType.ERROR,
-                    task.getException().getCause().getLocalizedMessage(),
-                    ButtonType.OK);
-            alert.show();
+            alertService.showError(task.getException().getCause().getLocalizedMessage(), "");
         });
         return task;
     }

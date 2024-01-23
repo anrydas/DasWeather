@@ -1,16 +1,25 @@
 package das.tools.weather.gui;
 
+import das.tools.weather.DasWeatherApplication;
+import das.tools.weather.config.GuiConfig;
+import das.tools.weather.service.AlertService;
 import das.tools.weather.service.GuiConfigService;
 import das.tools.weather.service.LocalizeResourcesService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.info.BuildProperties;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Properties;
 import java.util.ResourceBundle;
@@ -21,8 +30,13 @@ import java.util.regex.Matcher;
 public class ConfigControllerImpl implements ConfigController {
     @Autowired private GuiConfigService configService;
     @Autowired private LocalizeResourcesService localizeService;
+    @Autowired private BuildProperties buildProperties;
+    @Autowired private AlertService alertService;
+    @Autowired private GuiConfig.ViewHolder guiLocationView;
+    @Autowired private CheckLocationController locationController;
     private Properties appProps;
     private boolean isConfigChanged;
+    private Scene locationScene;
     @FXML private Label lbApiKey;
     @FXML private Label lbUrl;
     @FXML private Label lbLocation;
@@ -36,17 +50,21 @@ public class ConfigControllerImpl implements ConfigController {
     @FXML private CheckBox chbConfirmExit;
     @FXML private Button btOk;
     @FXML private Button btCancel;
+    @FXML private Button btSearchLocation;
     public ConfigControllerImpl() {
     }
 
     @Override
     public void initLocale() {
+        btSearchLocation.setText(localizeService.getLocalizedResource("button.search"));
+        btSearchLocation.setTooltip(new Tooltip(localizeService.getLocalizedResource("button.search.tooltip")));
     }
 
     @FXML
     private void initialize() {
         btOk.setOnAction(actionEvent -> saveConfigAndClose());
         btCancel.setOnAction(actionEvent -> closeStage());
+        btSearchLocation.setOnAction(actionEvent -> showCheckWindow());
     }
 
     @Override
@@ -77,6 +95,17 @@ public class ConfigControllerImpl implements ConfigController {
                 )
         );
         cbCondLang.getSelectionModel().select(langName);
+    }
+
+    private void showCheckWindow() {
+        locationScene = locationScene == null ? new Scene(guiLocationView.getView()) : locationScene;
+        Stage stage = new Stage();
+        stage.setTitle(String.format("Das Weather Location (v.%s)", buildProperties.getVersion()));
+        stage.setScene(locationScene);
+        stage.initModality(Modality.WINDOW_MODAL);
+        locationController.initLocale();
+        locationController.setLocation(edLocation.getText());
+        stage.showAndWait();
     }
 
     private void setLabelNames() {
@@ -144,38 +173,34 @@ public class ConfigControllerImpl implements ConfigController {
     }
 
     private boolean isFieldsValid() {
-        String msgEmpty = "%s couldn't be empty";
-        String msgNotValid = "%s is not valid";
+        String msgEmpty = localizeService.getLocalizedResource("alert.app.config.empty.message");
+        String msgNotValid = localizeService.getLocalizedResource("alert.app.config.valid.message");
         if ("".equals(edApiKey.getText())) {
-            showError(String.format(msgEmpty, "API key"));
+            showError(String.format(msgEmpty, localizeService.getLocalizedResource("alert.app.config.field.key")));
             return false;
         }
         if ("".equals(edLocation.getText())) {
-            showError(String.format(msgEmpty, "Location"));
+            showError(String.format(msgEmpty, localizeService.getLocalizedResource("alert.app.config.field.location")));
             return false;
         }
         if ("".equals(edForecastUrl.getText())) {
-            showError(String.format(msgEmpty, "Forecast URL"));
+            showError(String.format(msgEmpty, localizeService.getLocalizedResource("alert.app.config.field.url")));
             return false;
         }
         Matcher matchKey = API_KEY_PATTERN.matcher(edApiKey.getText());
         if (!matchKey.find()) {
-            showError(String.format(msgNotValid, "API key"));
+            showError(String.format(msgNotValid, localizeService.getLocalizedResource("alert.app.config.field.key")));
             return false;
         }
         matchKey = FORECAST_URL_PATTERN.matcher(edForecastUrl.getText());
         if (!matchKey.find()) {
-            showError(String.format(msgNotValid, "Forecast URL"));
+            showError(String.format(msgNotValid, localizeService.getLocalizedResource("alert.app.config.field.location")));
             return false;
         }
         return true;
     }
 
     private void showError(String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR,
-                message,
-                ButtonType.OK);
-        alert.setTitle("Configuration error");
-        alert.showAndWait();
+        alertService.showError("Configuration error", message);
     }
 }

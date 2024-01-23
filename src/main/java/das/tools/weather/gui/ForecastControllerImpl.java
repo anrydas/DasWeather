@@ -1,10 +1,13 @@
 package das.tools.weather.gui;
 
 import das.tools.weather.entity.ForecastWeatherResponse;
+import das.tools.weather.service.AlertService;
 import das.tools.weather.service.ChartDataProducer;
 import das.tools.weather.service.LocalizeResourcesService;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
@@ -24,9 +27,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.ResourceBundle;
 
 @Component
 @Slf4j
@@ -40,12 +41,11 @@ public class ForecastControllerImpl implements ForecastController {
     @FXML private LineChart<String, Number> chWind;
     @FXML private TabPane tabPane;
     private ForecastWeatherResponse data;
-    private ResourceBundle locale;
     private File saveFileInitialDirectory = new File(System.getProperty("user.dir"));
-    private static final Map<String,XYChart<String,Number>> TABS_TO_CHART_MAP = new LinkedHashMap<>();
 
     @Autowired private ChartDataProducer chartDataProducer;
     @Autowired private LocalizeResourcesService localizeService;
+    @Autowired private AlertService alertService;
 
     static {
         Map<String,String> extMap = FILE_FORMAT_NAMES;
@@ -68,12 +68,6 @@ public class ForecastControllerImpl implements ForecastController {
 
     @FXML
     private void initialize() {
-        TABS_TO_CHART_MAP.put(TAB_NAMES.get(1), chTemperature);
-        TABS_TO_CHART_MAP.put(TAB_NAMES.get(2), chPressure);
-        TABS_TO_CHART_MAP.put(TAB_NAMES.get(3), chHumidity);
-        TABS_TO_CHART_MAP.put(TAB_NAMES.get(4), chCloud);
-        TABS_TO_CHART_MAP.put(TAB_NAMES.get(5), chWind);
-
         btClose.setOnAction(actionEvent -> ((Stage) btClose.getScene().getWindow()).close());
         btSave.setOnAction(actionEvent -> saveChartToFile());
     }
@@ -97,7 +91,7 @@ public class ForecastControllerImpl implements ForecastController {
     private void saveChartToFile() {
         File file = selectFileToSaveChart();
         if (file != null) {
-            XYChart<String, Number> activeCart = getActiveCart();
+            XYChart<String, Number> activeCart = getActiveChart();
             WritableImage image = activeCart.snapshot(
                     new SnapshotParameters(),
                     new WritableImage((int) activeCart.getWidth(), (int) activeCart.getHeight())
@@ -114,15 +108,16 @@ public class ForecastControllerImpl implements ForecastController {
                     ImageIO.write(img, fileFormatName, file);
                 }
                 this.saveFileInitialDirectory = file.getParentFile();
-                Alert alert = new Alert(Alert.AlertType.INFORMATION,
-                        String.format(localizeService.getLocalizedResource("alert.saveFile.ok"), file.getName()));
-                alert.showAndWait();
+                alertService.showInfo(
+                        String.format(localizeService.getLocalizedResource("alert.saveFile.ok"), file.getName()),
+                        "");
             } catch (IOException e) {
                 log.error("Couldn't save chart into file", e);
-                Alert alert = new Alert(Alert.AlertType.ERROR,
+                alertService.showError(
                         String.format(localizeService.getLocalizedResource("alert.saveFile.error"),
-                                file.getName(), e.getLocalizedMessage()));
-                alert.showAndWait();
+                                file.getName(),
+                                e.getLocalizedMessage()),
+                        e.getLocalizedMessage());
             }
         }
     }
@@ -138,7 +133,6 @@ public class ForecastControllerImpl implements ForecastController {
     @Override
     public void onShowing() {
         setTabNames();
-        fillGraphics();
     }
 
     private void setTabNames() {
@@ -155,12 +149,18 @@ public class ForecastControllerImpl implements ForecastController {
         fillGraphics();
     }
 
-    private XYChart<String, Number> getActiveCart() {
-        return TABS_TO_CHART_MAP.get(tabPane.getSelectionModel().getSelectedItem().getText());
+    private XYChart<String, Number> getActiveChart() {
+        XYChart<String, Number> res = null;
+        for (Node node: ((Parent) tabPane.getSelectionModel().getSelectedItem().getContent()).getChildrenUnmodifiable()) {
+            if (node instanceof XYChart) {
+                res = (XYChart<String, Number>) node;
+                break;
+            }
+        };
+        return res;
     }
 
     private void fillGraphics() {
-        chartDataProducer.initLocale(this.locale);
         chartDataProducer.initChartsData(this.data.getForecast().getDayForecast());
         chartDataProducer.fillChart(chTemperature, TAB_NAMES.get(1));
         chartDataProducer.fillChart(chPressure, TAB_NAMES.get(2));

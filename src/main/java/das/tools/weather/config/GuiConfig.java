@@ -1,5 +1,6 @@
 package das.tools.weather.config;
 
+import das.tools.weather.gui.CheckLocationController;
 import das.tools.weather.gui.ConfigController;
 import das.tools.weather.gui.ForecastController;
 import das.tools.weather.gui.GuiController;
@@ -63,6 +64,16 @@ public class GuiConfig {
     @Bean @Primary
     public ForecastController getForecastController() throws IOException {
         return (ForecastController) getForecastView().getController();
+    }
+
+    @Bean(name = "guiLocationView")
+    public ViewHolder getSearchView() throws IOException {
+        return loadView("fxml/CheckLocation.fxml");
+    }
+
+    @Bean @Primary
+    public CheckLocationController geLocationController() throws IOException {
+        return (CheckLocationController) getSearchView().getController();
     }
 
     protected ViewHolder loadView(String url) throws IOException {
