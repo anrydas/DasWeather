@@ -1,7 +1,9 @@
 package das.tools.weather.gui;
 
 import das.tools.weather.entity.current.WeatherLocation;
-import das.tools.weather.service.*;
+import das.tools.weather.service.GuiConfigService;
+import das.tools.weather.service.LocalizeResourcesService;
+import das.tools.weather.service.WeatherService;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;

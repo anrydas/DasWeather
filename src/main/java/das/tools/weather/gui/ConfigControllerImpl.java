@@ -1,6 +1,5 @@
 package das.tools.weather.gui;
 
-import das.tools.weather.DasWeatherApplication;
 import das.tools.weather.config.GuiConfig;
 import das.tools.weather.service.AlertService;
 import das.tools.weather.service.GuiConfigService;
@@ -8,7 +7,6 @@ import das.tools.weather.service.LocalizeResourcesService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Modality;
@@ -18,11 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Properties;
-import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 
 @Component
