@@ -1,9 +1,7 @@
 ## Das Weather
 ### _Application to get Weather and show it_
 
-[![https://img.shields.io/badge/Java-8-white](https://img.shields.io/badge/Java-8-white)](https://www.java.com/) [![https://img.shields.io/badge/Spring-Boot-green](https://img.shields.io/badge/Java-FX-cyan)](https://openjfx.io/) [![https://img.shields.io/badge/weather-api-blue](https://img.shields.io/badge/weather-api-blue)](https://www.weatherapi.com/)
-
-_**Note**: In version 3 and above the Spring have been removed from application._ 
+[![https://img.shields.io/badge/Java-8-white](https://img.shields.io/badge/Java-8-white)](https://www.java.com/) [![https://img.shields.io/badge/weather-api-blue](https://img.shields.io/badge/weather-api-blue)](https://www.weatherapi.com/) [![https://img.shields.io/badge/Spring-Boot-green](https://img.shields.io/badge/Spring-Boot-green)](https://spring.io/) [![https://img.shields.io/badge/Spring-Boot-green](https://img.shields.io/badge/Java-FX-cyan)](https://openjfx.io/)
 
 ### 📃 Features
 - multiplatform
