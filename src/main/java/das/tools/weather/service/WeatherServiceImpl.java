@@ -1,11 +1,17 @@
 package das.tools.weather.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import das.tools.weather.entity.CurrenWeatherResponse;
 import das.tools.weather.entity.ForecastWeatherResponse;
+import das.tools.weather.entity.SearchLocationResponse;
+import das.tools.weather.entity.current.WeatherLocation;
 import das.tools.weather.exceptions.RestTemplateResponseErrorHandler;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.client.utils.URIBuilder;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -15,9 +21,9 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -127,6 +133,34 @@ public class WeatherServiceImpl implements WeatherService {
         CompletableFuture<ForecastWeatherResponse> completableFuture =
                 CompletableFuture.supplyAsync(() -> restTemplate.getForObject(url, ForecastWeatherResponse.class));
         ForecastWeatherResponse res = null;
+        try {
+            res = completableFuture.get();
+        } catch (InterruptedException | ExecutionException e) {
+            log.error("Error getting response from server: ", e);
+            throw new RuntimeException(e);
+        }
+        return res;
+    }
+
+    @Override
+    public WeatherLocation[] getLocations(String location) {
+        Properties props = configService.getCurrentConfig();
+        WeatherLocation[] res = null;
+        String url = ServletUriComponentsBuilder.fromHttpUrl("http://api.weatherapi.com/v1/search.json")
+                .queryParam("key", props.getProperty(GuiConfigService.GUI_CONFIG_API_KEY_KEY,
+                        configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_API_KEY_KEY)))
+                .queryParam("q", location)
+                .toUriString();
+        if(log.isDebugEnabled()) log.debug("[WeatherService].getLocation: got url={}", url);
+        res = getLocationResponseAsync(url);
+        if(log.isDebugEnabled()) log.debug("[WeatherService].getLocations: result={}", res);
+        return res;
+    }
+
+    private WeatherLocation[] getLocationResponseAsync(String url) {
+        CompletableFuture<WeatherLocation[]> completableFuture =
+                CompletableFuture.supplyAsync(() -> restTemplate.getForObject(url, WeatherLocation[].class));
+        WeatherLocation[] res = null;
         try {
             res = completableFuture.get();
         } catch (InterruptedException | ExecutionException e) {

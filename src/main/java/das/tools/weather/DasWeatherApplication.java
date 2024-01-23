@@ -2,6 +2,7 @@ package das.tools.weather;
 
 import das.tools.weather.config.GuiConfig;
 import das.tools.weather.gui.GuiController;
+import das.tools.weather.service.AlertService;
 import das.tools.weather.service.GuiConfigService;
 import das.tools.weather.service.LocalizeResourcesService;
 import javafx.application.Platform;
@@ -32,6 +33,7 @@ public class DasWeatherApplication extends AbstractJavaFxApplicationSupport {
     @Autowired private GuiConfigService guiConfig;
     @Autowired private GuiController guiController;
     @Autowired private LocalizeResourcesService localizeService;
+    @Autowired private AlertService alertService;
 
     @Override
     public void start(Stage stage) {
@@ -44,11 +46,10 @@ public class DasWeatherApplication extends AbstractJavaFxApplicationSupport {
             stage.setOnCloseRequest(event -> {
                 boolean isConfirmExit = Boolean.parseBoolean(guiConfig.getConfigStringValue(GuiConfigService.GUI_CONFIG_CONFIRM_EXIT_KEY, "true"));
                 if (isConfirmExit) {
-                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
-                            localizeService.getLocalizedResource("alert.app.exit.text"));
-                    alert.setTitle(localizeService.getLocalizedResource("alert.app.exit.title"));
-                    alert.setHeaderText("Das Weather Application");
-                    Optional<ButtonType> option = alert.showAndWait();
+                    Optional<ButtonType> option = alertService.showConfirm(
+                            localizeService.getLocalizedResource("alert.app.exit.text"),
+                            localizeService.getLocalizedResource("alert.app.exit.title"),
+                            "Das Weather Application");
                     if (ButtonType.CANCEL.equals(option.orElse(null))) {
                         event.consume();
                         return;
