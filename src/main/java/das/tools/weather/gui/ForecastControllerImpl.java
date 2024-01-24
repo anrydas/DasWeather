@@ -2,6 +2,7 @@ package das.tools.weather.gui;
 
 import das.tools.weather.entity.ForecastWeatherResponse;
 import das.tools.weather.entity.forecast.WeatherAstro;
+import das.tools.weather.entity.forecast.WeatherDay;
 import das.tools.weather.entity.forecast.WeatherDayForecast;
 import das.tools.weather.service.AlertService;
 import das.tools.weather.service.ChartDataProducer;
@@ -45,6 +46,7 @@ public class ForecastControllerImpl implements ForecastController {
     @FXML private LineChart<String, Number> chCloud;
     @FXML private LineChart<String, Number> chWind;
     @FXML private AreaChart<String, Number> chSun;
+    @FXML private AreaChart<String, Number> chPrecipitation;
     @FXML private TabPane tabPane;
     private ForecastWeatherResponse data;
     private File saveFileInitialDirectory = new File(System.getProperty("user.dir"));
@@ -71,6 +73,7 @@ public class ForecastControllerImpl implements ForecastController {
         map.put(4, localizeService.getLocalizedResource("chart.tab.4"));
         map.put(5, localizeService.getLocalizedResource("chart.tab.5"));
         map.put(6, localizeService.getLocalizedResource("chart.tab.6"));
+        map.put(7, localizeService.getLocalizedResource("chart.tab.7"));
     }
 
     @FXML
@@ -182,6 +185,7 @@ public class ForecastControllerImpl implements ForecastController {
         chartDataProducer.makeLegendClickable(chWind);
 
         fillSunTab();
+        fillPrecipitationTab();
     }
 
     private void fillSunTab() {
@@ -201,21 +205,45 @@ public class ForecastControllerImpl implements ForecastController {
         for (WeatherDayForecast dayForecast : data.getForecast().getDayForecast()) {
             XYChart.Data<String, Number> sunRiseData = new XYChart.Data<>(dayForecast.getDate(), getParsedTime(dayForecast.getAstro().getSunRise()));
             sunRiseSeries.getData().add(sunRiseData);
-            installTooltipOnNode(sunRiseData.getNode(), dayForecast.getAstro());
+            installTooltipOnSunNode(sunRiseData.getNode(), dayForecast.getAstro());
 
             XYChart.Data<String, Number> dayLengthData = new XYChart.Data<>(dayForecast.getDate(),
                     getDayLength(dayForecast.getAstro().getSunRise(), dayForecast.getAstro().getSunSet()));
             dayLengthSeries.getData().add(dayLengthData);
-            installTooltipOnNode(dayLengthData.getNode(), dayForecast.getAstro());
+            installTooltipOnSunNode(dayLengthData.getNode(), dayForecast.getAstro());
 
             XYChart.Data<String, Number> sunSetData = new XYChart.Data<>(dayForecast.getDate(), getParsedTime(dayForecast.getAstro().getSunSet()));
             sunSetSeries.getData().add(sunSetData);
-            installTooltipOnNode(sunSetData.getNode(), dayForecast.getAstro());
+            installTooltipOnSunNode(sunSetData.getNode(), dayForecast.getAstro());
         }
         chartDataProducer.makeLegendClickable(chSun);
     }
 
-    private void installTooltipOnNode(Node node, WeatherAstro astro) {
+    private void fillPrecipitationTab() {
+        chPrecipitation.getData().clear();
+        XYChart.Series<String,Number> rainSeries = new XYChart.Series<>();
+        XYChart.Series<String,Number> snowSeries = new XYChart.Series<>();
+
+        rainSeries.setName(localizeService.getLocalizedResource("rain.legend"));
+        snowSeries.setName(localizeService.getLocalizedResource("snow.legend"));
+
+        chPrecipitation.getData().add(rainSeries);
+        chPrecipitation.getData().add(snowSeries);
+
+        for (WeatherDayForecast dayForecast : data.getForecast().getDayForecast()) {
+            XYChart.Data<String, Number> rainData = new XYChart.Data<>(dayForecast.getDate(), dayForecast.getDay().getTotalPrecipitation());
+            rainSeries.getData().add(rainData);
+            installTooltipOnPrecipitationNode(rainData.getNode(), dayForecast.getDay());
+
+            XYChart.Data<String, Number> snowData = new XYChart.Data<>(dayForecast.getDate(), dayForecast.getDay().getTotalSnow() * 10);
+            snowSeries.getData().add(snowData);
+            installTooltipOnPrecipitationNode(snowData.getNode(), dayForecast.getDay());
+        }
+        chartDataProducer.makeLegendClickable(chPrecipitation);
+
+    }
+
+    private void installTooltipOnSunNode(Node node, WeatherAstro astro) {
         if (node != null) {
             node.setOnMouseEntered(event -> node.getStyleClass().add("chart-on-hover"));
             node.setOnMouseExited(event -> node.getStyleClass().remove("chart-on-hover"));
@@ -223,6 +251,20 @@ public class ForecastControllerImpl implements ForecastController {
                     astro.getSunRise(),
                     astro.getSunSet(),
                     getTimeLength(astro.getSunRise(), astro.getSunSet()));
+            Tooltip tooltip = new Tooltip(msg);
+            Tooltip.install(node, tooltip);
+        }
+    }
+
+    private void installTooltipOnPrecipitationNode(Node node, WeatherDay day) {
+        if (node != null) {
+            node.setOnMouseEntered(event -> node.getStyleClass().add("chart-on-hover"));
+            node.setOnMouseExited(event -> node.getStyleClass().remove("chart-on-hover"));
+            String msg = String.format(localizeService.getLocalizedResource("precipitation.point.tooltip"),
+                    day.getTotalPrecipitation(),
+                    day.getChanceOfRain(),
+                    day.getTotalSnow(),
+                    day.getChanceOfSnow());
             Tooltip tooltip = new Tooltip(msg);
             Tooltip.install(node, tooltip);
         }
