@@ -104,7 +104,7 @@ public class ChartDataProducerImpl implements ChartDataProducer {
                 localizeService.getLocalizedResource("point.tooltip"),
                 hour.getTime(),
                 hour.getCondition().getText(),
-                hour.getTemperature(), hour.getTemperatureF(), hour.getFillsLike(), hour.getFillsLikeF(),
+                hour.getTemperature(), hour.getTemperatureF(), hour.getFeelsLike(), hour.getFeelsLikeF(),
                 hour.getHumidity(),
                 GuiControllerImpl.millibarToMmHg(hour.getPressure()), hour.getPressure(),
                 hour.getWindDirection(), hour.getWindKmh(), hour.getWindMph(), hour.getGustKmh(), hour.getGustMph()
