@@ -224,6 +224,6 @@ public class ConfigControllerImpl implements ConfigController {
     }
 
     private void showError(String message) {
-        alertService.showError("Configuration error", message);
+        alertService.showError(localizeService.getLocalizedResource("alert.app.config.header"), message);
     }
 }
