@@ -244,28 +244,27 @@ public class ForecastControllerImpl implements ForecastController {
     }
 
     private void installTooltipOnSunNode(Node node, WeatherAstro astro) {
-        if (node != null) {
-            node.setOnMouseEntered(event -> node.getStyleClass().add("chart-on-hover"));
-            node.setOnMouseExited(event -> node.getStyleClass().remove("chart-on-hover"));
-            String msg = String.format(localizeService.getLocalizedResource("sun.point.tooltip"),
-                    astro.getSunRise(),
-                    astro.getSunSet(),
-                    getTimeLength(astro.getSunRise(), astro.getSunSet()));
-            Tooltip tooltip = new Tooltip(msg);
-            Tooltip.install(node, tooltip);
-        }
+        String msg = String.format(localizeService.getLocalizedResource("sun.point.tooltip"),
+                astro.getSunRise(),
+                astro.getSunSet(),
+                getTimeLength(astro.getSunRise(), astro.getSunSet()));
+        installTooltipOnNode(node, msg);
     }
 
     private void installTooltipOnPrecipitationNode(Node node, WeatherDay day) {
+        String msg = String.format(localizeService.getLocalizedResource("precipitation.point.tooltip"),
+                day.getTotalPrecipitation(),
+                day.getChanceOfRain(),
+                day.getTotalSnow(),
+                day.getChanceOfSnow());
+        installTooltipOnNode(node, msg);
+    }
+
+    private void installTooltipOnNode(Node node, String message) {
         if (node != null) {
             node.setOnMouseEntered(event -> node.getStyleClass().add("chart-on-hover"));
             node.setOnMouseExited(event -> node.getStyleClass().remove("chart-on-hover"));
-            String msg = String.format(localizeService.getLocalizedResource("precipitation.point.tooltip"),
-                    day.getTotalPrecipitation(),
-                    day.getChanceOfRain(),
-                    day.getTotalSnow(),
-                    day.getChanceOfSnow());
-            Tooltip tooltip = new Tooltip(msg);
+            Tooltip tooltip = new Tooltip(message);
             Tooltip.install(node, tooltip);
         }
     }
