@@ -450,7 +450,7 @@ public class GuiControllerImpl implements GuiController {
     }
 
     private void fillDayLength(WeatherAstro currentAstro) {
-        String dayLength = getTimeLength(currentAstro.getSunRise(), currentAstro.getSunSet());
+        String dayLength = forecastController.getTimeLength(currentAstro.getSunRise(), currentAstro.getSunSet());
         lbDayLength.setText(dayLength);
         Tooltip tooltip = getTooltip(String.format(localizeService.getLocalizedResource("dayLength.tooltip"), dayLength));
         tooltip.setGraphic(getTooltipImage(imgDayLength.getImage(), 100));
@@ -462,7 +462,7 @@ public class GuiControllerImpl implements GuiController {
         lbSunRise.setText(getProperlyFormattedTime(currentAstro.getSunRise()));
         lbSunSet.setText(getProperlyFormattedTime(currentAstro.getSunSet()));
         Tooltip dayLength = getTooltip(String.format(localizeService.getLocalizedResource("dayLength.tooltip"),
-                getTimeLength(currentAstro.getSunRise(), currentAstro.getSunSet())));
+                forecastController.getTimeLength(currentAstro.getSunRise(), currentAstro.getSunSet())));
         lbSunRise.setTooltip(dayLength);
         lbSunSet.setTooltip(dayLength);
         Tooltip.install(imgSunRise, dayLength);
@@ -490,15 +490,6 @@ public class GuiControllerImpl implements GuiController {
             res = "n/a";
         }
         return res;
-    }
-
-    private String getTimeLength(String start, String end) {
-        LocalTime startTime = LocalTime.parse(start, TIME_FORMATTER_FOR_RESPONSE);
-        LocalTime endTime = LocalTime.parse(end, TIME_FORMATTER_FOR_RESPONSE);
-        long diff = Duration.between(startTime, endTime).getSeconds();
-        long hours = diff / (60 * 60) % 24;
-        long minutes = diff / (60) % 60;
-        return String.format("%02d:%02d", hours, minutes);
     }
 
     private String getMoonPhaseImageName(String phase) {
