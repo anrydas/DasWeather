@@ -503,6 +503,8 @@ public class GuiControllerImpl implements GuiController {
     private void showConfigWindow() {
         configScene = configScene == null ? new Scene(guiConfigView.getView()) : configScene;
         Stage stage = new Stage();
+        stage.getIcons().clear();
+        stage.getIcons().add(((Stage) btUpdate.getScene().getWindow()).getIcons().get(0));
         stage.setTitle(String.format("Das Weather Config (v.%s)", buildProperties.getVersion()));
         stage.setScene(configScene);
         stage.setResizable(false);
@@ -520,6 +522,8 @@ public class GuiControllerImpl implements GuiController {
     private void showForecastWindow() {
         forecastScene = forecastScene == null ? new Scene(guiForecastView.getView()) : forecastScene;
         Stage stage = new Stage();
+        stage.getIcons().clear();
+        stage.getIcons().add(((Stage) btUpdate.getScene().getWindow()).getIcons().get(0));
         stage.setTitle(String.format("Das Weather Forecast (v.%s)", buildProperties.getVersion()));
         stage.setScene(forecastScene);
         stage.initModality(Modality.APPLICATION_MODAL);
