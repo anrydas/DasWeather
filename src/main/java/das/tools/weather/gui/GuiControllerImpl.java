@@ -32,7 +32,6 @@ import org.springframework.boot.info.BuildProperties;
 import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
-import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -58,7 +57,7 @@ public class GuiControllerImpl implements GuiController {
     @Autowired private AlertService alertService;
 
     @FXML private Label lbWindSpeedText;
-    @FXML private Label lbFillsLikeText;
+    @FXML private Label lbFeelsLikeText;
     @FXML private ImageView imgDayLength;
     @FXML private Label lbDayLength;
     @FXML private ImageView imgAirQuality;
@@ -83,7 +82,7 @@ public class GuiControllerImpl implements GuiController {
     @FXML private ImageView imgMoonPhase;
     @FXML private Label lbMoonPhase;
     @FXML private Label lbHumidity;
-    @FXML private Label lbFills;
+    @FXML private Label lbFeels;
     @FXML private Label lbWindSpeed;
     @FXML private Label lbWindGists;
     @FXML private Label lbPrecipitation;
@@ -169,7 +168,7 @@ public class GuiControllerImpl implements GuiController {
     private void setLocalizedResources() {
         btUpdate.setText(localizeService.getLocalizedResource("button.update.text"));
         btConfig.setTooltip(getTooltip(localizeService.getLocalizedResource("button.configure.tooltip")));
-        lbFillsLikeText.setText(localizeService.getLocalizedResource("label.fillsLikeText.text"));
+        lbFeelsLikeText.setText(localizeService.getLocalizedResource("label.feelsLikeText.text"));
         lbWindSpeedText.setText(localizeService.getLocalizedResource("label.windSpeed.text"));
     }
 
@@ -275,7 +274,7 @@ public class GuiControllerImpl implements GuiController {
 
     private void fillTemperature(WeatherCurrent current) {
         lbTemperature.setText(String.format("%.0f℃", current.getTemperatureC()));
-        lbFills.setText(String.format("%.0f℃", current.getFeelsLike()));
+        lbFeels.setText(String.format("%.0f℃", current.getFeelsLike()));
         String imageName = current.getTemperatureC() > 0 ? IMAGE_TEMP_HOT_PNG : IMAGE_TEMP_COLD_PNG;
         Image image = new Image(Objects.requireNonNull(this.getClass().getResourceAsStream(imageName)));
         imgTemperature.setImage(image);
@@ -290,7 +289,7 @@ public class GuiControllerImpl implements GuiController {
         );
         tooltip.setGraphic(iv);
         lbTemperature.setTooltip(tooltip);
-        lbFills.setTooltip(tooltip);
+        lbFeels.setTooltip(tooltip);
         Tooltip.install(imgTemperature, tooltip);
     }
 
@@ -513,8 +512,7 @@ public class GuiControllerImpl implements GuiController {
         configController.initLocale();
         stage.showAndWait();
         if (configController.isConfigChanged()) {
-            localizeService.initLocale();
-            setLocalizedResources();
+            onShowingStage();
             updateWeatherDataForce();
         }
     }
