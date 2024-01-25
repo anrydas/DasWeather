@@ -119,6 +119,8 @@ public class ConfigControllerImpl implements ConfigController {
     private void showCheckWindow() {
         locationScene = locationScene == null ? new Scene(guiLocationView.getView()) : locationScene;
         Stage stage = new Stage();
+        stage.getIcons().clear();
+        stage.getIcons().add(((Stage) btSearchLocation.getScene().getWindow()).getIcons().get(0));
         stage.setTitle(String.format("Das Weather Location (v.%s)", buildProperties.getVersion()));
         stage.setScene(locationScene);
         stage.setResizable(false);
@@ -222,6 +224,6 @@ public class ConfigControllerImpl implements ConfigController {
     }
 
     private void showError(String message) {
-        alertService.showError("Configuration error", message);
+        alertService.showError(localizeService.getLocalizedResource("alert.app.config.header"), message);
     }
 }

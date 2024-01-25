@@ -32,7 +32,6 @@ import org.springframework.boot.info.BuildProperties;
 import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
-import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -58,7 +57,7 @@ public class GuiControllerImpl implements GuiController {
     @Autowired private AlertService alertService;
 
     @FXML private Label lbWindSpeedText;
-    @FXML private Label lbFillsLikeText;
+    @FXML private Label lbFeelsLikeText;
     @FXML private ImageView imgDayLength;
     @FXML private Label lbDayLength;
     @FXML private ImageView imgAirQuality;
@@ -83,7 +82,7 @@ public class GuiControllerImpl implements GuiController {
     @FXML private ImageView imgMoonPhase;
     @FXML private Label lbMoonPhase;
     @FXML private Label lbHumidity;
-    @FXML private Label lbFills;
+    @FXML private Label lbFeels;
     @FXML private Label lbWindSpeed;
     @FXML private Label lbWindGists;
     @FXML private Label lbPrecipitation;
@@ -169,7 +168,7 @@ public class GuiControllerImpl implements GuiController {
     private void setLocalizedResources() {
         btUpdate.setText(localizeService.getLocalizedResource("button.update.text"));
         btConfig.setTooltip(getTooltip(localizeService.getLocalizedResource("button.configure.tooltip")));
-        lbFillsLikeText.setText(localizeService.getLocalizedResource("label.fillsLikeText.text"));
+        lbFeelsLikeText.setText(localizeService.getLocalizedResource("label.feelsLikeText.text"));
         lbWindSpeedText.setText(localizeService.getLocalizedResource("label.windSpeed.text"));
     }
 
@@ -275,7 +274,7 @@ public class GuiControllerImpl implements GuiController {
 
     private void fillTemperature(WeatherCurrent current) {
         lbTemperature.setText(String.format("%.0f℃", current.getTemperatureC()));
-        lbFills.setText(String.format("%.0f℃", current.getFeelsLike()));
+        lbFeels.setText(String.format("%.0f℃", current.getFeelsLike()));
         String imageName = current.getTemperatureC() > 0 ? IMAGE_TEMP_HOT_PNG : IMAGE_TEMP_COLD_PNG;
         Image image = new Image(Objects.requireNonNull(this.getClass().getResourceAsStream(imageName)));
         imgTemperature.setImage(image);
@@ -290,7 +289,7 @@ public class GuiControllerImpl implements GuiController {
         );
         tooltip.setGraphic(iv);
         lbTemperature.setTooltip(tooltip);
-        lbFills.setTooltip(tooltip);
+        lbFeels.setTooltip(tooltip);
         Tooltip.install(imgTemperature, tooltip);
     }
 
@@ -450,7 +449,7 @@ public class GuiControllerImpl implements GuiController {
     }
 
     private void fillDayLength(WeatherAstro currentAstro) {
-        String dayLength = getTimeLength(currentAstro.getSunRise(), currentAstro.getSunSet());
+        String dayLength = forecastController.getTimeLength(currentAstro.getSunRise(), currentAstro.getSunSet());
         lbDayLength.setText(dayLength);
         Tooltip tooltip = getTooltip(String.format(localizeService.getLocalizedResource("dayLength.tooltip"), dayLength));
         tooltip.setGraphic(getTooltipImage(imgDayLength.getImage(), 100));
@@ -462,7 +461,7 @@ public class GuiControllerImpl implements GuiController {
         lbSunRise.setText(getProperlyFormattedTime(currentAstro.getSunRise()));
         lbSunSet.setText(getProperlyFormattedTime(currentAstro.getSunSet()));
         Tooltip dayLength = getTooltip(String.format(localizeService.getLocalizedResource("dayLength.tooltip"),
-                getTimeLength(currentAstro.getSunRise(), currentAstro.getSunSet())));
+                forecastController.getTimeLength(currentAstro.getSunRise(), currentAstro.getSunSet())));
         lbSunRise.setTooltip(dayLength);
         lbSunSet.setTooltip(dayLength);
         Tooltip.install(imgSunRise, dayLength);
@@ -492,15 +491,6 @@ public class GuiControllerImpl implements GuiController {
         return res;
     }
 
-    private String getTimeLength(String start, String end) {
-        LocalTime startTime = LocalTime.parse(start, TIME_FORMATTER_FOR_RESPONSE);
-        LocalTime endTime = LocalTime.parse(end, TIME_FORMATTER_FOR_RESPONSE);
-        long diff = Duration.between(startTime, endTime).getSeconds();
-        long hours = diff / (60 * 60) % 24;
-        long minutes = diff / (60) % 60;
-        return String.format("%02d:%02d", hours, minutes);
-    }
-
     private String getMoonPhaseImageName(String phase) {
         return "/images/moon/" + getMoonPhaseAcronim(phase) + ".png";
     }
@@ -512,6 +502,8 @@ public class GuiControllerImpl implements GuiController {
     private void showConfigWindow() {
         configScene = configScene == null ? new Scene(guiConfigView.getView()) : configScene;
         Stage stage = new Stage();
+        stage.getIcons().clear();
+        stage.getIcons().add(((Stage) btUpdate.getScene().getWindow()).getIcons().get(0));
         stage.setTitle(String.format("Das Weather Config (v.%s)", buildProperties.getVersion()));
         stage.setScene(configScene);
         stage.setResizable(false);
@@ -520,8 +512,7 @@ public class GuiControllerImpl implements GuiController {
         configController.initLocale();
         stage.showAndWait();
         if (configController.isConfigChanged()) {
-            localizeService.initLocale();
-            setLocalizedResources();
+            onShowingStage();
             updateWeatherDataForce();
         }
     }
@@ -529,6 +520,8 @@ public class GuiControllerImpl implements GuiController {
     private void showForecastWindow() {
         forecastScene = forecastScene == null ? new Scene(guiForecastView.getView()) : forecastScene;
         Stage stage = new Stage();
+        stage.getIcons().clear();
+        stage.getIcons().add(((Stage) btUpdate.getScene().getWindow()).getIcons().get(0));
         stage.setTitle(String.format("Das Weather Forecast (v.%s)", buildProperties.getVersion()));
         stage.setScene(forecastScene);
         stage.initModality(Modality.APPLICATION_MODAL);
