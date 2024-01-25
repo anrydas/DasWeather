@@ -7,7 +7,7 @@
 - multiplatform
 - quick and easy to use
 - lightweight
-- uses **multiple** languages to show weather info
+- **multiple** languages (included 17 languages)
 - configured update interval
 - weather forecast
 
