@@ -24,9 +24,9 @@ public class WeatherHour {
     @JsonProperty("dewpoint_c")
     float dewPoint;
     @JsonProperty("feelslike_c")
-    float fillsLike;
+    float feelsLike;
     @JsonProperty("feelslike_f")
-    float fillsLikeF;
+    float feelsLikeF;
     @JsonProperty("gust_kph")
     float gustKmh;
     @JsonProperty("gust_mph")
