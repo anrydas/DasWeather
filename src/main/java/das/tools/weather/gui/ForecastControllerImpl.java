@@ -195,8 +195,8 @@ public class ForecastControllerImpl implements ForecastController {
         XYChart.Series<String,Number> sunSetSeries = new XYChart.Series<>();
 
         sunRiseSeries.setName(localizeService.getLocalizedResource("sun.rise"));
-        dayLengthSeries.setName(localizeService.getLocalizedResource("sun.set"));
-        sunSetSeries.setName(localizeService.getLocalizedResource("sun.day.length"));
+        dayLengthSeries.setName(localizeService.getLocalizedResource("sun.day.length"));
+        sunSetSeries.setName(localizeService.getLocalizedResource("sun.set"));
 
         chSun.getData().add(sunRiseSeries);
         chSun.getData().add(dayLengthSeries);
