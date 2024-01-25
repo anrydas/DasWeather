@@ -103,8 +103,7 @@ public class WeatherServiceImpl implements WeatherService {
                         configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_FORECAST_URL_KEY)))
                 .queryParam("key", props.getProperty(GuiConfigService.GUI_CONFIG_API_KEY_KEY,
                         configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_API_KEY_KEY)))
-                .queryParam("q", props.getProperty(GuiConfigService.GUI_CONFIG_WEATHER_LOCATION_KEY,
-                        configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_WEATHER_LOCATION_KEY)))
+                .queryParam("q", getLocationParameterValue(props))
                 .queryParam("aqi", "yes")
                 .queryParam("lang", props.getProperty(GuiConfigService.GUI_CONFIG_CONDITION_LANGUAGE_KEY,
                         configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_CONDITION_LANGUAGE_KEY)))
@@ -122,6 +121,16 @@ public class WeatherServiceImpl implements WeatherService {
         }
 
         return response;
+    }
+
+    private String getLocationParameterValue(Properties props) {
+        String locationId = props.getProperty(GuiConfigService.GUI_CONFIG_WEATHER_LOCATION_ID_KEY);
+        String res = (locationId != null && !"".equals(locationId)) ?
+                "id:"+locationId :
+                props.getProperty(GuiConfigService.GUI_CONFIG_WEATHER_LOCATION_KEY,
+                        configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_WEATHER_LOCATION_KEY));
+        if (log.isDebugEnabled()) log.debug("got location parameter={}", res);
+        return res;
     }
 
     private ForecastWeatherResponse getResponseAsync(String url) {
