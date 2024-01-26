@@ -15,7 +15,7 @@ public interface WeatherService {
 
     ForecastWeatherResponse getForecastWeather();
 
-    WeatherLocation[] getLocations(String location);
+    WeatherLocation[] getLocations(String location, String key);
 
     Image getRemoteImage(String imageUrl);
 
