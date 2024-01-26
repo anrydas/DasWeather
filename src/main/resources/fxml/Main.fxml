@@ -173,7 +173,7 @@
         </HBox>
         <HBox alignment="CENTER" prefHeight="31.0" prefWidth="501.0" spacing="40.0">
         <VBox alignment="CENTER">
-            <Label text="Forecast: ">
+            <Label fx:id="lbForecast" text="Forecast: ">
                <font>
                   <Font size="18.0" />
                </font></Label>
