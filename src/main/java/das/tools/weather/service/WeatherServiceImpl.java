@@ -147,18 +147,23 @@ public class WeatherServiceImpl implements WeatherService {
     }
 
     @Override
-    public WeatherLocation[] getLocations(String location) {
+    public WeatherLocation[] getLocations(String location, String key) {
         Properties props = configService.getCurrentConfig();
         WeatherLocation[] res = null;
         String url = ServletUriComponentsBuilder.fromHttpUrl("http://api.weatherapi.com/v1/search.json")
-                .queryParam("key", props.getProperty(GuiConfigService.GUI_CONFIG_API_KEY_KEY,
-                        configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_API_KEY_KEY)))
+                .queryParam("key", getApiKey(props, key))
                 .queryParam("q", location)
                 .toUriString();
         if(log.isDebugEnabled()) log.debug("[WeatherService].getLocation: got url={}", url);
         res = getLocationResponseAsync(url);
         if(log.isDebugEnabled()) log.debug("[WeatherService].getLocations: result={}", res);
         return res;
+    }
+
+    private String getApiKey(Properties props, String key) {
+        String storedKey = props.getProperty(GuiConfigService.GUI_CONFIG_API_KEY_KEY,
+                configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_API_KEY_KEY));
+        return (storedKey != null && !"".equals(storedKey)) ? storedKey : key;
     }
 
     private WeatherLocation[] getLocationResponseAsync(String url) {
