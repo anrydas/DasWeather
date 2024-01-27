@@ -135,6 +135,9 @@ public class ConfigControllerImpl implements ConfigController {
         locationController.setLocation(edLocation.getText());
         locationController.setApiKey(edApiKey.getText());
         stage.showAndWait();
+        appProps = configService.getCurrentConfig();
+        edLocation.setText(appProps.getProperty(GuiConfigService.GUI_CONFIG_WEATHER_LOCATION_KEY,
+                configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_WEATHER_LOCATION_KEY)));
         setLocationConfirmation();
     }
 
