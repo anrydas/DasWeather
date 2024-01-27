@@ -56,6 +56,7 @@ public class GuiControllerImpl implements GuiController {
     @Autowired private LocalizeResourcesService localizeService;
     @Autowired private AlertService alertService;
 
+    @FXML private Label lbForecast;
     @FXML private Label lbWindSpeedText;
     @FXML private Label lbFeelsLikeText;
     @FXML private ImageView imgDayLength;
@@ -170,6 +171,7 @@ public class GuiControllerImpl implements GuiController {
         btConfig.setTooltip(getTooltip(localizeService.getLocalizedResource("button.configure.tooltip")));
         lbFeelsLikeText.setText(localizeService.getLocalizedResource("label.feelsLikeText.text"));
         lbWindSpeedText.setText(localizeService.getLocalizedResource("label.windSpeed.text"));
+        lbForecast.setText(localizeService.getLocalizedResource("label.forecast.text"));
     }
 
     private void updateControls() {

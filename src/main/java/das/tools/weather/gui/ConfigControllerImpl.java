@@ -64,6 +64,11 @@ public class ConfigControllerImpl implements ConfigController {
         btOk.setOnAction(actionEvent -> saveConfigAndClose());
         btCancel.setOnAction(actionEvent -> closeStage());
         btSearchLocation.setOnAction(actionEvent -> showCheckWindow());
+        edApiKey.setOnKeyReleased(event -> apiKeyPressed());
+    }
+
+    private void apiKeyPressed() {
+        btSearchLocation.setDisable(!(edApiKey.getText().length() > 0));
     }
 
     @Override
@@ -93,6 +98,7 @@ public class ConfigControllerImpl implements ConfigController {
                 )
         );
         cbCondLang.getSelectionModel().select(langName);
+        apiKeyPressed();
         setLocationConfirmation();
     }
 
@@ -127,7 +133,11 @@ public class ConfigControllerImpl implements ConfigController {
         stage.initModality(Modality.APPLICATION_MODAL);
         locationController.initLocale();
         locationController.setLocation(edLocation.getText());
+        locationController.setApiKey(edApiKey.getText());
         stage.showAndWait();
+        appProps = configService.getCurrentConfig();
+        edLocation.setText(appProps.getProperty(GuiConfigService.GUI_CONFIG_WEATHER_LOCATION_KEY,
+                configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_WEATHER_LOCATION_KEY)));
         setLocationConfirmation();
     }
 
