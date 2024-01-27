@@ -8,6 +8,7 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -29,6 +30,7 @@ public class WeatherServiceImpl implements WeatherService {
     private final RestTemplate restTemplate;
     private final GuiConfigService configService;
     private final RestTemplateResponseErrorHandler responseErrorHandler;
+    private final AlertService alertService;
 
     static {
         Map<Integer,Integer> map = WEATHER_CODE_CONDITION_IMAGES;
@@ -82,7 +84,8 @@ public class WeatherServiceImpl implements WeatherService {
         map.put(1282, 395);
     }
 
-    public WeatherServiceImpl(RestTemplateBuilder restTemplateBuilder, GuiConfigService configService, RestTemplateResponseErrorHandler responseErrorHandler) {
+    public WeatherServiceImpl(RestTemplateBuilder restTemplateBuilder, GuiConfigService configService, RestTemplateResponseErrorHandler responseErrorHandler, AlertService alertService) {
+        this.alertService = alertService;
         this.restTemplate = restTemplateBuilder
                 .errorHandler(responseErrorHandler)
                 .build();
@@ -134,16 +137,16 @@ public class WeatherServiceImpl implements WeatherService {
     }
 
     private ForecastWeatherResponse getResponseAsync(String url) {
-        CompletableFuture<ForecastWeatherResponse> completableFuture =
-                CompletableFuture.supplyAsync(() -> restTemplate.getForObject(url, ForecastWeatherResponse.class));
-        ForecastWeatherResponse res = null;
+        CompletableFuture<ResponseEntity<ForecastWeatherResponse>> completableFuture =
+                CompletableFuture.supplyAsync(() -> restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(new HttpHeaders()), ForecastWeatherResponse.class));
+        ResponseEntity<ForecastWeatherResponse> response;
         try {
-            res = completableFuture.get();
+            response = completableFuture.get();
+            return response.getBody();
         } catch (InterruptedException | ExecutionException e) {
             log.error("Error getting response from server: ", e);
             throw new RuntimeException(e);
         }
-        return res;
     }
 
     @Override
@@ -167,16 +170,16 @@ public class WeatherServiceImpl implements WeatherService {
     }
 
     private WeatherLocation[] getLocationResponseAsync(String url) {
-        CompletableFuture<WeatherLocation[]> completableFuture =
-                CompletableFuture.supplyAsync(() -> restTemplate.getForObject(url, WeatherLocation[].class));
-        WeatherLocation[] res = null;
+        CompletableFuture<ResponseEntity<WeatherLocation[]>> completableFuture =
+                CompletableFuture.supplyAsync(() -> restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(new HttpHeaders()),WeatherLocation[].class));
+        ResponseEntity<WeatherLocation[]> response;
         try {
-            res = completableFuture.get();
+            response = completableFuture.get();
+            return response.getBody();
         } catch (InterruptedException | ExecutionException e) {
             log.error("Error getting response from server: ", e);
             throw new RuntimeException(e);
         }
-        return res;
     }
 
     @Override
