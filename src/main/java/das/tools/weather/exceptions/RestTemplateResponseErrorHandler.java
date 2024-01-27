@@ -1,5 +1,8 @@
 package das.tools.weather.exceptions;
 
+import das.tools.weather.service.AlertService;
+import das.tools.weather.service.LocalizeResourcesService;
+import javafx.application.Platform;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
@@ -12,6 +15,14 @@ import static org.springframework.http.HttpStatus.Series.SERVER_ERROR;
 
 @Component
 public class RestTemplateResponseErrorHandler implements ResponseErrorHandler {
+    private final AlertService alertService;
+    private final LocalizeResourcesService localizeService;
+
+    public RestTemplateResponseErrorHandler(AlertService alertService, LocalizeResourcesService localizeService) {
+        this.alertService = alertService;
+        this.localizeService = localizeService;
+    }
+
     @Override
     public boolean hasError(ClientHttpResponse response) throws IOException {
         return response.getStatusCode().series() == CLIENT_ERROR
@@ -22,14 +33,30 @@ public class RestTemplateResponseErrorHandler implements ResponseErrorHandler {
     public void handleError(ClientHttpResponse response) throws IOException {
         if (response.getStatusCode().series() == CLIENT_ERROR) {
             if (response.getStatusCode() == HttpStatus.FORBIDDEN) {
-                throw new ClientException("There was an error getting weather data. Try to change API key ant try again.");
+                showFxError(localizeService.getLocalizedResource("alert.ex.header.common"),
+                        localizeService.getLocalizedResource("alert.ex.message.key"));
             } else {
-                throw new ClientException("There was a client error.");
+                showFxError(localizeService.getLocalizedResource("alert.ex.header.common"),
+                        localizeService.getLocalizedResource("alert.ex.message.client") + "\n"
+                                + response.getStatusText());
             }
         } else if (response.getStatusCode().series() == SERVER_ERROR) {
-            throw new ServerException("There was a server error.");
+            showFxError(localizeService.getLocalizedResource("alert.ex.header.common"),
+                    localizeService.getLocalizedResource("alert.ex.message.server") + "\n" +
+                            response.getStatusText());
         } else {
-            throw new ApplicationException("There was an error during communication with remote.");
+            showFxError(localizeService.getLocalizedResource("alert.ex.header.error"),
+                    localizeService.getLocalizedResource("alert.ex.message.common") + "\n" +
+                            response.getStatusText());
         }
+    }
+
+    private void showFxError(String head, String message) {
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                alertService.showError(head, message);
+            }
+        });
     }
 }

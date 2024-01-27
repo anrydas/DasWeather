@@ -26,6 +26,7 @@ public class LocationControllerImpl implements LocationController {
     @Autowired private WeatherService weatherService;
     @Autowired private GuiConfigService configService;
     private WeatherLocation[] foundLocations;
+    private String key;
 
     @FXML private Label lbLocationName;
     @FXML private Label lbLocationsList;
@@ -82,8 +83,13 @@ public class LocationControllerImpl implements LocationController {
         locationNamePressed();
     }
 
+    @Override
+    public void setApiKey(String key) {
+        this.key = key;
+    }
+
     private void searchForLocations() {
-        foundLocations = weatherService.getLocations(edLocationName.getText());
+        foundLocations = weatherService.getLocations(edLocationName.getText(), this.key);
         lstLocations.getItems().clear();
         for (WeatherLocation loc : foundLocations) {
             String locName = String.format("%s, %s (%s)", loc.getName(), loc.getRegion(), loc.getCountry());

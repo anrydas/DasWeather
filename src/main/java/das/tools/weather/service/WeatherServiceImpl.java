@@ -8,6 +8,10 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -29,6 +33,7 @@ public class WeatherServiceImpl implements WeatherService {
     private final RestTemplate restTemplate;
     private final GuiConfigService configService;
     private final RestTemplateResponseErrorHandler responseErrorHandler;
+    private final AlertService alertService;
 
     static {
         Map<Integer,Integer> map = WEATHER_CODE_CONDITION_IMAGES;
@@ -82,7 +87,8 @@ public class WeatherServiceImpl implements WeatherService {
         map.put(1282, 395);
     }
 
-    public WeatherServiceImpl(RestTemplateBuilder restTemplateBuilder, GuiConfigService configService, RestTemplateResponseErrorHandler responseErrorHandler) {
+    public WeatherServiceImpl(RestTemplateBuilder restTemplateBuilder, GuiConfigService configService, RestTemplateResponseErrorHandler responseErrorHandler, AlertService alertService) {
+        this.alertService = alertService;
         this.restTemplate = restTemplateBuilder
                 .errorHandler(responseErrorHandler)
                 .build();
@@ -103,8 +109,7 @@ public class WeatherServiceImpl implements WeatherService {
                         configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_FORECAST_URL_KEY)))
                 .queryParam("key", props.getProperty(GuiConfigService.GUI_CONFIG_API_KEY_KEY,
                         configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_API_KEY_KEY)))
-                .queryParam("q", props.getProperty(GuiConfigService.GUI_CONFIG_WEATHER_LOCATION_KEY,
-                        configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_WEATHER_LOCATION_KEY)))
+                .queryParam("q", getLocationParameterValue(props))
                 .queryParam("aqi", "yes")
                 .queryParam("lang", props.getProperty(GuiConfigService.GUI_CONFIG_CONDITION_LANGUAGE_KEY,
                         configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_CONDITION_LANGUAGE_KEY)))
@@ -124,26 +129,35 @@ public class WeatherServiceImpl implements WeatherService {
         return response;
     }
 
+    private String getLocationParameterValue(Properties props) {
+        String locationId = props.getProperty(GuiConfigService.GUI_CONFIG_WEATHER_LOCATION_ID_KEY);
+        String res = (locationId != null && !"".equals(locationId)) ?
+                "id:"+locationId :
+                props.getProperty(GuiConfigService.GUI_CONFIG_WEATHER_LOCATION_KEY,
+                        configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_WEATHER_LOCATION_KEY));
+        if (log.isDebugEnabled()) log.debug("got location parameter={}", res);
+        return res;
+    }
+
     private ForecastWeatherResponse getResponseAsync(String url) {
-        CompletableFuture<ForecastWeatherResponse> completableFuture =
-                CompletableFuture.supplyAsync(() -> restTemplate.getForObject(url, ForecastWeatherResponse.class));
-        ForecastWeatherResponse res = null;
+        CompletableFuture<ResponseEntity<ForecastWeatherResponse>> completableFuture =
+                CompletableFuture.supplyAsync(() -> restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(new HttpHeaders()), ForecastWeatherResponse.class));
+        ResponseEntity<ForecastWeatherResponse> response;
         try {
-            res = completableFuture.get();
+            response = completableFuture.get();
+            return response.getBody();
         } catch (InterruptedException | ExecutionException e) {
             log.error("Error getting response from server: ", e);
             throw new RuntimeException(e);
         }
-        return res;
     }
 
     @Override
-    public WeatherLocation[] getLocations(String location) {
+    public WeatherLocation[] getLocations(String location, String key) {
         Properties props = configService.getCurrentConfig();
         WeatherLocation[] res = null;
         String url = ServletUriComponentsBuilder.fromHttpUrl("http://api.weatherapi.com/v1/search.json")
-                .queryParam("key", props.getProperty(GuiConfigService.GUI_CONFIG_API_KEY_KEY,
-                        configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_API_KEY_KEY)))
+                .queryParam("key", getApiKey(props, key))
                 .queryParam("q", location)
                 .toUriString();
         if(log.isDebugEnabled()) log.debug("[WeatherService].getLocation: got url={}", url);
@@ -152,17 +166,23 @@ public class WeatherServiceImpl implements WeatherService {
         return res;
     }
 
+    private String getApiKey(Properties props, String key) {
+        String storedKey = props.getProperty(GuiConfigService.GUI_CONFIG_API_KEY_KEY,
+                configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_API_KEY_KEY));
+        return (storedKey != null && !"".equals(storedKey)) ? storedKey : key;
+    }
+
     private WeatherLocation[] getLocationResponseAsync(String url) {
-        CompletableFuture<WeatherLocation[]> completableFuture =
-                CompletableFuture.supplyAsync(() -> restTemplate.getForObject(url, WeatherLocation[].class));
-        WeatherLocation[] res = null;
+        CompletableFuture<ResponseEntity<WeatherLocation[]>> completableFuture =
+                CompletableFuture.supplyAsync(() -> restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(new HttpHeaders()),WeatherLocation[].class));
+        ResponseEntity<WeatherLocation[]> response;
         try {
-            res = completableFuture.get();
+            response = completableFuture.get();
+            return response.getBody();
         } catch (InterruptedException | ExecutionException e) {
             log.error("Error getting response from server: ", e);
             throw new RuntimeException(e);
         }
-        return res;
     }
 
     @Override
