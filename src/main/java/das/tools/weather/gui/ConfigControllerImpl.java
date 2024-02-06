@@ -1,6 +1,5 @@
 package das.tools.weather.gui;
 
-import das.tools.weather.config.GuiConfig;
 import das.tools.weather.service.AlertService;
 import das.tools.weather.service.GuiConfigService;
 import das.tools.weather.service.LocalizeResourcesService;
@@ -11,9 +10,12 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
+import net.rgielen.fxweaver.core.FxWeaver;
+import net.rgielen.fxweaver.core.FxmlView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.stereotype.Component;
@@ -23,17 +25,19 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 
 @Component
+@FxmlView("/fxml/Config.fxml")
 @Slf4j
 public class ConfigControllerImpl implements ConfigController {
-    @Autowired private GuiConfigService configService;
-    @Autowired private LocalizeResourcesService localizeService;
-    @Autowired private BuildProperties buildProperties;
-    @Autowired private AlertService alertService;
-    @Autowired private GuiConfig.ViewHolder guiLocationView;
-    @Autowired private LocationController locationController;
+    private final GuiConfigService configService;
+    private final LocalizeResourcesService localizeService;
+    private final BuildProperties buildProperties;
+    private final AlertService alertService;
+    private final FxWeaver fxWeaver;
     private Properties appProps;
     private boolean isConfigChanged;
-    private Scene locationScene;
+
+    private Stage stage;
+    @FXML private AnchorPane root;
     @FXML private Label lbApiKey;
     @FXML private Label lbUrl;
     @FXML private Label lbLocation;
@@ -49,7 +53,12 @@ public class ConfigControllerImpl implements ConfigController {
     @FXML private Button btCancel;
     @FXML private Button btSearchLocation;
     @FXML private ImageView imgConfirmed;
-    public ConfigControllerImpl() {
+    public ConfigControllerImpl(GuiConfigService configService, LocalizeResourcesService localizeService, BuildProperties buildProperties, AlertService alertService, FxWeaver fxWeaver) {
+        this.configService = configService;
+        this.localizeService = localizeService;
+        this.buildProperties = buildProperties;
+        this.alertService = alertService;
+        this.fxWeaver = fxWeaver;
     }
 
     @Override
@@ -61,10 +70,28 @@ public class ConfigControllerImpl implements ConfigController {
 
     @FXML
     private void initialize() {
+        this.stage = new Stage();
+        this.stage.setScene(new Scene(root));
         btOk.setOnAction(actionEvent -> saveConfigAndClose());
         btCancel.setOnAction(actionEvent -> closeStage());
-        btSearchLocation.setOnAction(actionEvent -> showCheckWindow());
+        btSearchLocation.setOnAction(actionEvent -> showLocationWindow());
         edApiKey.setOnKeyReleased(event -> apiKeyPressed());
+    }
+
+    @Override
+    public void show() {
+        stage.setTitle(String.format("Das Weather Config (v.%s)", buildProperties.getVersion()));
+        stage.setResizable(false);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setOnShowing(windowEvent -> onShowingStage());
+        initLocale();
+        stage.showAndWait();
+    }
+
+    @Override
+    public void setWindowIcon(Image icon) {
+        stage.getIcons().clear();
+        stage.getIcons().add(icon);
     }
 
     private void apiKeyPressed() {
@@ -122,19 +149,13 @@ public class ConfigControllerImpl implements ConfigController {
         return locationId != null && !"".equals(locationId);
     }
 
-    private void showCheckWindow() {
-        locationScene = locationScene == null ? new Scene(guiLocationView.getView()) : locationScene;
-        Stage stage = new Stage();
-        stage.getIcons().clear();
-        stage.getIcons().add(((Stage) btSearchLocation.getScene().getWindow()).getIcons().get(0));
-        stage.setTitle(String.format("Das Weather Location (v.%s)", buildProperties.getVersion()));
-        stage.setScene(locationScene);
-        stage.setResizable(false);
-        stage.initModality(Modality.APPLICATION_MODAL);
-        locationController.initLocale();
-        locationController.setLocation(edLocation.getText());
-        locationController.setApiKey(edApiKey.getText());
-        stage.showAndWait();
+    private void showLocationWindow() {
+        LocationController controller = fxWeaver.loadController(LocationControllerImpl.class);
+        controller.setWindowIcon(((Stage) root.getScene().getWindow()).getIcons().get(0));
+        controller.setLocation(edLocation.getText());
+        controller.setApiKey(edApiKey.getText());
+        controller.show();
+
         appProps = configService.getCurrentConfig();
         edLocation.setText(appProps.getProperty(GuiConfigService.GUI_CONFIG_WEATHER_LOCATION_KEY,
                 configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_WEATHER_LOCATION_KEY)));

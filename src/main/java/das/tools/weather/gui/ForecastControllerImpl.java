@@ -11,6 +11,7 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.chart.AreaChart;
 import javafx.scene.chart.LineChart;
@@ -19,12 +20,17 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.Tooltip;
+import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import lombok.extern.slf4j.Slf4j;
+import net.rgielen.fxweaver.core.FxmlView;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.info.BuildProperties;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.imageio.ImageIO;
@@ -35,7 +41,8 @@ import java.time.Duration;
 import java.time.LocalTime;
 import java.util.Map;
 
-@Component
+@Component @Scope("prototype")
+@FxmlView("/fxml/Forecast.fxml")
 @Slf4j
 public class ForecastControllerImpl implements ForecastController {
     @FXML private Button btClose;
@@ -50,10 +57,13 @@ public class ForecastControllerImpl implements ForecastController {
     @FXML private TabPane tabPane;
     private ForecastWeatherResponse data;
     private File saveFileInitialDirectory = new File(System.getProperty("user.dir"));
+    private Stage stage;
+    @FXML private AnchorPane root;
 
-    @Autowired private ChartDataProducer chartDataProducer;
-    @Autowired private LocalizeResourcesService localizeService;
-    @Autowired private AlertService alertService;
+    private final ChartDataProducer chartDataProducer;
+    private final LocalizeResourcesService localizeService;
+    private final AlertService alertService;
+    private final BuildProperties buildProperties;
 
     static {
         Map<String,String> extMap = FILE_FORMAT_NAMES;
@@ -62,6 +72,13 @@ public class ForecastControllerImpl implements ForecastController {
         extMap.put("JPEG", "JPEG");
         extMap.put("GIF", "GIF");
         extMap.put("BMP", "BMP");
+    }
+
+    public ForecastControllerImpl(ChartDataProducer chartDataProducer, LocalizeResourcesService localizeService, AlertService alertService, BuildProperties buildProperties) {
+        this.chartDataProducer = chartDataProducer;
+        this.localizeService = localizeService;
+        this.alertService = alertService;
+        this.buildProperties = buildProperties;
     }
 
     @Override
@@ -77,9 +94,24 @@ public class ForecastControllerImpl implements ForecastController {
     }
 
     @FXML
-    private void initialize() {
+    public void initialize() {
+        this.stage = new Stage();
+        this.stage.setScene(new Scene(root));
         btClose.setOnAction(actionEvent -> ((Stage) btClose.getScene().getWindow()).close());
         btSave.setOnAction(actionEvent -> saveChartToFile());
+    }
+
+    @Override
+    public void show() {
+        stage.setTitle(String.format("Das Weather Forecast (v.%s)", buildProperties.getVersion()));
+        stage.setOnShowing(windowEvent -> onShowing());
+        stage.showAndWait();
+    }
+
+    @Override
+    public void setWindowIcon(Image icon) {
+        stage.getIcons().clear();
+        stage.getIcons().add(icon);
     }
 
     private File selectFileToSaveChart() {
@@ -155,6 +187,7 @@ public class ForecastControllerImpl implements ForecastController {
 
     @Override
     public void setData(ForecastWeatherResponse data) {
+        initLocale();
         this.data = data;
         fillGraphics();
     }
