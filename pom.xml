@@ -9,12 +9,15 @@
         <relativePath/>
     </parent>
     <properties>
-        <app.version>4.6.0-RELEASE</app.version>
+        <app.version>4.6.1-RELEASE</app.version>
         <java.version>8</java.version>
         <jackson.version>2.14.2</jackson.version>
         <httpclient.version>4.5.14</httpclient.version>
         <spring-web.version>5.3.27</spring-web.version>
         <spring-webmvc.version>5.3.27</spring-webmvc.version>
+        <javafx.version>12</javafx.version>
+        <fxweavr.version>1.3.0</fxweavr.version>
+        <javafx-swing.version>11-ea+24</javafx-swing.version>
     </properties>
     <groupId>das.tools.weather</groupId>
     <artifactId>DasWeather</artifactId>
@@ -65,22 +68,22 @@
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
-            <version>12</version>
+            <version>${javafx.version}</version>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
-            <version>12</version>
+            <version>${javafx.version}</version>
         </dependency>
         <dependency>
             <groupId>net.rgielen</groupId>
             <artifactId>javafx-weaver-spring</artifactId>
-            <version>1.3.0</version>
+            <version>${fxweavr.version}</version>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-swing</artifactId>
-            <version>11-ea+24</version>
+            <version>${javafx-swing.version}</version>
         </dependency>
 
     </dependencies>
