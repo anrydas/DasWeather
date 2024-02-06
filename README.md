@@ -49,6 +49,6 @@
 
 ### 🐞 Known issues
 - On Windows 11 after Hibernation the [Main window](#MainWin) may not be updated for couple minutes
-  - **_Resolving:_** Press **Update** button. It will be updated during 1-2 minutes.
+  - **_Resolving:_** Press **Update** button. Anyway, it will be updated during 1 till 10 minutes.
 
 ###### _Made by -=:dAs:=-_
