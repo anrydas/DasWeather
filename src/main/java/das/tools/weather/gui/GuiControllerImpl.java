@@ -168,8 +168,8 @@ public class GuiControllerImpl implements GuiController {
         imgForecast03.setOnMouseClicked(mouseEvent -> showForecastWindow());
     }
 
+    @Override
     public void show() {
-
     }
 
     @Override
