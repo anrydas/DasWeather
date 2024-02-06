@@ -1,6 +1,5 @@
 package das.tools.weather.gui;
 
-import das.tools.weather.config.GuiConfig;
 import das.tools.weather.entity.ForecastWeatherResponse;
 import das.tools.weather.entity.current.WeatherCurrent;
 import das.tools.weather.entity.forecast.WeatherAstro;
@@ -19,14 +18,16 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.TextAlignment;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import net.rgielen.fxweaver.core.FxWeaver;
+import net.rgielen.fxweaver.core.FxmlView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.stereotype.Component;
@@ -41,21 +42,19 @@ import java.util.Map;
 import java.util.Objects;
 
 @Component
+@FxmlView("/fxml/Main.fxml")
 @Slf4j
 public class GuiControllerImpl implements GuiController {
-    private Scene configScene;
-    private Scene forecastScene;
 
-    @Autowired private GuiConfigService configService;
-    @Autowired private BuildProperties buildProperties;
-    @Autowired private WeatherService weatherService;
-    @Autowired private ConfigController configController;
-    @Autowired private GuiConfig.ViewHolder guiConfigView;
-    @Autowired private GuiConfig.ViewHolder guiForecastView;
-    @Autowired private ForecastController forecastController;
-    @Autowired private LocalizeResourcesService localizeService;
-    @Autowired private AlertService alertService;
+    private final GuiConfigService configService;
+    private final WeatherService weatherService;
+    private final ConfigController configController;
+    private final ForecastController forecastController;
+    private final LocalizeResourcesService localizeService;
+    private final AlertService alertService;
+    private final FxWeaver fxWeaver;
 
+    @FXML private AnchorPane root;
     @FXML private Label lbForecast;
     @FXML private Label lbWindSpeedText;
     @FXML private Label lbFeelsLikeText;
@@ -111,6 +110,16 @@ public class GuiControllerImpl implements GuiController {
     @FXML private ImageView imgConfigure;
     @FXML public ImageView imgWindDirection;
 
+    public GuiControllerImpl(GuiConfigService configService, WeatherService weatherService, ConfigController configController, ForecastController forecastController, LocalizeResourcesService localizeService, AlertService alertService, FxWeaver fxWeaver) {
+        this.configService = configService;
+        this.weatherService = weatherService;
+        this.configController = configController;
+        this.forecastController = forecastController;
+        this.localizeService = localizeService;
+        this.alertService = alertService;
+        this.fxWeaver = fxWeaver;
+    }
+
     @Override
     public void initLocale() {
         Map<String,String> map = WIND_DIRECTIONS;
@@ -157,6 +166,10 @@ public class GuiControllerImpl implements GuiController {
         imgForecast01.setOnMouseClicked(mouseEvent -> showForecastWindow());
         imgForecast02.setOnMouseClicked(mouseEvent -> showForecastWindow());
         imgForecast03.setOnMouseClicked(mouseEvent -> showForecastWindow());
+    }
+
+    public void show() {
+
     }
 
     @Override
@@ -502,35 +515,21 @@ public class GuiControllerImpl implements GuiController {
     }
 
     private void showConfigWindow() {
-        configScene = configScene == null ? new Scene(guiConfigView.getView()) : configScene;
-        Stage stage = new Stage();
-        stage.getIcons().clear();
-        stage.getIcons().add(((Stage) btUpdate.getScene().getWindow()).getIcons().get(0));
-        stage.setTitle(String.format("Das Weather Config (v.%s)", buildProperties.getVersion()));
-        stage.setScene(configScene);
-        stage.setResizable(false);
-        stage.initModality(Modality.APPLICATION_MODAL);
-        stage.setOnShowing(windowEvent -> configController.onShowingStage());
-        configController.initLocale();
-        stage.showAndWait();
+        ConfigController controller = fxWeaver.loadController(ConfigControllerImpl.class);
+        controller.setWindowIcon(((Stage) root.getScene().getWindow()).getIcons().get(0));
+        controller.show();
         if (configController.isConfigChanged()) {
-            onShowingStage();
+            controller.onShowingStage();
             updateWeatherDataForce();
         }
+
     }
 
     private void showForecastWindow() {
-        forecastScene = forecastScene == null ? new Scene(guiForecastView.getView()) : forecastScene;
-        Stage stage = new Stage();
-        stage.getIcons().clear();
-        stage.getIcons().add(((Stage) btUpdate.getScene().getWindow()).getIcons().get(0));
-        stage.setTitle(String.format("Das Weather Forecast (v.%s)", buildProperties.getVersion()));
-        stage.setScene(forecastScene);
-        stage.initModality(Modality.APPLICATION_MODAL);
-        stage.setOnShowing(windowEvent -> forecastController.onShowing());
-        forecastController.initLocale();
-        forecastController.setData(this.dataHolder.getResponse());
-        stage.showAndWait(); // ToDo: find possibility to show many forecast windows
+        ForecastController controller = fxWeaver.loadController(ForecastControllerImpl.class);
+        controller.setWindowIcon(((Stage) root.getScene().getWindow()).getIcons().get(0));
+        controller.setData(this.dataHolder.getResponse());
+        controller.show();
     }
 
     private static Tooltip getTooltip(String caption) {
