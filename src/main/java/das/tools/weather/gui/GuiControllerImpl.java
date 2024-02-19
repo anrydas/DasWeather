@@ -225,7 +225,7 @@ public class GuiControllerImpl implements GuiController {
     }
 
     private void fillAirQuality(WeatherCurrent current) {
-        String MSG_AIR_QUALITY = "CO=%.00f,   NO2=%.00f,   O3=%.00f,   SO2=%.00f";
+        String MSG_AIR_QUALITY = "CO=%.1f,   NO2=%.1f,   O3=%.1f,   SO2=%.1f";
         lbAirQuality.setText(String.format(MSG_AIR_QUALITY,
                 current.getAirQuality().getCo(),
                 current.getAirQuality().getNo2(),
@@ -247,7 +247,7 @@ public class GuiControllerImpl implements GuiController {
         lbVisibility.setTooltip(tooltipVisibility);
         Tooltip.install(imgVisibility, tooltipVisibility);
 
-        lbUvIdx.setText(String.format("%.00f", current.getUvIndex()));
+        lbUvIdx.setText(String.format("%.2f", current.getUvIndex()));
         Tooltip tooltipUv = getTooltip(
                 String.format(localizeService.getLocalizedResource("uvIndex.tooltip"),
                         current.getUvIndex()
