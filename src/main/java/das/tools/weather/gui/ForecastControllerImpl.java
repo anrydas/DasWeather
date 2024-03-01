@@ -28,7 +28,6 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 import lombok.extern.slf4j.Slf4j;
 import net.rgielen.fxweaver.core.FxmlView;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -99,6 +98,9 @@ public class ForecastControllerImpl implements ForecastController {
         this.stage.setScene(new Scene(root));
         btClose.setOnAction(actionEvent -> ((Stage) btClose.getScene().getWindow()).close());
         btSave.setOnAction(actionEvent -> saveChartToFile());
+
+        TabDraggingSupport support = new TabDraggingSupport();
+        support.addDragging(tabPane);
     }
 
     @Override
