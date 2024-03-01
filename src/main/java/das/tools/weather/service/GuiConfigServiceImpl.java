@@ -48,6 +48,7 @@ public class GuiConfigServiceImpl implements GuiConfigService {
         mapDefaults.put(GUI_CONFIG_WEATHER_LOCATION_KEY, "Kyiv");
         mapDefaults.put(GUI_CONFIG_CONDITION_LANGUAGE_KEY, "en");
         mapDefaults.put(GUI_CONFIG_FORECAST_URL_KEY, "http://api.weatherapi.com/v1/forecast.json");
+        mapDefaults.put(GUI_CONFIG_FORECAST_TABS_ORDER_KEY, "tab1,tab2,tab3,tab4,tab5,tab6,tab7");
     }
 
     @Override
