@@ -11,7 +11,6 @@ import das.tools.weather.service.LocalizeResourcesService;
 import das.tools.weather.service.WeatherService;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
@@ -28,8 +27,6 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.rgielen.fxweaver.core.FxWeaver;
 import net.rgielen.fxweaver.core.FxmlView;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.info.BuildProperties;
 import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
@@ -153,7 +150,25 @@ public class GuiControllerImpl implements GuiController {
 
     @FXML
     private void initialize() {
-        btUpdate.setOnAction(event -> updateWeatherData());
+        root.setOnKeyPressed(event -> {
+            if (event.isShiftDown()) {
+                btUpdate.setText(localizeService.getLocalizedResource("button.update.now.text"));
+            }
+        });
+        root.setOnKeyReleased(event -> {
+            if (!event.isShiftDown()) {
+                btUpdate.setText(localizeService.getLocalizedResource("button.update.text"));
+            }
+        });
+
+        btUpdate.setOnMouseClicked(event -> {
+            if (event.isShiftDown()) {
+                updateWeatherDataForce();
+            } else {
+                updateWeatherData();
+            }
+        });
+
         btConfig.setOnAction(actionEvent -> showConfigWindow());
 
         imgConfigure.setImage(new Image(IMAGE_CONFIGURE_PNG));
