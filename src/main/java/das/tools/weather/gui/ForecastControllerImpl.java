@@ -98,9 +98,6 @@ public class ForecastControllerImpl implements ForecastController {
         this.stage.setScene(new Scene(root));
         btClose.setOnAction(actionEvent -> ((Stage) btClose.getScene().getWindow()).close());
         btSave.setOnAction(actionEvent -> saveChartToFile());
-
-        TabDraggingSupport support = new TabDraggingSupport();
-        support.addDragging(tabPane);
     }
 
     @Override
@@ -177,6 +174,8 @@ public class ForecastControllerImpl implements ForecastController {
     @Override
     public void onShowing() {
         setTabNames();
+        TabDraggingSupport support = new TabDraggingSupport();
+        support.addDragging(tabPane);
     }
 
     private void setTabNames() {
