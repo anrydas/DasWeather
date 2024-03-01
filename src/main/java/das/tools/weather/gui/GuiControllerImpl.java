@@ -169,7 +169,7 @@ public class GuiControllerImpl implements GuiController {
             }
         });
 
-        btConfig.setOnAction(actionEvent -> showConfigWindow());
+        btConfig.setOnAction(event -> showConfigWindow());
 
         imgConfigure.setImage(new Image(IMAGE_CONFIGURE_PNG));
         imgWindDirection.setImage(new Image(IMAGE_WIND_ARROW_PNG));
@@ -178,9 +178,9 @@ public class GuiControllerImpl implements GuiController {
         imgMoonRise.setImage(new Image(IMAGE_MOONRISE_PNG));
         imgMoonSet.setImage(new Image(IMAGE_MOONSET_PNG));
 
-        imgForecast01.setOnMouseClicked(mouseEvent -> showForecastWindow());
-        imgForecast02.setOnMouseClicked(mouseEvent -> showForecastWindow());
-        imgForecast03.setOnMouseClicked(mouseEvent -> showForecastWindow());
+        imgForecast01.setOnMouseClicked(event -> showForecastWindow());
+        imgForecast02.setOnMouseClicked(event -> showForecastWindow());
+        imgForecast03.setOnMouseClicked(event -> showForecastWindow());
     }
 
     @Override
