@@ -33,7 +33,7 @@
   - 7th: **Sun Rise** **Sun Set** **Moon Rise** **Moon Phase** **Moon Set**
   - 8th: **Weather Forecast** - click on Image to show [Forecast Window](#ForecastWin) with forecast weather data
 - Buttons:
-  - **Update** - to update weather data
+  - **Update** - to update weather data; the Update will be forced with **Shift** pressed, otherwise update will lunch according to configuration
   - **Config** - to change Application's config
 
 ### 📜 Configuration Window<a id='ConfigWin'/>
@@ -42,7 +42,7 @@
 ### 📜 Forecast Window<a id='ForecastWin'/>
 ![Screenshot](images/ForecastWindow.png) ![Screenshot](images/ForecastWindow_L.png)
 - Any forecast chart could be saved as PNG, JPEG, GIF or BMP file.
-- 
+- Chart's tabs may be dragged, tabs order will be saved (and restored) if Forecast window have been closet by pressing **Close** button
 ### 📜 Location Window<a id='LocationWin'/>
 ![Screenshot](images/LocationWindow.png)
 - Gives possibility to find location to show weather/forecast in.
