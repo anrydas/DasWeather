@@ -6,6 +6,7 @@ import das.tools.weather.entity.forecast.WeatherDay;
 import das.tools.weather.entity.forecast.WeatherDayForecast;
 import das.tools.weather.service.AlertService;
 import das.tools.weather.service.ChartDataProducer;
+import das.tools.weather.service.GuiConfigService;
 import das.tools.weather.service.LocalizeResourcesService;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
@@ -28,7 +29,6 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 import lombok.extern.slf4j.Slf4j;
 import net.rgielen.fxweaver.core.FxmlView;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalTime;
 import java.util.Map;
+import java.util.Properties;
 
 @Component @Scope("prototype")
 @FxmlView("/fxml/Forecast.fxml")
@@ -64,6 +65,7 @@ public class ForecastControllerImpl implements ForecastController {
     private final LocalizeResourcesService localizeService;
     private final AlertService alertService;
     private final BuildProperties buildProperties;
+    private final GuiConfigService configService;
 
     static {
         Map<String,String> extMap = FILE_FORMAT_NAMES;
@@ -74,11 +76,12 @@ public class ForecastControllerImpl implements ForecastController {
         extMap.put("BMP", "BMP");
     }
 
-    public ForecastControllerImpl(ChartDataProducer chartDataProducer, LocalizeResourcesService localizeService, AlertService alertService, BuildProperties buildProperties) {
+    public ForecastControllerImpl(ChartDataProducer chartDataProducer, LocalizeResourcesService localizeService, AlertService alertService, BuildProperties buildProperties, GuiConfigService configService) {
         this.chartDataProducer = chartDataProducer;
         this.localizeService = localizeService;
         this.alertService = alertService;
         this.buildProperties = buildProperties;
+        this.configService = configService;
     }
 
     @Override
@@ -97,15 +100,36 @@ public class ForecastControllerImpl implements ForecastController {
     public void initialize() {
         this.stage = new Stage();
         this.stage.setScene(new Scene(root));
+        this.stage.setOnCloseRequest(event -> {
+            saveTabsOrder();
+        });
         btClose.setOnAction(actionEvent -> ((Stage) btClose.getScene().getWindow()).close());
         btSave.setOnAction(actionEvent -> saveChartToFile());
+    }
+
+    private void saveTabsOrder() {
+        Properties props = configService.getCurrentConfig();
+        StringBuilder sb = new StringBuilder();
+        for (Tab tab : tabPane.getTabs()) {
+            sb.append(tab.getId()).append(",");
+        }
+        props.setProperty(GuiConfigService.GUI_CONFIG_FORECAST_TABS_ORDER_KEY, sb.toString());
+        configService.saveConfig(props);
+        if (log.isDebugEnabled()) log.debug("Stored tab's order: {}", sb);
     }
 
     @Override
     public void show() {
         stage.setTitle(String.format("Das Weather Forecast (v.%s)", buildProperties.getVersion()));
         stage.setOnShowing(windowEvent -> onShowing());
+        stage.setOnShown(windowEvent -> onShown());
         stage.showAndWait();
+    }
+
+    private void onShown() {
+        reorderingTabs();
+        TabDraggingSupport support = new TabDraggingSupport();
+        support.addDragging(tabPane);
     }
 
     @Override
@@ -182,6 +206,20 @@ public class ForecastControllerImpl implements ForecastController {
         for (Tab tab : tabPane.getTabs()) {
             tab.setText(TAB_NAMES.get(i));
             i++;
+        }
+    }
+
+    private void reorderingTabs() {
+        String storedOrder = configService.getConfigStringValue(GuiConfigService.GUI_CONFIG_FORECAST_TABS_ORDER_KEY,
+                configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_FORECAST_TABS_ORDER_KEY));
+        String[] storedTabs = storedOrder.split(",");
+        for (int i = 0; i < storedTabs.length; i++) {
+            Tab tab = tabPane.getTabs().get(i);
+            if (!storedTabs[i].equals(tab.getId())) {
+                int newIndex = Integer.parseInt(storedTabs[i].substring(3)) - 1;
+                tabPane.getTabs().remove(i);
+                tabPane.getTabs().add(newIndex, tab);
+            }
         }
     }
 

@@ -4,7 +4,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
-public interface GuiController extends Localized {
+public interface GuiController extends Localized, GuiWindow {
     String APPLICATION_TITLE = "Das Weather: %s %s";
     int MINIMAL_UPDATE_INTERVAL = 1800000;
     DateTimeFormatter DATE_FORMATTER_FOR_RESPONSE = DateTimeFormatter.ofPattern("yyyy-MM-dd");

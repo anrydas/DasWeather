@@ -2,10 +2,8 @@ package das.tools.weather.gui;
 
 import javafx.scene.image.Image;
 
-public interface LocationController extends Localized {
+public interface LocationController extends Localized, GuiWindow {
     void setLocation(String location);
-
-    void show();
 
     void setApiKey(String key);
 
