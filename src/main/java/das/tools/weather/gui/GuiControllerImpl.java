@@ -11,7 +11,6 @@ import das.tools.weather.service.LocalizeResourcesService;
 import das.tools.weather.service.WeatherService;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
@@ -28,8 +27,6 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.rgielen.fxweaver.core.FxWeaver;
 import net.rgielen.fxweaver.core.FxmlView;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.info.BuildProperties;
 import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
@@ -153,8 +150,26 @@ public class GuiControllerImpl implements GuiController {
 
     @FXML
     private void initialize() {
-        btUpdate.setOnAction(event -> updateWeatherData());
-        btConfig.setOnAction(actionEvent -> showConfigWindow());
+        root.setOnKeyPressed(event -> {
+            if (event.isShiftDown()) {
+                btUpdate.setText(localizeService.getLocalizedResource("button.update.now.text"));
+            }
+        });
+        root.setOnKeyReleased(event -> {
+            if (!event.isShiftDown()) {
+                btUpdate.setText(localizeService.getLocalizedResource("button.update.text"));
+            }
+        });
+
+        btUpdate.setOnMouseClicked(event -> {
+            if (event.isShiftDown()) {
+                updateWeatherDataForce();
+            } else {
+                updateWeatherData();
+            }
+        });
+
+        btConfig.setOnAction(event -> showConfigWindow());
 
         imgConfigure.setImage(new Image(IMAGE_CONFIGURE_PNG));
         imgWindDirection.setImage(new Image(IMAGE_WIND_ARROW_PNG));
@@ -163,13 +178,13 @@ public class GuiControllerImpl implements GuiController {
         imgMoonRise.setImage(new Image(IMAGE_MOONRISE_PNG));
         imgMoonSet.setImage(new Image(IMAGE_MOONSET_PNG));
 
-        imgForecast01.setOnMouseClicked(mouseEvent -> showForecastWindow());
-        imgForecast02.setOnMouseClicked(mouseEvent -> showForecastWindow());
-        imgForecast03.setOnMouseClicked(mouseEvent -> showForecastWindow());
+        imgForecast01.setOnMouseClicked(event -> showForecastWindow());
+        imgForecast02.setOnMouseClicked(event -> showForecastWindow());
+        imgForecast03.setOnMouseClicked(event -> showForecastWindow());
     }
 
+    @Override
     public void show() {
-
     }
 
     @Override
@@ -225,7 +240,7 @@ public class GuiControllerImpl implements GuiController {
     }
 
     private void fillAirQuality(WeatherCurrent current) {
-        String MSG_AIR_QUALITY = "CO=%.00f,   NO2=%.00f,   O3=%.00f,   SO2=%.00f";
+        String MSG_AIR_QUALITY = "CO=%.1f,   NO2=%.1f,   O3=%.1f,   SO2=%.1f";
         lbAirQuality.setText(String.format(MSG_AIR_QUALITY,
                 current.getAirQuality().getCo(),
                 current.getAirQuality().getNo2(),
@@ -247,7 +262,7 @@ public class GuiControllerImpl implements GuiController {
         lbVisibility.setTooltip(tooltipVisibility);
         Tooltip.install(imgVisibility, tooltipVisibility);
 
-        lbUvIdx.setText(String.format("%.00f", current.getUvIndex()));
+        lbUvIdx.setText(String.format("%.2f", current.getUvIndex()));
         Tooltip tooltipUv = getTooltip(
                 String.format(localizeService.getLocalizedResource("uvIndex.tooltip"),
                         current.getUvIndex()

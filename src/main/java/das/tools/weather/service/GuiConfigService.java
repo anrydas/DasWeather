@@ -17,6 +17,7 @@ public interface GuiConfigService {
     String GUI_CONFIG_WEATHER_LOCATION_COUNTRY_KEY = "app.weather.location.country";
     String GUI_CONFIG_CONDITION_LANGUAGE_KEY = "app.weather.condition.lang";
     String GUI_CONFIG_FORECAST_URL_KEY = "app.weather.forecast.url";
+    String GUI_CONFIG_FORECAST_TABS_ORDER_KEY = "app.weather.forecast.tabs.order";
     Map<String,String> GUI_SUPPORTED_CONDITION_LANGUAGES = new HashMap<>();
     Map<String,String> GUI_CONFIG_DEFAULT_VALUES = new HashMap<>();
 
