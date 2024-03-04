@@ -103,7 +103,10 @@ public class ForecastControllerImpl implements ForecastController {
         this.stage.setOnCloseRequest(event -> {
             saveTabsOrder();
         });
-        btClose.setOnAction(actionEvent -> ((Stage) btClose.getScene().getWindow()).close());
+        btClose.setOnAction(actionEvent -> {
+            saveTabsOrder();
+            ((Stage) btClose.getScene().getWindow()).close();
+        });
         btSave.setOnAction(actionEvent -> saveChartToFile());
     }
 
