@@ -18,6 +18,7 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import lombok.AllArgsConstructor;
@@ -106,6 +107,10 @@ public class GuiControllerImpl implements GuiController {
     @FXML private ProgressBar pb;
     @FXML private ImageView imgConfigure;
     @FXML public ImageView imgWindDirection;
+    @FXML private VBox vboxForecast0;
+    @FXML private VBox vboxForecast1;
+    @FXML private VBox vboxForecast2;
+    @FXML private VBox vboxForecast3;
 
     public GuiControllerImpl(GuiConfigService configService, WeatherService weatherService, ConfigController configController, ForecastController forecastController, LocalizeResourcesService localizeService, AlertService alertService, FxWeaver fxWeaver) {
         this.configService = configService;
@@ -178,9 +183,10 @@ public class GuiControllerImpl implements GuiController {
         imgMoonRise.setImage(new Image(IMAGE_MOONRISE_PNG));
         imgMoonSet.setImage(new Image(IMAGE_MOONSET_PNG));
 
-        imgForecast01.setOnMouseClicked(event -> showForecastWindow());
-        imgForecast02.setOnMouseClicked(event -> showForecastWindow());
-        imgForecast03.setOnMouseClicked(event -> showForecastWindow());
+        vboxForecast0.setOnMouseClicked(event -> showForecastWindow());
+        vboxForecast1.setOnMouseClicked(event -> showForecastWindow());
+        vboxForecast2.setOnMouseClicked(event -> showForecastWindow());
+        vboxForecast3.setOnMouseClicked(event -> showForecastWindow());
     }
 
     @Override
