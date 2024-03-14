@@ -1,5 +1,6 @@
 package das.tools.weather.entity.current;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRootName;
 import lombok.*;
 
@@ -16,4 +17,6 @@ public class WeatherAirQuality {
     float no2;
     float o3;
     float so2;
+    @JsonProperty("us-epa-index")
+    int index;
 }
