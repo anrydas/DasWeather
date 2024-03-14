@@ -18,6 +18,7 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
@@ -53,6 +54,7 @@ public class GuiControllerImpl implements GuiController {
     private final FxWeaver fxWeaver;
 
     @FXML private AnchorPane root;
+    @FXML private HBox hbAirQuality;
     @FXML private Label lbForecast;
     @FXML private Label lbWindSpeedText;
     @FXML private Label lbFeelsLikeText;
@@ -246,18 +248,30 @@ public class GuiControllerImpl implements GuiController {
     }
 
     private void fillAirQuality(WeatherCurrent current) {
-        String MSG_AIR_QUALITY = "CO=%.1f,   NO2=%.1f,   O3=%.1f,   SO2=%.1f";
+        String MSG_AIR_QUALITY = "Idx=%d CO=%.1f,   NO2=%.1f,   O3=%.1f,   SO2=%.1f";
+        int colorIndex = current.getAirQuality().getIndex();
         lbAirQuality.setText(String.format(MSG_AIR_QUALITY,
+                colorIndex,
                 current.getAirQuality().getCo(),
                 current.getAirQuality().getNo2(),
                 current.getAirQuality().getO3(),
                 current.getAirQuality().getSo2())
         );
-        Tooltip tooltip = getTooltip(String.format(localizeService.getLocalizedResource("airQuality.tooltip"), lbAirQuality.getText()));
+        Tooltip tooltip = getTooltip(
+                String.format(localizeService.getLocalizedResource("airQuality.tooltip"), lbAirQuality.getText()) +
+                        "\n" +localizeService.getLocalizedResource("airQuality.tooltip.1")
+        );
         ImageView iv = getTooltipImage(new Image(IMAGE_AIR_QUALITY_HINT_PNG), 100);
         tooltip.setGraphic(iv);
         lbAirQuality.setTooltip(tooltip);
         Tooltip.install(imgAirQuality, tooltip);
+        if (colorIndex >= 1 && colorIndex <= 6) {
+            hbAirQuality.setStyle(String.format("-fx-background-color: %s", getAirColor(colorIndex)));
+        }
+    }
+
+    private String getAirColor(int index) {
+        return AIR_QUALITY_COLORS[index-1];
     }
 
     private void fillVisibilityAndUvAndDayLen(WeatherCurrent current) {

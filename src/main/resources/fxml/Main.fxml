@@ -5,6 +5,7 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
+
 <AnchorPane fx:id="root" prefHeight="510.0" prefWidth="521.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="das.tools.weather.gui.GuiControllerImpl">
     <VBox layoutX="10.0" layoutY="14.0" prefHeight="414.0" prefWidth="501.0" spacing="4.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="14.0">
         <HBox id="HBox" alignment="CENTER_LEFT" prefHeight="38.0" prefWidth="250.0" spacing="5.0">
@@ -127,13 +128,13 @@
                 </font>
             </Label>
         </HBox>
-        <HBox id="HBox" alignment="CENTER" prefHeight="50.0" prefWidth="502.0" spacing="10.0">
+        <HBox id="HBox" fx:id="hbAirQuality" alignment="CENTER" prefHeight="50.0" prefWidth="502.0" spacing="10.0">
             <ImageView fx:id="imgAirQuality" fitHeight="32.0" fitWidth="32.0" preserveRatio="true">
                 <Image url="@/images/AirQuality.png" />
             </ImageView>
             <Label fx:id="lbAirQuality" alignment="CENTER" prefHeight="27.0" prefWidth="375.0" text="100" textAlignment="CENTER">
                 <font>
-                    <Font size="18.0" />
+                    <Font size="16.0" />
                 </font>
             </Label>
         </HBox>
