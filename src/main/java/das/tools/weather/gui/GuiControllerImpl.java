@@ -218,7 +218,8 @@ public class GuiControllerImpl implements GuiController {
         stage.getIcons().add(this.dataHolder.getImage());
         stage.setTitle(String.format(APPLICATION_TITLE,
                 this.dataHolder.getResponse().getLocation().getName(),
-                current.getLastUpdate()
+                current.getLastUpdate(),
+                (new SimpleDateFormat("HH:mm")).format(new Date())
         ));
 
         fillConditions(current);

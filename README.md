@@ -24,7 +24,7 @@
 ### 📜 Main Window<a id='MainWin'/>
 ![Screenshot](images/WeatherWindow_v2.png) ![Screenshot](images/WeatherWindow_v2_L.png)
 - Info Items:
-  - 1st: **_Condition_** icon and it's name, **_Your Place Name_** and **_Last Updated_** - time when the weather have been updated  
+  - 1st: **_Condition_** icon and it's name, **_Your Place Name_** and **_Last Updated_** - time when the weather have been updated
   - 2nd: 🔥 **_Temperature_** ℃ **_Fills Like_** ℃ 🌫 **_Humidity_ %** 
   - 3rd: **Cloud** % **Precipitation** mm **Pressure** mmHg
   - 4th: 💨 **Wind Direction** (with arrow) **Wind Speed** km/h **Wind Gust** km/h
@@ -42,7 +42,7 @@
 ### 📜 Forecast Window<a id='ForecastWin'/>
 ![Screenshot](images/ForecastWindow.png) ![Screenshot](images/ForecastWindow_L.png)
 - Any forecast chart could be saved as PNG, JPEG, GIF or BMP file.
-- Chart's tabs may be dragged, tabs order will be saved (and restored) if Forecast window have been closet by pressing **Close** button
+- Chart's tabs may be dragged, tabs order will be saved and restored next time window appears
 ### 📜 Location Window<a id='LocationWin'/>
 ![Screenshot](images/LocationWindow.png)
 - Gives possibility to find location to show weather/forecast in.
