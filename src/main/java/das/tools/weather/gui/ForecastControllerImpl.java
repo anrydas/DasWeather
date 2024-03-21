@@ -112,13 +112,16 @@ public class ForecastControllerImpl implements ForecastController {
 
     private void saveTabsOrder() {
         Properties props = configService.getCurrentConfig();
+        Properties oldProps = (Properties) props.clone();
         StringBuilder sb = new StringBuilder();
         for (Tab tab : tabPane.getTabs()) {
             sb.append(tab.getId()).append(",");
         }
         props.setProperty(GuiConfigService.GUI_CONFIG_FORECAST_TABS_ORDER_KEY, sb.toString());
-        configService.saveConfig(props);
-        if (log.isDebugEnabled()) log.debug("Stored tab's order: {}", sb);
+        if (!oldProps.equals(props)) {
+            configService.saveConfig(props);
+            if (log.isDebugEnabled()) log.debug("Stored tab's order: {}", sb);
+        }
     }
 
     @Override

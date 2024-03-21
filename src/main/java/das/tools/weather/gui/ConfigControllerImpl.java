@@ -34,7 +34,7 @@ public class ConfigControllerImpl implements ConfigController {
     private final AlertService alertService;
     private final FxWeaver fxWeaver;
     private Properties appProps;
-    private boolean isConfigChanged;
+    private boolean isConfigChanged = false;
 
     private Stage stage;
     @FXML private AnchorPane root;
@@ -187,18 +187,22 @@ public class ConfigControllerImpl implements ConfigController {
         if (isFieldsValid()) {
             saveConfig();
             closeStage();
-            isConfigChanged = true;
         }
     }
 
     private void closeStage() {
-        isConfigChanged = false;
+        //isConfigChanged = false;
         ((Stage) btCancel.getScene().getWindow()).close();
     }
 
     private void saveConfig() {
+        Properties oldProps = (Properties) appProps.clone();
         updateConfigFromForm();
-        configService.saveConfig(appProps);
+        if (!oldProps.equals(appProps)) {
+            isConfigChanged = true;
+            configService.saveConfig(appProps);
+            if (log.isDebugEnabled()) log.debug("Stored updated application's properties: {}", appProps);
+        }
     }
 
     private void updateConfigFromForm() {
