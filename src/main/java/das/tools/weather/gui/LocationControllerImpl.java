@@ -19,7 +19,6 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 import net.rgielen.fxweaver.core.FxmlView;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.stereotype.Component;
 
@@ -35,6 +34,7 @@ public class LocationControllerImpl implements LocationController {
     private final BuildProperties buildProperties;
     private WeatherLocation[] foundLocations;
     private String key;
+    private boolean isLocationChanged = false;
 
     @FXML private AnchorPane root;
     @FXML private Label lbLocationName;
@@ -55,6 +55,7 @@ public class LocationControllerImpl implements LocationController {
 
     @FXML
     private void initialize() {
+        isLocationChanged = false;
         this.stage = new Stage();
         stage.setScene(new Scene(root));
 
@@ -62,7 +63,10 @@ public class LocationControllerImpl implements LocationController {
         btSearch.setOnAction(actionEvent -> searchForLocations());
         btOk.setOnAction(actionEvent -> saveLocation());
         btOk.setDisable(true);
-        btCancel.setOnAction(actionEvent -> ((Stage) btCancel.getScene().getWindow()).close());
+        btCancel.setOnAction(actionEvent -> {
+            isLocationChanged = false;
+            ((Stage) btCancel.getScene().getWindow()).close();
+        });
         lstLocations.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
@@ -76,13 +80,22 @@ public class LocationControllerImpl implements LocationController {
     private void saveLocation() {
         WeatherLocation location = foundLocations[lstLocations.getSelectionModel().getSelectedIndex()];
         Properties props = configService.getCurrentConfig();
+        Properties oldProps = (Properties) props.clone();
         props.setProperty(GuiConfigService.GUI_CONFIG_WEATHER_LOCATION_ID_KEY, String.valueOf(location.getId()));
         props.setProperty(GuiConfigService.GUI_CONFIG_WEATHER_LOCATION_KEY, location.getName());
         props.setProperty(GuiConfigService.GUI_CONFIG_WEATHER_LOCATION_LATITUDE_KEY, String.valueOf(location.getLatitude()));
         props.setProperty(GuiConfigService.GUI_CONFIG_WEATHER_LOCATION_LONGITUDE_KEY, String.valueOf(location.getLongitude()));
         props.setProperty(GuiConfigService.GUI_CONFIG_WEATHER_LOCATION_COUNTRY_KEY, String.valueOf(location.getCountry()));
-        configService.saveConfig(props);
+        if (!oldProps.equals(props)) {
+            isLocationChanged = true;
+            configService.saveConfig(props);
+        }
         ((Stage) btOk.getScene().getWindow()).close();
+    }
+
+    @Override
+    public boolean isLocationChanged() {
+        return isLocationChanged;
     }
 
     private void locationNamePressed() {
