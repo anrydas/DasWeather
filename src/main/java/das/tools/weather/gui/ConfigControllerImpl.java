@@ -1,8 +1,10 @@
 package das.tools.weather.gui;
 
+import das.tools.weather.entity.current.WeatherLocation;
 import das.tools.weather.service.AlertService;
 import das.tools.weather.service.GuiConfigService;
 import das.tools.weather.service.LocalizeResourcesService;
+import das.tools.weather.service.WeatherService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -16,7 +18,6 @@ import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 import net.rgielen.fxweaver.core.FxWeaver;
 import net.rgielen.fxweaver.core.FxmlView;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.stereotype.Component;
 
@@ -33,9 +34,11 @@ public class ConfigControllerImpl implements ConfigController {
     private final BuildProperties buildProperties;
     private final AlertService alertService;
     private final FxWeaver fxWeaver;
+    private final WeatherService weatherService;
     private Properties appProps;
     private boolean isConfigChanged = false;
     private boolean isLocationChanged = false;
+    private String oldLocationName;
 
     private Stage stage;
     @FXML private AnchorPane root;
@@ -54,12 +57,13 @@ public class ConfigControllerImpl implements ConfigController {
     @FXML private Button btCancel;
     @FXML private Button btSearchLocation;
     @FXML private ImageView imgConfirmed;
-    public ConfigControllerImpl(GuiConfigService configService, LocalizeResourcesService localizeService, BuildProperties buildProperties, AlertService alertService, FxWeaver fxWeaver) {
+    public ConfigControllerImpl(GuiConfigService configService, LocalizeResourcesService localizeService, BuildProperties buildProperties, AlertService alertService, FxWeaver fxWeaver, WeatherService weatherService) {
         this.configService = configService;
         this.localizeService = localizeService;
         this.buildProperties = buildProperties;
         this.alertService = alertService;
         this.fxWeaver = fxWeaver;
+        this.weatherService = weatherService;
     }
 
     @Override
@@ -110,6 +114,7 @@ public class ConfigControllerImpl implements ConfigController {
                 configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_FORECAST_URL_KEY)));
         edLocation.setText(appProps.getProperty(GuiConfigService.GUI_CONFIG_WEATHER_LOCATION_KEY,
                 configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_WEATHER_LOCATION_KEY)));
+        oldLocationName = edLocation.getText();
         chbConfirmExit.setSelected(Boolean.parseBoolean(appProps.getProperty(GuiConfigService.GUI_CONFIG_CONFIRM_EXIT_KEY,
                 configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_CONFIRM_EXIT_KEY))));
         spUpdateInterval.getValueFactory().setValue(
@@ -128,6 +133,7 @@ public class ConfigControllerImpl implements ConfigController {
                 )
         );
         cbCondLang.getSelectionModel().select(langName);
+        edLocation.setOnKeyReleased(event -> setLocationConfirmation());
         apiKeyPressed();
         setLocationConfirmation();
     }
@@ -148,8 +154,25 @@ public class ConfigControllerImpl implements ConfigController {
 
     private boolean isLocationConfirmed() {
         appProps = configService.getCurrentConfig();
-        String locationId = appProps.getProperty(GuiConfigService.GUI_CONFIG_WEATHER_LOCATION_ID_KEY, "");
-        return locationId != null && !"".equals(locationId);
+        String storedLocationId = appProps.getProperty(GuiConfigService.GUI_CONFIG_WEATHER_LOCATION_ID_KEY, "");
+        String locationId = getCurrentLocationId();
+        return storedLocationId != null && !"".equals(storedLocationId)
+                && oldLocationName.equals(edLocation.getText())
+                && locationId.equals(storedLocationId);
+    }
+
+    private String getCurrentLocationId() {
+        String res = "";
+        try {
+            WeatherLocation[] locations = weatherService.getLocations(edLocation.getText(), appProps.getProperty(GuiConfigService.GUI_CONFIG_API_KEY_KEY));
+            assert locations != null;
+            if (locations.length > 0) {
+                res = String.valueOf(locations[0].getId());
+            }
+        } catch (Exception e) {
+            log.error("Error getting current location: ", e);
+        }
+        return res;
     }
 
     private void showLocationWindow() {
