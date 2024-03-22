@@ -35,6 +35,7 @@ public class ConfigControllerImpl implements ConfigController {
     private final FxWeaver fxWeaver;
     private Properties appProps;
     private boolean isConfigChanged = false;
+    private boolean isLocationChanged = false;
 
     private Stage stage;
     @FXML private AnchorPane root;
@@ -70,6 +71,8 @@ public class ConfigControllerImpl implements ConfigController {
 
     @FXML
     private void initialize() {
+        isConfigChanged = false;
+        isLocationChanged = false;
         this.stage = new Stage();
         this.stage.setScene(new Scene(root));
         btOk.setOnAction(actionEvent -> saveConfigAndClose());
@@ -155,7 +158,7 @@ public class ConfigControllerImpl implements ConfigController {
         controller.setLocation(edLocation.getText());
         controller.setApiKey(edApiKey.getText());
         controller.show();
-
+        isLocationChanged = controller.isLocationChanged();
         appProps = configService.getCurrentConfig();
         edLocation.setText(appProps.getProperty(GuiConfigService.GUI_CONFIG_WEATHER_LOCATION_KEY,
                 configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_WEATHER_LOCATION_KEY)));
@@ -191,6 +194,8 @@ public class ConfigControllerImpl implements ConfigController {
     }
 
     private void closeStage() {
+        isConfigChanged = false;
+        isLocationChanged = false;
         ((Stage) btCancel.getScene().getWindow()).close();
     }
 
@@ -201,6 +206,8 @@ public class ConfigControllerImpl implements ConfigController {
             isConfigChanged = true;
             configService.saveConfig(appProps);
             if (log.isDebugEnabled()) log.debug("Stored updated application's properties: {}", appProps);
+        } else {
+            isConfigChanged = isLocationChanged;
         }
     }
 
