@@ -23,28 +23,36 @@
 
 ### 📜 Main Window<a id='MainWin'/>
 ![Screenshot](images/WeatherWindow_v2.png) ![Screenshot](images/WeatherWindow_v2_L.png)
-- Info Items:
+- **Info Items**:
   - 1st: **_Condition_** icon and it's name, **_Your Place Name_** and **_Last Updated_** - time when the weather have been updated
   - 2nd: 🔥 **_Temperature_** ℃ **_Fills Like_** ℃ 🌫 **_Humidity_ %** 
   - 3rd: **Cloud** % **Precipitation** mm **Pressure** mmHg
   - 4th: 💨 **Wind Direction** (with arrow) **Wind Speed** km/h **Wind Gust** km/h
   - 5th: **Visibility** km **Ultra Violet Index** (with tooltip)
-  - 6th: **Air Quality:**
+  - 6th: **Air Quality:** (with colored background according to Air Quality's US EPA index)
   - 7th: **Sun Rise** **Sun Set** **Moon Rise** **Moon Phase** **Moon Set**
   - 8th: **Weather Forecast** - click on Image to show [Forecast Window](#ForecastWin) with forecast weather data
-- Buttons:
+- **Buttons**:
   - **Update** - to update weather data; the Update will be forced with **Shift** pressed, otherwise update will lunch according to configuration
   - **Config** - to change Application's config
 
 ### 📜 Configuration Window<a id='ConfigWin'/>
 ![Screenshot](images/PreferencesWindow.png) ![Screenshot](images/PreferencesWindow_L.png)
+- Application's parameters could be changed:
+  - API key
+  - Weather's API end point link
+  - Location - may be find in [Location Window](#LocationWin)
+  - Weather update interval (60 minutes - minimal interval)
+  - Interface language
+  - Application exit confirmation
 
 ### 📜 Forecast Window<a id='ForecastWin'/>
 ![Screenshot](images/ForecastWindow.png) ![Screenshot](images/ForecastWindow_L.png)
 - Any forecast chart could be saved as PNG, JPEG, GIF or BMP file.
 - Chart's tabs may be dragged, tabs order will be saved and restored next time window appears
+
 ### 📜 Location Window<a id='LocationWin'/>
-![Screenshot](images/LocationWindow.png)
+![Screenshot](images/LocationWindow.png) ![Screenshot](images/LocationWindow_L.png)
 - Gives possibility to find location to show weather/forecast in.
 
 ### 🐞 Known issues
