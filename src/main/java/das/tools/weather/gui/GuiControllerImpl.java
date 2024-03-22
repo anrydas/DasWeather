@@ -555,10 +555,9 @@ public class GuiControllerImpl implements GuiController {
         controller.setWindowIcon(((Stage) root.getScene().getWindow()).getIcons().get(0));
         controller.show();
         if (configController.isConfigChanged()) {
-            controller.onShowingStage();
+            onShowingStage();
             updateWeatherDataForce();
         }
-
     }
 
     private void showForecastWindow() {
