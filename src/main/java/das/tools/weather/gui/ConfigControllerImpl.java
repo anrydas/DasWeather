@@ -191,7 +191,6 @@ public class ConfigControllerImpl implements ConfigController {
     }
 
     private void closeStage() {
-        //isConfigChanged = false;
         ((Stage) btCancel.getScene().getWindow()).close();
     }
 
