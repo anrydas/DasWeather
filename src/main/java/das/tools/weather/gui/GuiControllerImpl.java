@@ -249,7 +249,7 @@ public class GuiControllerImpl implements GuiController {
     }
 
     private void fillAirQuality(WeatherCurrent current) {
-        String MSG_AIR_QUALITY = "Idx=%d CO=%.1f,   NO2=%.1f,   O3=%.1f,   SO2=%.1f";
+        String MSG_AIR_QUALITY = "Idx=%d, CO=%.1f, NO2=%.1f, O3=%.1f, SO2=%.1f";
         int colorIndex = current.getAirQuality().getIndex();
         lbAirQuality.setText(String.format(MSG_AIR_QUALITY,
                 colorIndex,
