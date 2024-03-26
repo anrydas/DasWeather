@@ -39,8 +39,7 @@ import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalTime;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 @Component @Scope("prototype")
 @FxmlView("/fxml/Forecast.fxml")
@@ -219,14 +218,48 @@ public class ForecastControllerImpl implements ForecastController {
         String storedOrder = configService.getConfigStringValue(GuiConfigService.GUI_CONFIG_FORECAST_TABS_ORDER_KEY,
                 configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_FORECAST_TABS_ORDER_KEY));
         String[] storedTabs = storedOrder.split(",");
-        for (int i = 0; i < storedTabs.length; i++) {
-            Tab tab = tabPane.getTabs().get(i);
-            if (!storedTabs[i].equals(tab.getId())) {
-                int newIndex = Integer.parseInt(storedTabs[i].substring(3)) - 1;
-                tabPane.getTabs().remove(i);
-                tabPane.getTabs().add(newIndex, tab);
+        int[] tabsIndexes = new int[tabPane.getTabs().size()];
+        for (int i = 0; i < tabPane.getTabs().size(); i++) {
+            tabsIndexes[i] = getSwapIndex(tabPane.getTabs().get(i).getId(), storedTabs);
+        }
+        log.debug("tabsIndexes={}", tabsIndexes);
+        List<Tab> sourceTabs = new LinkedList<>(tabPane.getTabs());
+        for (int j = 0; j < tabsIndexes.length - 1; j++) {
+            for (int i = 0; i < tabsIndexes.length; i++) {
+                if (tabsIndexes[i] != j) {
+                    Tab tab = sourceTabs.get(i);
+                    tabPane.getTabs().remove(getTabByName(tab.getId(), tabPane.getTabs()));
+                    tabPane.getTabs().add(tabsIndexes[i], tab);
+                }
+                if (String.join(",", storedOrder).equals(getTabIds())) {
+                    return;
+                }
             }
         }
+    }
+
+    private Tab getTabByName(String name, List<Tab> tabs) {
+        for (Tab t : tabs) {
+            if (name.equals(t.getId())) {
+                return t;
+            }
+        }
+        return null;
+    }
+
+    private int getSwapIndex(String el, String[] ar) {
+        for (int i = 0; i < ar.length; i++) {
+            if (el.equals(ar[i])) return i;
+        }
+        return -1;
+    }
+
+    private String getTabIds() {
+        StringBuilder sb = new StringBuilder();
+        for (Tab tab: tabPane.getTabs()) {
+            sb.append(tab.getId()).append(",");
+        }
+        return sb.toString();
     }
 
     @Override
