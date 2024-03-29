@@ -5,6 +5,7 @@ import das.tools.weather.entity.current.WeatherCurrent;
 import das.tools.weather.entity.forecast.WeatherAstro;
 import das.tools.weather.entity.forecast.WeatherDay;
 import das.tools.weather.entity.forecast.WeatherDayForecast;
+import das.tools.weather.entity.forecast.WeatherHour;
 import das.tools.weather.service.AlertService;
 import das.tools.weather.service.GuiConfigService;
 import das.tools.weather.service.LocalizeResourcesService;
@@ -57,7 +58,8 @@ public class GuiControllerImpl implements GuiController {
     @FXML private HBox hbAirQuality;
     @FXML private Label lbForecast;
     @FXML private Label lbWindSpeedText;
-    @FXML private Label lbFeelsLikeText;
+
+    @FXML private ImageView imgFillsLikeTemp;
     @FXML private ImageView imgDayLength;
     @FXML private Label lbDayLength;
     @FXML private ImageView imgAirQuality;
@@ -113,6 +115,8 @@ public class GuiControllerImpl implements GuiController {
     @FXML private VBox vboxForecast1;
     @FXML private VBox vboxForecast2;
     @FXML private VBox vboxForecast3;
+    @FXML private Label lbAverage;
+    @FXML private ImageView imgAvgTemp;
 
     public GuiControllerImpl(GuiConfigService configService, WeatherService weatherService, ConfigController configController, ForecastController forecastController, LocalizeResourcesService localizeService, AlertService alertService, FxWeaver fxWeaver) {
         this.configService = configService;
@@ -205,7 +209,6 @@ public class GuiControllerImpl implements GuiController {
     private void setLocalizedResources() {
         btUpdate.setText(localizeService.getLocalizedResource("button.update.text"));
         btConfig.setTooltip(getTooltip(localizeService.getLocalizedResource("button.configure.tooltip")));
-        lbFeelsLikeText.setText(localizeService.getLocalizedResource("label.feelsLikeText.text"));
         lbWindSpeedText.setText(localizeService.getLocalizedResource("label.windSpeed.text"));
         lbForecast.setText(localizeService.getLocalizedResource("label.forecast.text"));
     }
@@ -229,6 +232,7 @@ public class GuiControllerImpl implements GuiController {
         fillHumidity(current);
 
         WeatherDayForecast[] dayForecasts = this.dataHolder.getResponse().getForecast().getDayForecast();
+        fillDailyAverageTemp(dayForecasts);
         fillCloud(current);
         fillPrecipitation(dayForecasts[0].getDay());
         fillPressure(current);
@@ -246,6 +250,19 @@ public class GuiControllerImpl implements GuiController {
         btUpdate.setTooltip(getTooltip(String.format(localizeService.getLocalizedResource("button.update.tooltip"),
                 new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm").format(Date.from(dataHolder.getLastUpdatedTimestamp()))
         )));
+    }
+
+    private void fillDailyAverageTemp(WeatherDayForecast[] dayForecasts) {
+        lbAverage.setText(String.format("%.0f℃", dayForecasts[0].getDay().getAvgTemperature()));
+        Tooltip tooltip = getTooltip(String.format(
+                localizeService.getLocalizedResource("temp.average.tooltip"),
+                dayForecasts[0].getDay().getAvgTemperature(),
+                dayForecasts[0].getDay().getAvgTemperatureF())
+        );
+        ImageView iv = getTooltipImage(imgAvgTemp.getImage(), 100);
+        tooltip.setGraphic(iv);
+        lbAverage.setTooltip(tooltip);
+        Tooltip.install(imgAvgTemp, tooltip);
     }
 
     private void fillAirQuality(WeatherCurrent current) {
@@ -342,6 +359,7 @@ public class GuiControllerImpl implements GuiController {
         lbTemperature.setTooltip(tooltip);
         lbFeels.setTooltip(tooltip);
         Tooltip.install(imgTemperature, tooltip);
+        Tooltip.install(imgFillsLikeTemp, tooltip);
     }
 
     private void fillHumidity(WeatherCurrent current) {

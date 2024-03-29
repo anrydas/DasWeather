@@ -29,13 +29,23 @@
             <ImageView fx:id="imgTemperature" fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
                 <Image url="@/images/temp_hot.png" />
             </ImageView>
-            <Label fx:id="lbTemperature" contentDisplay="CENTER" prefHeight="21.0" prefWidth="61.0" text="20 C" textAlignment="CENTER">
+            <Label fx:id="lbTemperature" contentDisplay="CENTER" prefHeight="27.0" prefWidth="50.0" text="20 C" textAlignment="CENTER">
                 <font>
                     <Font size="18.0" />
                 </font>
             </Label>
-            <Label fx:id="lbFeelsLikeText" alignment="TOP_RIGHT" contentDisplay="CENTER" prefHeight="18.0" prefWidth="99.0" text="Fills like: " textAlignment="CENTER" />
-            <Label fx:id="lbFeels" contentDisplay="CENTER" prefHeight="27.0" prefWidth="71.0" text="20 C" textAlignment="CENTER">
+            <ImageView fx:id="imgFillsLikeTemp" fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
+                <Image url="@/images/temp_fills.png" />
+            </ImageView>
+            <Label fx:id="lbFeels" contentDisplay="CENTER" prefHeight="27.0" prefWidth="51.0" text="20 C" textAlignment="CENTER">
+                <font>
+                    <Font size="18.0" />
+                </font>
+            </Label>
+            <ImageView fx:id="imgAvgTemp" fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
+                <Image url="@/images/temp_avg.png" />
+            </ImageView>
+            <Label fx:id="lbAverage" contentDisplay="CENTER" prefHeight="27.0" prefWidth="51.0" text="20 C" textAlignment="CENTER">
                 <font>
                     <Font size="18.0" />
                 </font>
