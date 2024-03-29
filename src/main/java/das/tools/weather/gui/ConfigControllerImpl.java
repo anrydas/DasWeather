@@ -161,7 +161,6 @@ public class ConfigControllerImpl implements ConfigController {
         String storedLocationId = appProps.getProperty(GuiConfigService.GUI_CONFIG_WEATHER_LOCATION_ID_KEY, "");
         String locationId = getCurrentLocationId();
         return storedLocationId != null && !"".equals(storedLocationId)
-                && oldLocationName.equals(edLocation.getText())
                 && locationId.equals(storedLocationId);
     }
 
@@ -186,6 +185,9 @@ public class ConfigControllerImpl implements ConfigController {
         controller.setApiKey(edApiKey.getText());
         controller.show();
         isLocationChanged = controller.isLocationChanged();
+        if (isLocationChanged) {
+            oldLocationName = edLocation.getText();
+        }
         appProps = configService.getCurrentConfig();
         edLocation.setText(appProps.getProperty(GuiConfigService.GUI_CONFIG_WEATHER_LOCATION_KEY,
                 configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_WEATHER_LOCATION_KEY)));
