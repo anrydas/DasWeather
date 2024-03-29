@@ -10,11 +10,11 @@ import java.util.HashMap;
 public class UvIndexColor  extends AbstractColor implements ColorEngine {
     {
         COLOR_MAP = new HashMap<>();
-        COLOR_MAP.put(1, "#7BF57B");
-        COLOR_MAP.put(2, "#FFFFBC");
-        COLOR_MAP.put(3, "#FAD86F");
-        COLOR_MAP.put(4, "#F57D7B");
-        COLOR_MAP.put(5, "#CC6FFA");
+        COLOR_MAP.put(2, "#7BF57B");
+        COLOR_MAP.put(5, "#FFFFBC");
+        COLOR_MAP.put(7, "#FAD86F");
+        COLOR_MAP.put(10, "#F57D7B");
+        COLOR_MAP.put(11, "#CC6FFA");
     }
     @Override
     public ColorElement getEngine() {
