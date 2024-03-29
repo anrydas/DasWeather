@@ -19,6 +19,8 @@ public class WeatherDay {
     float avgHumidity;
     @JsonProperty("avgtemp_c")
     float avgTemperature;
+    @JsonProperty("avgtemp_f")
+    float avgTemperatureF;
     @JsonProperty("avgvis_km")
     float avgVisibilityKm;
     @JsonProperty("daily_chance_of_rain")
