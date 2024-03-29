@@ -84,7 +84,7 @@
                     <Font size="18.0" />
                 </font>
             </Label>
-            <HBox fx:id="pressureBox" alignment="CENTER" prefHeight="28.0" prefWidth="130.0">
+            <HBox fx:id="pressureBox" alignment="CENTER" prefHeight="28.0" prefWidth="148.0">
                 <ImageView fx:id="imgPressure" fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
                     <Image url="@/images/pressure.png" />
                 </ImageView>
@@ -115,13 +115,13 @@
                     </font>
                 </Label>
             </HBox>
-            <HBox fx:id="windGustBox" alignment="CENTER" prefHeight="28.0" prefWidth="110.0">
+            <HBox fx:id="windGustBox" alignment="CENTER" prefHeight="27.0" prefWidth="127.0">
                 <ImageView fx:id="imgWindGists" fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
-                    <Image url="@/images/WindGist.png"/>
+                    <Image url="@/images/WindGist.png" />
                 </ImageView>
                 <Label fx:id="lbWindGists" prefHeight="27.0" prefWidth="87.0" text="20 km/h" textAlignment="CENTER">
                     <font>
-                        <Font size="18.0"/>
+                        <Font size="18.0" />
                     </font>
                 </Label>
             </HBox>
