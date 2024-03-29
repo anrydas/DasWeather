@@ -25,7 +25,7 @@
 ![Screenshot](images/WeatherWindow_v2.png) ![Screenshot](images/WeatherWindow_v2_L.png)
 - **Info Items**:
   - 1st: **_Condition_** icon and it's name, **_Your Place Name_** and **_Last Updated_** - time when the weather have been updated
-  - 2nd: 🔥 **_Temperature_** ℃ **_Fills Like_** ℃ 🌫 **_Humidity_ %** 
+  - 2nd: 🔥 **_Temperature_** ℃ **_Fills Like_** ℃ **_Day Average Temperature_** ℃ 🌫 **_Humidity_ %** 
   - 3rd: **Cloud** % **Precipitation** mm **Pressure** mmHg
   - 4th: 💨 **Wind Direction** (with arrow) **Wind Speed** km/h **Wind Gust** km/h
   - 5th: **Visibility** km **Ultra Violet Index** (with tooltip)
