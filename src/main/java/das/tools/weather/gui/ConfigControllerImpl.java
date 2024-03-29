@@ -80,7 +80,11 @@ public class ConfigControllerImpl implements ConfigController {
         this.stage = new Stage();
         this.stage.setScene(new Scene(root));
         btOk.setOnAction(actionEvent -> saveConfigAndClose());
-        btCancel.setOnAction(actionEvent -> closeStage());
+        btCancel.setOnAction(actionEvent -> {
+            isConfigChanged = false;
+            isLocationChanged = false;
+            closeStage();
+        });
         btSearchLocation.setOnAction(actionEvent -> showLocationWindow());
         edApiKey.setOnKeyReleased(event -> apiKeyPressed());
     }
@@ -217,8 +221,6 @@ public class ConfigControllerImpl implements ConfigController {
     }
 
     private void closeStage() {
-        isConfigChanged = false;
-        isLocationChanged = false;
         ((Stage) btCancel.getScene().getWindow()).close();
     }
 
