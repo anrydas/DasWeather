@@ -5,7 +5,8 @@ import das.tools.weather.entity.current.WeatherCurrent;
 import das.tools.weather.entity.forecast.WeatherAstro;
 import das.tools.weather.entity.forecast.WeatherDay;
 import das.tools.weather.entity.forecast.WeatherDayForecast;
-import das.tools.weather.entity.forecast.WeatherHour;
+import das.tools.weather.gui.color.ColorElement;
+import das.tools.weather.gui.color.ColorEngineFactory;
 import das.tools.weather.service.AlertService;
 import das.tools.weather.service.GuiConfigService;
 import das.tools.weather.service.LocalizeResourcesService;
@@ -55,7 +56,7 @@ public class GuiControllerImpl implements GuiController {
     private final FxWeaver fxWeaver;
 
     @FXML private AnchorPane root;
-    @FXML private HBox hbAirQuality;
+    @FXML private HBox airQualityBox;
     @FXML private Label lbForecast;
     @FXML private Label lbWindSpeedText;
 
@@ -117,6 +118,15 @@ public class GuiControllerImpl implements GuiController {
     @FXML private VBox vboxForecast3;
     @FXML private Label lbAverage;
     @FXML private ImageView imgAvgTemp;
+    @FXML private HBox uvIndexBox;
+    @FXML private HBox tempBox;
+    @FXML private HBox fillsTempBox;
+    @FXML private HBox avgTempBox;
+    @FXML private HBox visibilityBox;
+    @FXML private HBox humidityBox;
+    @FXML private HBox pressureBox;
+    @FXML private HBox windSpeedBox;
+    @FXML private HBox windGustBox;
 
     public GuiControllerImpl(GuiConfigService configService, WeatherService weatherService, ConfigController configController, ForecastController forecastController, LocalizeResourcesService localizeService, AlertService alertService, FxWeaver fxWeaver) {
         this.configService = configService;
@@ -261,8 +271,10 @@ public class GuiControllerImpl implements GuiController {
         );
         ImageView iv = getTooltipImage(imgAvgTemp.getImage(), 100);
         tooltip.setGraphic(iv);
-        lbAverage.setTooltip(tooltip);
-        Tooltip.install(imgAvgTemp, tooltip);
+        Tooltip.install(avgTempBox, tooltip);
+
+        avgTempBox.setStyle(String.format("-fx-background-color: %s",
+                ColorEngineFactory.getEngine(ColorElement.TEMPERATURE).getColor((int) dayForecasts[0].getDay().getAvgTemperature())));
     }
 
     private void fillAirQuality(WeatherCurrent current) {
@@ -281,15 +293,11 @@ public class GuiControllerImpl implements GuiController {
         );
         ImageView iv = getTooltipImage(new Image(IMAGE_AIR_QUALITY_HINT_PNG), 100);
         tooltip.setGraphic(iv);
-        lbAirQuality.setTooltip(tooltip);
-        Tooltip.install(imgAirQuality, tooltip);
+        Tooltip.install(airQualityBox, tooltip);
         if (colorIndex >= 1 && colorIndex <= 6) {
-            hbAirQuality.setStyle(String.format("-fx-background-color: %s", getAirColor(colorIndex)));
+            airQualityBox.setStyle(String.format("-fx-background-color: %s",
+                    ColorEngineFactory.getEngine(ColorElement.AIR_QUALITY).getColor(colorIndex)));
         }
-    }
-
-    private String getAirColor(int index) {
-        return AIR_QUALITY_COLORS[index-1];
     }
 
     private void fillVisibilityAndUvAndDayLen(WeatherCurrent current) {
@@ -297,8 +305,7 @@ public class GuiControllerImpl implements GuiController {
         Tooltip tooltipVisibility = getTooltip(String.format(localizeService.getLocalizedResource("visibility.tooltip"), current.getVisibilityKm()));
         ImageView iv = getTooltipImage(imgVisibility.getImage(), 100);
         tooltipVisibility.setGraphic(iv);
-        lbVisibility.setTooltip(tooltipVisibility);
-        Tooltip.install(imgVisibility, tooltipVisibility);
+        Tooltip.install(visibilityBox, tooltipVisibility);
 
         lbUvIdx.setText(String.format("%.2f", current.getUvIndex()));
         Tooltip tooltipUv = getTooltip(
@@ -308,8 +315,12 @@ public class GuiControllerImpl implements GuiController {
         );
         iv = getTooltipImage(imgUvIndex.getImage(), 100);
         tooltipUv.setGraphic(iv);
-        lbUvIdx.setTooltip(tooltipUv);
-        Tooltip.install(imgUvIndex, tooltipUv);
+        Tooltip.install(uvIndexBox, tooltipUv);
+
+        visibilityBox.setStyle(String.format("-fx-background-color: %s",
+                ColorEngineFactory.getEngine(ColorElement.VISIBILITY).getColor((int) current.getVisibilityKm() * 1000)));
+        uvIndexBox.setStyle(String.format("-fx-background-color: %s",
+                ColorEngineFactory.getEngine(ColorElement.UV_INDEX).getColor((int) current.getUvIndex())));
     }
 
     private void fillLocation(WeatherCurrent current) {
@@ -356,10 +367,13 @@ public class GuiControllerImpl implements GuiController {
                 )
         );
         tooltip.setGraphic(iv);
-        lbTemperature.setTooltip(tooltip);
-        lbFeels.setTooltip(tooltip);
-        Tooltip.install(imgTemperature, tooltip);
-        Tooltip.install(imgFillsLikeTemp, tooltip);
+        Tooltip.install(tempBox, tooltip);
+        Tooltip.install(fillsTempBox, tooltip);
+
+        tempBox.setStyle(String.format("-fx-background-color: %s",
+                ColorEngineFactory.getEngine(ColorElement.TEMPERATURE).getColor((int) current.getTemperatureC())));
+        fillsTempBox.setStyle(String.format("-fx-background-color: %s",
+                ColorEngineFactory.getEngine(ColorElement.TEMPERATURE).getColor((int) current.getFeelsLike())));
     }
 
     private void fillHumidity(WeatherCurrent current) {
@@ -367,16 +381,18 @@ public class GuiControllerImpl implements GuiController {
         ImageView iv = getTooltipImage(imgHumidity.getImage(), 100);
         Tooltip tooltip = getTooltip(String.format(localizeService.getLocalizedResource("humidity.tooltip"), current.getHumidity()));
         tooltip.setGraphic(iv);
-        lbHumidity.setTooltip(tooltip);
-        Tooltip.install(imgHumidity, tooltip);
+        Tooltip.install(humidityBox, tooltip);
+        humidityBox.setStyle(String.format("-fx-background-color: %s",
+                ColorEngineFactory.getEngine(ColorElement.HUMIDITY).getColor(current.getHumidity())));
     }
 
     private void fillPressure(WeatherCurrent current) {
         lbPressure.setText(String.format("%.0f mmHg", millibarToMmHg(current.getPressureMb())));
         Tooltip tooltip = getTooltip(String.format(localizeService.getLocalizedResource("pressure.tooltip"), millibarToMmHg(current.getPressureMb()), current.getPressureMb()));
         tooltip.setGraphic(getTooltipImage(imgPressure.getImage(), 100));
-        lbPressure.setTooltip(tooltip);
-        Tooltip.install(imgPressure, tooltip);
+        Tooltip.install(pressureBox, tooltip);
+        pressureBox.setStyle(String.format("-fx-background-color: %s",
+                ColorEngineFactory.getEngine(ColorElement.PRESSURE).getColor(current.getHumidity())));
     }
 
     public static ImageView getTooltipImage(Image image, int width) {
@@ -414,12 +430,14 @@ public class GuiControllerImpl implements GuiController {
         ImageView iv = getTooltipImage(new Image(Objects.requireNonNull(this.getClass().getResourceAsStream(IMAGE_COMPASS_ARROW_PNG))), 40);
         iv.setRotate(current.getWindDegree());
         tooltip.setGraphic(iv);
-        lbWindDirection.setTooltip(tooltip);
-        lbWindSpeed.setTooltip(tooltip);
-        lbWindGists.setTooltip(tooltip);
         Tooltip.install(imgWindDirection, tooltip);
-        Tooltip.install(imgWind, tooltip);
-        Tooltip.install(imgWindGists, tooltip);
+        Tooltip.install(windSpeedBox, tooltip);
+        Tooltip.install(windGustBox, tooltip);
+
+        windSpeedBox.setStyle(String.format("-fx-background-color: %s",
+                ColorEngineFactory.getEngine(ColorElement.WIND_SPEED).getColor((int) current.getWindKmh())));
+        windGustBox.setStyle(String.format("-fx-background-color: %s",
+                ColorEngineFactory.getEngine(ColorElement.WIND_SPEED).getColor((int) current.getGust())));
     }
 
     private String getWindDirection(String s) {

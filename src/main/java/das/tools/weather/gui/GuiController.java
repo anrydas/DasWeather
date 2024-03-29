@@ -32,7 +32,6 @@ public interface GuiController extends Localized, GuiWindow {
     Map<String,String> WIND_DIRECTIONS = new HashMap<>();
     Map<String,String> MOON_PHASES = new HashMap<>();
     String IMAGE_WEATHER_DEFAULT_ICON_PNG = "/images/weather-default-01.png";
-    String[] AIR_QUALITY_COLORS = {"#7FFFD4", "#FFFFBC", "#FAD86F", "#FA8F6F", "#CC6FFA", "#A52A2A"};
 
     void onShowingStage();
     void updateWeatherData();
