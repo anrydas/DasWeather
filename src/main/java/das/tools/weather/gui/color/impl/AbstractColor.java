@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public class AbstractColor {
+public abstract class AbstractColor {
     protected Map<Integer, String> COLOR_MAP;
 
     protected int getIndex(int value) {
