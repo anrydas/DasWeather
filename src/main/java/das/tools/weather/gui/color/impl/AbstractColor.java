@@ -12,8 +12,8 @@ public class AbstractColor {
         List<Integer> keys = new ArrayList<>(COLOR_MAP.keySet());
         Collections.sort(keys);
         for (int i = 1; i < keys.size(); i++) {
-            if (keys.get(i - 1) <= value && value <= keys.get(i)) {
-                return keys.get(i);
+            if (keys.get(i - 1) < value && value <= keys.get(i)) {
+                return keys.get(i-1);
             }
         }
         return keys.get(keys.size() - 1);
