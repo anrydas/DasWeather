@@ -24,7 +24,7 @@ public interface GuiController extends Localized, GuiWindow {
     String IMAGE_SNOW_AND_RAIN_PNG = "/images/precip/snow_and_rain.png";
     String IMAGE_SNOW_PNG = "/images/precip/snow.png";
     String IMAGE_RAIN_PNG = "/images/precip/rain.png";
-    String IMAGE_NO_PRECIPITATION_PNG = "/images/precip/no_precipitation_1.png";
+    String IMAGE_NO_PRECIPITATION_PNG = "/images/precip/no_precipitation.png";
     String IMAGE_AIR_QUALITY_PNG = "/images/AirQuality.png";
     String IMAGE_LOCATION_CONFIRMED_PNG = "/images/gui/confirmOk.png";
     String IMAGE_LOCATION_UN_CONFIRMED_PNG = "/images/gui/confirmUn.png";

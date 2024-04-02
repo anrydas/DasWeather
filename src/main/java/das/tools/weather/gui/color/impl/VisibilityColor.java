@@ -4,7 +4,7 @@ import das.tools.weather.gui.color.ColorElement;
 import das.tools.weather.gui.color.ColorEngine;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.HashMap;
 
 @Component
 public class VisibilityColor extends AbstractColor implements ColorEngine {
