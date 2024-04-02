@@ -10,7 +10,7 @@ import java.util.HashMap;
 public class PrecipitationColor extends AbstractColor implements ColorEngine {
     {
         COLOR_MAP = new HashMap<>();
-        COLOR_MAP.put(-1, "#DEFFFA");
+        COLOR_MAP.put(0, "#DEFFFA");
         COLOR_MAP.put(1, "#87F0FE");
         COLOR_MAP.put(3, "#87C6FE");
         COLOR_MAP.put(6, "#63B5FE");
