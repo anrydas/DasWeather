@@ -11,9 +11,12 @@ public abstract class AbstractColor {
     protected int getIndex(int value) {
         List<Integer> keys = new ArrayList<>(COLOR_MAP.keySet());
         Collections.sort(keys);
+        if (value <= keys.get(0)) {
+            return keys.get(0);
+        }
         for (int i = 1; i < keys.size(); i++) {
-            if (keys.get(i - 1) < value && value <= keys.get(i)) {
-                return keys.get(i-1);
+            if (value > keys.get(i - 1) && value <= keys.get(i)) {
+                return keys.get(i);
             }
         }
         return keys.get(keys.size() - 1);
