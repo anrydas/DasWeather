@@ -14,6 +14,9 @@ public abstract class AbstractColor {
         if (value <= keys.get(0)) {
             return keys.get(0);
         }
+        if (value >= keys.get(keys.size()-1)) {
+            return keys.get(keys.size()-1);
+        }
         for (int i = 1; i < keys.size(); i++) {
             if (value > keys.get(i - 1) && value <= keys.get(i)) {
                 return keys.get(i);
