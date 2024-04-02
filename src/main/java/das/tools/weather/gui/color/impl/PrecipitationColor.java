@@ -13,8 +13,8 @@ public class PrecipitationColor extends AbstractColor implements ColorEngine {
         COLOR_MAP.put(-1, "#DEFFFA");
         COLOR_MAP.put(1, "#87F0FE");
         COLOR_MAP.put(3, "#87C6FE");
-        COLOR_MAP.put(5, "#63B5FE");
-        COLOR_MAP.put(6, "#637AFE");
+        COLOR_MAP.put(6, "#63B5FE");
+        COLOR_MAP.put(10, "#637AFE");
     }
     @Override
     public ColorElement getEngine() {

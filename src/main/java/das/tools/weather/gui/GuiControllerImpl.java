@@ -464,13 +464,15 @@ public class GuiControllerImpl implements GuiController {
             colorValue = Math.round(totalSnow);
         } else if (totalPrecipitation > 0 && totalSnow <= 0) {
             lbPrecipitation.setText(String.format("%.0f mm", totalPrecipitation));
-            colorValue = Math.round(totalPrecipitation / 10);
+            colorValue = Math.round(totalPrecipitation);
         } else if (totalPrecipitation <= 0 && totalSnow > 0) {
             lbPrecipitation.setText(String.format("%.0f cm", totalSnow));
             colorValue = Math.round(totalSnow);
         } else {
             lbPrecipitation.setText("0 mm");
         }
+
+        colorValue = colorValue <= 10 ? colorValue :  colorValue / 10;
 
         Tooltip tooltip = getTooltip(String.format(localizeService.getLocalizedResource("precipitation.tooltip"), totalPrecipitation, totalSnow));
         tooltip.setTextAlignment(TextAlignment.RIGHT);
