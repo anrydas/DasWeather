@@ -223,7 +223,6 @@ public class GuiControllerImpl implements GuiController {
     private void setLocalizedResources() {
         btUpdate.setText(localizeService.getLocalizedResource("button.update.text"));
         btConfig.setTooltip(getTooltip(localizeService.getLocalizedResource("button.configure.tooltip")));
-        lbWindSpeedText.setText(localizeService.getLocalizedResource("label.windSpeed.text"));
         lbForecast.setText(localizeService.getLocalizedResource("label.forecast.text"));
     }
 

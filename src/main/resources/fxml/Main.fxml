@@ -5,6 +5,7 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
+
 <AnchorPane fx:id="root" prefHeight="510.0" prefWidth="521.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="das.tools.weather.gui.GuiControllerImpl">
     <VBox layoutX="10.0" layoutY="14.0" prefHeight="414.0" prefWidth="501.0" spacing="4.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="14.0">
         <HBox id="HBox" alignment="CENTER_LEFT" prefHeight="38.0" prefWidth="250.0" spacing="5.0">
@@ -79,12 +80,11 @@
             </HBox>
             <HBox fx:id="precipBox" alignment="CENTER">
                 <ImageView fx:id="imgPrecipitation" fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
-                    <Image url="@/images/precip/snow.png"/>
+                    <Image url="@/images/precip/snow.png" />
                 </ImageView>
-                <Label fx:id="lbPrecipitation" alignment="CENTER" prefHeight="27.0" prefWidth="99.0" text="100 mm"
-                       textAlignment="CENTER">
+                <Label fx:id="lbPrecipitation" alignment="CENTER" prefHeight="27.0" prefWidth="99.0" text="100 mm" textAlignment="CENTER">
                     <font>
-                        <Font size="18.0"/>
+                        <Font size="18.0" />
                     </font>
                 </Label>
             </HBox>
@@ -102,7 +102,7 @@
         <HBox id="HBox" alignment="CENTER" prefHeight="27.0" prefWidth="477.0" spacing="5.0">
             <HBox fx:id="windBox" alignment="CENTER" prefHeight="27.0" prefWidth="115.0">
                 <ImageView fx:id="imgWind" fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
-                    <Image url="@/images/wind.png" />
+                    <Image url="@/images/wind_dir.png" />
                 </ImageView>
                 <Label fx:id="lbWindDirection" alignment="CENTER" prefHeight="27.0" prefWidth="58.0" text="NNW" textAlignment="CENTER">
                     <font>
@@ -113,8 +113,10 @@
                     <Image url="@/images/wind_arrow.png" />
                 </ImageView>
             </HBox>
-            <HBox fx:id="windSpeedBox" alignment="CENTER" prefHeight="27.0" prefWidth="191.0">
-                <Label fx:id="lbWindSpeedText" alignment="TOP_RIGHT" contentDisplay="CENTER" prefHeight="18.0" prefWidth="108.0" text="Speed: " textAlignment="CENTER" />
+            <HBox fx:id="windSpeedBox" alignment="CENTER" prefHeight="27.0" prefWidth="140.0">
+                <ImageView fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
+                    <Image url="@/images/wind_speed.png" />
+                </ImageView>
                 <Label fx:id="lbWindSpeed" alignment="CENTER" contentDisplay="RIGHT" prefHeight="27.0" prefWidth="92.0" text="20 km/h" textAlignment="CENTER">
                     <font>
                         <Font size="18.0" />
@@ -123,7 +125,7 @@
             </HBox>
             <HBox fx:id="windGustBox" alignment="CENTER" prefHeight="27.0" prefWidth="127.0">
                 <ImageView fx:id="imgWindGists" fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
-                    <Image url="@/images/WindGist.png" />
+                    <Image url="@/images/wind_gist.png" />
                 </ImageView>
                 <Label fx:id="lbWindGists" alignment="CENTER" prefHeight="27.0" prefWidth="87.0" text="20 km/h" textAlignment="CENTER">
                     <font>
