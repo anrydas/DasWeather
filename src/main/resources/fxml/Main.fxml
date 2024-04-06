@@ -30,7 +30,7 @@
                 <ImageView fx:id="imgTemperature" fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
                     <Image url="@/images/temp_hot.png" />
                 </ImageView>
-                <Label fx:id="lbTemperature" contentDisplay="CENTER" prefHeight="27.0" prefWidth="50.0" text="20 C" textAlignment="CENTER">
+                <Label fx:id="lbTemperature" alignment="CENTER" contentDisplay="CENTER" prefHeight="27.0" prefWidth="50.0" text="20 C" textAlignment="CENTER">
                     <font>
                         <Font size="18.0" />
                     </font>
@@ -40,7 +40,7 @@
                 <ImageView fx:id="imgFillsLikeTemp" fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
                     <Image url="@/images/temp_fills.png" />
                 </ImageView>
-                <Label fx:id="lbFeels" contentDisplay="CENTER" prefHeight="27.0" prefWidth="51.0" text="20 C" textAlignment="CENTER">
+                <Label fx:id="lbFeels" alignment="CENTER" contentDisplay="CENTER" prefHeight="27.0" prefWidth="51.0" text="20 C" textAlignment="CENTER">
                     <font>
                         <Font size="18.0" />
                     </font>
@@ -50,7 +50,7 @@
                 <ImageView fx:id="imgAvgTemp" fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
                     <Image url="@/images/temp_avg.png" />
                 </ImageView>
-                <Label fx:id="lbAverage" contentDisplay="CENTER" prefHeight="27.0" prefWidth="51.0" text="20 C" textAlignment="CENTER">
+                <Label fx:id="lbAverage" alignment="CENTER" contentDisplay="CENTER" prefHeight="27.0" prefWidth="51.0" text="20 C" textAlignment="CENTER">
                     <font>
                         <Font size="18.0" />
                     </font>
@@ -68,27 +68,31 @@
             </HBox>
         </HBox>
         <HBox id="HBox" alignment="CENTER" prefHeight="38.0" prefWidth="250.0" spacing="5.0">
-            <ImageView fx:id="imgCloud" fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
-                <Image url="@/images/cloud.png" />
-            </ImageView>
-            <Label fx:id="lbCloud" prefHeight="27.0" prefWidth="70.0" text="100%" textAlignment="CENTER">
-                <font>
-                    <Font size="18.0" />
-                </font>
-            </Label>
-            <ImageView fx:id="imgPrecipitation" fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
-                <Image url="@/images/precip/snow.png" />
-            </ImageView>
-            <Label fx:id="lbPrecipitation" prefHeight="27.0" prefWidth="99.0" text="100 mm" textAlignment="CENTER">
-                <font>
-                    <Font size="18.0" />
-                </font>
-            </Label>
+            <HBox fx:id="cloudyBox" alignment="CENTER" prefHeight="28.0" prefWidth="108.0">
+                <ImageView fx:id="imgCloud" fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
+                    <Image url="@/images/cloud.png" />
+                </ImageView>
+                <Label fx:id="lbCloud" alignment="CENTER" prefHeight="27.0" prefWidth="59.0" text="100%" textAlignment="CENTER">
+                    <font>
+                        <Font size="18.0" />
+                    </font>
+                </Label>
+            </HBox>
+            <HBox fx:id="precipBox" alignment="CENTER">
+                <ImageView fx:id="imgPrecipitation" fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
+                    <Image url="@/images/precip/snow.png" />
+                </ImageView>
+                <Label fx:id="lbPrecipitation" alignment="CENTER" prefHeight="27.0" prefWidth="99.0" text="100 mm" textAlignment="CENTER">
+                    <font>
+                        <Font size="18.0" />
+                    </font>
+                </Label>
+            </HBox>
             <HBox fx:id="pressureBox" alignment="CENTER" prefHeight="28.0" prefWidth="148.0">
                 <ImageView fx:id="imgPressure" fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
                     <Image url="@/images/pressure.png" />
                 </ImageView>
-                <Label fx:id="lbPressure" prefHeight="27.0" prefWidth="112.0" text="760 mmHg" textAlignment="CENTER">
+                <Label fx:id="lbPressure" alignment="CENTER" prefHeight="27.0" prefWidth="112.0" text="760 mmHg" textAlignment="CENTER">
                     <font>
                         <Font size="18.0" />
                     </font>
@@ -96,20 +100,24 @@
             </HBox>
         </HBox>
         <HBox id="HBox" alignment="CENTER" prefHeight="27.0" prefWidth="477.0" spacing="5.0">
-            <ImageView fx:id="imgWind" fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
-                <Image url="@/images/wind.png" />
-            </ImageView>
-            <Label fx:id="lbWindDirection" alignment="CENTER" prefHeight="27.0" prefWidth="58.0" text="NNW" textAlignment="CENTER">
-                <font>
-                    <Font size="18.0" />
-                </font>
-            </Label>
-            <ImageView fx:id="imgWindDirection" fitHeight="26.0" fitWidth="14.0" preserveRatio="true">
-                <Image url="@/images/wind_arrow.png" />
-            </ImageView>
-            <HBox fx:id="windSpeedBox" alignment="CENTER" prefHeight="28.0" prefWidth="150.0">
-                <Label fx:id="lbWindSpeedText" alignment="TOP_RIGHT" contentDisplay="CENTER" prefHeight="18.0" prefWidth="89.0" text="Speed: " textAlignment="CENTER" />
-                <Label fx:id="lbWindSpeed" contentDisplay="RIGHT" prefHeight="27.0" prefWidth="92.0" text="20 km/h" textAlignment="CENTER">
+            <HBox fx:id="windBox" alignment="CENTER" prefHeight="27.0" prefWidth="115.0">
+                <ImageView fx:id="imgWind" fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
+                    <Image url="@/images/wind_dir.png" />
+                </ImageView>
+                <Label fx:id="lbWindDirection" alignment="CENTER" prefHeight="27.0" prefWidth="58.0" text="NNW" textAlignment="CENTER">
+                    <font>
+                        <Font size="18.0" />
+                    </font>
+                </Label>
+                <ImageView fx:id="imgWindDirection" fitHeight="26.0" fitWidth="14.0" preserveRatio="true">
+                    <Image url="@/images/wind_arrow.png" />
+                </ImageView>
+            </HBox>
+            <HBox fx:id="windSpeedBox" alignment="CENTER" prefHeight="27.0" prefWidth="140.0">
+                <ImageView fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
+                    <Image url="@/images/wind_speed.png" />
+                </ImageView>
+                <Label fx:id="lbWindSpeed" alignment="CENTER" contentDisplay="RIGHT" prefHeight="27.0" prefWidth="92.0" text="20 km/h" textAlignment="CENTER">
                     <font>
                         <Font size="18.0" />
                     </font>
@@ -117,9 +125,9 @@
             </HBox>
             <HBox fx:id="windGustBox" alignment="CENTER" prefHeight="27.0" prefWidth="127.0">
                 <ImageView fx:id="imgWindGists" fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
-                    <Image url="@/images/WindGist.png" />
+                    <Image url="@/images/wind_gist.png" />
                 </ImageView>
-                <Label fx:id="lbWindGists" prefHeight="27.0" prefWidth="87.0" text="20 km/h" textAlignment="CENTER">
+                <Label fx:id="lbWindGists" alignment="CENTER" prefHeight="27.0" prefWidth="87.0" text="20 km/h" textAlignment="CENTER">
                     <font>
                         <Font size="18.0" />
                     </font>
@@ -131,7 +139,7 @@
                 <ImageView fx:id="imgVisibility" fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
                     <Image url="@/images/visibility.png" />
                 </ImageView>
-                <Label fx:id="lbVisibility" prefHeight="27.0" prefWidth="75.0" text="100 km" textAlignment="CENTER">
+                <Label fx:id="lbVisibility" alignment="CENTER" prefHeight="27.0" prefWidth="75.0" text="100 km" textAlignment="CENTER">
                     <font>
                         <Font size="18.0" />
                     </font>
@@ -141,20 +149,22 @@
                 <ImageView fx:id="imgUvIndex" fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
                     <Image url="@/images/UVindex.png" />
                 </ImageView>
-                <Label fx:id="lbUvIdx" prefHeight="27.0" prefWidth="49.0" text="100" textAlignment="CENTER">
+                <Label fx:id="lbUvIdx" alignment="CENTER" prefHeight="27.0" prefWidth="49.0" text="100" textAlignment="CENTER">
                     <font>
                         <Font size="18.0" />
                     </font>
                 </Label>
             </HBox>
-            <ImageView fx:id="imgDayLength" fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
-                <Image url="@/images/DayLength.png" />
-            </ImageView>
-            <Label fx:id="lbDayLength" prefHeight="27.0" prefWidth="63.0" text="20:20" textAlignment="CENTER">
-                <font>
-                    <Font size="18.0" />
-                </font>
-            </Label>
+            <HBox fx:id="dayLenBox" alignment="CENTER" prefHeight="28.0" prefWidth="103.0">
+                <ImageView fx:id="imgDayLength" fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
+                    <Image url="@/images/DayLength.png" />
+                </ImageView>
+                <Label fx:id="lbDayLength" alignment="CENTER" prefHeight="27.0" prefWidth="63.0" text="20:20" textAlignment="CENTER">
+                    <font>
+                        <Font size="18.0" />
+                    </font>
+                </Label>
+            </HBox>
         </HBox>
         <HBox id="HBox" fx:id="airQualityBox" alignment="CENTER" prefHeight="50.0" prefWidth="502.0" spacing="10.0">
             <ImageView fx:id="imgAirQuality" fitHeight="32.0" fitWidth="32.0" preserveRatio="true">

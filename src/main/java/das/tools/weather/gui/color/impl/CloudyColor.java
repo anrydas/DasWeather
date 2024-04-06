@@ -7,18 +7,19 @@ import org.springframework.stereotype.Component;
 import java.util.HashMap;
 
 @Component
-public class VisibilityColor extends AbstractColor implements ColorEngine {
+public class CloudyColor extends AbstractColor implements ColorEngine {
     {
         COLOR_MAP = new HashMap<>();
-        COLOR_MAP.put(0, "#FEC28A");
-        COLOR_MAP.put(200, "#FCDE99");
-        COLOR_MAP.put(500, "#FFFFBC");
-        COLOR_MAP.put(1000, "#DEFFFA");
-        COLOR_MAP.put(10000, "#F1FEFC");
+        COLOR_MAP.put(0, "#DEFFFA");
+        COLOR_MAP.put(10, "#B0F6FF");
+        COLOR_MAP.put(40, "#87F0FE");
+        COLOR_MAP.put(60, "#87C6FE");
+        COLOR_MAP.put(80, "#63B5FE");
+        COLOR_MAP.put(100, "#637AFE");
     }
     @Override
     public ColorElement getEngine() {
-        return ColorElement.VISIBILITY;
+        return ColorElement.CLOUDY;
     }
 
     @Override

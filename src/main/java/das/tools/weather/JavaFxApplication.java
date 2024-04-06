@@ -1,7 +1,6 @@
 package das.tools.weather;
 
 import das.tools.weather.entity.StageReadyEvent;
-import das.tools.weather.gui.GuiController;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.stage.Stage;

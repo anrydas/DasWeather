@@ -127,6 +127,10 @@ public class GuiControllerImpl implements GuiController {
     @FXML private HBox pressureBox;
     @FXML private HBox windSpeedBox;
     @FXML private HBox windGustBox;
+    @FXML private HBox dayLenBox;
+    @FXML private HBox windBox;
+    @FXML private HBox cloudyBox;
+    @FXML private HBox precipBox;
 
     public GuiControllerImpl(GuiConfigService configService, WeatherService weatherService, ConfigController configController, ForecastController forecastController, LocalizeResourcesService localizeService, AlertService alertService, FxWeaver fxWeaver) {
         this.configService = configService;
@@ -219,7 +223,6 @@ public class GuiControllerImpl implements GuiController {
     private void setLocalizedResources() {
         btUpdate.setText(localizeService.getLocalizedResource("button.update.text"));
         btConfig.setTooltip(getTooltip(localizeService.getLocalizedResource("button.configure.tooltip")));
-        lbWindSpeedText.setText(localizeService.getLocalizedResource("label.windSpeed.text"));
         lbForecast.setText(localizeService.getLocalizedResource("label.forecast.text"));
     }
 
@@ -406,8 +409,9 @@ public class GuiControllerImpl implements GuiController {
         lbCloud.setText(String.format("%d％", current.getCloud()));
         Tooltip tooltip = getTooltip(String.format(localizeService.getLocalizedResource("cloud.tooltip"), current.getCloud()));
         tooltip.setGraphic(getTooltipImage(imgCloud.getImage(), 100));
-        lbCloud.setTooltip(tooltip);
-        Tooltip.install(imgCloud, tooltip);
+        Tooltip.install(cloudyBox, tooltip);
+        cloudyBox.setStyle(String.format("-fx-background-color: %s",
+                ColorEngineFactory.getEngine(ColorElement.CLOUDY).getColor(current.getCloud())));
     }
 
     private void fillWind(WeatherCurrent current) {
@@ -430,10 +434,12 @@ public class GuiControllerImpl implements GuiController {
         ImageView iv = getTooltipImage(new Image(Objects.requireNonNull(this.getClass().getResourceAsStream(IMAGE_COMPASS_ARROW_PNG))), 40);
         iv.setRotate(current.getWindDegree());
         tooltip.setGraphic(iv);
-        Tooltip.install(imgWindDirection, tooltip);
+        Tooltip.install(windBox, tooltip);
         Tooltip.install(windSpeedBox, tooltip);
         Tooltip.install(windGustBox, tooltip);
 
+        windBox.setStyle(String.format("-fx-background-color: %s",
+                ColorEngineFactory.getEngine(ColorElement.WIND_DIRECTION).getColor(current.getWindDegree())));
         windSpeedBox.setStyle(String.format("-fx-background-color: %s",
                 ColorEngineFactory.getEngine(ColorElement.WIND_SPEED).getColor((int) current.getWindKmh())));
         windGustBox.setStyle(String.format("-fx-background-color: %s",
@@ -451,21 +457,28 @@ public class GuiControllerImpl implements GuiController {
         Image image = new Image(Objects.requireNonNull(this.getClass().getResourceAsStream(getPrecipitationImageResourceFileName(day))));
         imgPrecipitation.setImage(image);
 
+        int colorValue = 0;
         if (totalPrecipitation > 0 && totalSnow > 0) {
             lbPrecipitation.setText(String.format("%.0f/%.0f", totalPrecipitation, totalSnow));
+            colorValue = Math.round(totalSnow);
         } else if (totalPrecipitation > 0 && totalSnow <= 0) {
             lbPrecipitation.setText(String.format("%.0f mm", totalPrecipitation));
+            colorValue = Math.round(totalPrecipitation);
         } else if (totalPrecipitation <= 0 && totalSnow > 0) {
             lbPrecipitation.setText(String.format("%.0f cm", totalSnow));
+            colorValue = Math.round(totalSnow);
         } else {
             lbPrecipitation.setText("0 mm");
         }
 
+        colorValue = colorValue <= 10 ? colorValue :  colorValue / 10;
+
         Tooltip tooltip = getTooltip(String.format(localizeService.getLocalizedResource("precipitation.tooltip"), totalPrecipitation, totalSnow));
         tooltip.setTextAlignment(TextAlignment.RIGHT);
         tooltip.setGraphic(getTooltipImage(image, 100));
-        lbPrecipitation.setTooltip(tooltip);
-        Tooltip.install(imgPrecipitation, tooltip);
+        Tooltip.install(precipBox, tooltip);
+        precipBox.setStyle(String.format("-fx-background-color: %s",
+                ColorEngineFactory.getEngine(ColorElement.PRECIPITATIONS).getColor(colorValue)));
     }
 
     private String getPrecipitationImageResourceFileName(WeatherDay day) {
@@ -540,8 +553,16 @@ public class GuiControllerImpl implements GuiController {
         lbDayLength.setText(dayLength);
         Tooltip tooltip = getTooltip(String.format(localizeService.getLocalizedResource("dayLength.tooltip"), dayLength));
         tooltip.setGraphic(getTooltipImage(imgDayLength.getImage(), 100));
-        lbDayLength.setTooltip(tooltip);
-        Tooltip.install(imgDayLength, tooltip);
+        Tooltip.install(dayLenBox, tooltip);
+        dayLenBox.setStyle(String.format("-fx-background-color: %s",
+                ColorEngineFactory.getEngine(ColorElement.DAY_LENGTH).getColor(strTimeToInt(dayLength))));
+    }
+
+    private int strTimeToInt(String source) {
+        String[] split = source.split(":");
+        int h = Integer.parseInt(split[0]);
+        int m = Integer.parseInt(split[1]);
+        return h*60 + m;
     }
 
     private void fillAstro(WeatherAstro currentAstro) {

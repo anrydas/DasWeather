@@ -10,7 +10,7 @@ import java.util.HashMap;
 public class PressureColor extends AbstractColor implements ColorEngine {
     {
         COLOR_MAP = new HashMap<>();
-        COLOR_MAP.put(0, "#A3FFB9");
+        COLOR_MAP.put(720, "#A3FFB9");
         COLOR_MAP.put(730, "#FFFFBC");
         COLOR_MAP.put(750, "#F5CC7B");
         COLOR_MAP.put(770, "#F57D7B");

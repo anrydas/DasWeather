@@ -41,7 +41,7 @@
 - Application's parameters could be changed:
   - API key
   - Weather's API end point link
-  - Location - may be find in [Location Window](#LocationWin)
+  - Location - may be found in [Location Window](#LocationWin)
   - Weather update interval (60 minutes - minimal interval)
   - Interface language
   - Application exit confirmation

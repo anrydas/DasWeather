@@ -39,7 +39,10 @@ import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalTime;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 @Component @Scope("prototype")
 @FxmlView("/fxml/Forecast.fxml")
