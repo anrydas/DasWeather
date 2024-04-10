@@ -68,7 +68,7 @@
             </HBox>
         </HBox>
         <HBox id="HBox" alignment="CENTER" prefHeight="38.0" prefWidth="250.0" spacing="5.0">
-            <HBox fx:id="cloudyBox" alignment="CENTER" prefHeight="28.0" prefWidth="108.0">
+            <HBox fx:id="cloudyBox" alignment="CENTER" prefHeight="28.0" prefWidth="116.0">
                 <ImageView fx:id="imgCloud" fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
                     <Image url="@/images/cloud.png" />
                 </ImageView>
@@ -78,7 +78,7 @@
                     </font>
                 </Label>
             </HBox>
-            <HBox fx:id="precipBox" alignment="CENTER">
+            <HBox fx:id="precipBox" alignment="CENTER" prefHeight="28.0" prefWidth="133.0">
                 <ImageView fx:id="imgPrecipitation" fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
                     <Image url="@/images/precip/snow.png" />
                 </ImageView>
@@ -100,7 +100,7 @@
             </HBox>
         </HBox>
         <HBox id="HBox" alignment="CENTER" prefHeight="27.0" prefWidth="477.0" spacing="5.0">
-            <HBox fx:id="windBox" alignment="CENTER" prefHeight="27.0" prefWidth="115.0">
+            <HBox fx:id="windBox" alignment="CENTER" prefHeight="27.0" prefWidth="122.0">
                 <ImageView fx:id="imgWind" fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
                     <Image url="@/images/wind_dir.png" />
                 </ImageView>
@@ -113,7 +113,7 @@
                     <Image url="@/images/wind_arrow.png" />
                 </ImageView>
             </HBox>
-            <HBox fx:id="windSpeedBox" alignment="CENTER" prefHeight="27.0" prefWidth="140.0">
+            <HBox fx:id="windSpeedBox" alignment="CENTER" prefHeight="27.0" prefWidth="149.0">
                 <ImageView fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
                     <Image url="@/images/wind_speed.png" />
                 </ImageView>
@@ -123,7 +123,7 @@
                     </font>
                 </Label>
             </HBox>
-            <HBox fx:id="windGustBox" alignment="CENTER" prefHeight="27.0" prefWidth="127.0">
+            <HBox fx:id="windGustBox" alignment="CENTER" prefHeight="27.0" prefWidth="135.0">
                 <ImageView fx:id="imgWindGists" fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
                     <Image url="@/images/wind_gist.png" />
                 </ImageView>
@@ -135,7 +135,7 @@
             </HBox>
         </HBox>
         <HBox id="HBox" alignment="CENTER" prefHeight="38.0" prefWidth="494.0" spacing="5.0">
-            <HBox fx:id="visibilityBox" alignment="CENTER" prefHeight="28.0" prefWidth="113.0">
+            <HBox fx:id="visibilityBox" alignment="CENTER" prefHeight="28.0" prefWidth="131.0">
                 <ImageView fx:id="imgVisibility" fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
                     <Image url="@/images/visibility.png" />
                 </ImageView>
@@ -145,7 +145,7 @@
                     </font>
                 </Label>
             </HBox>
-            <HBox fx:id="uvIndexBox" alignment="CENTER" prefHeight="28.0" prefWidth="113.0">
+            <HBox fx:id="uvIndexBox" alignment="CENTER" prefHeight="28.0" prefWidth="131.0">
                 <ImageView fx:id="imgUvIndex" fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
                     <Image url="@/images/UVindex.png" />
                 </ImageView>
@@ -155,7 +155,7 @@
                     </font>
                 </Label>
             </HBox>
-            <HBox fx:id="dayLenBox" alignment="CENTER" prefHeight="28.0" prefWidth="103.0">
+            <HBox fx:id="dayLenBox" alignment="CENTER" prefHeight="28.0" prefWidth="124.0">
                 <ImageView fx:id="imgDayLength" fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
                     <Image url="@/images/DayLength.png" />
                 </ImageView>

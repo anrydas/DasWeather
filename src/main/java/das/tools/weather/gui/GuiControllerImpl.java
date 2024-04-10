@@ -7,10 +7,7 @@ import das.tools.weather.entity.forecast.WeatherDay;
 import das.tools.weather.entity.forecast.WeatherDayForecast;
 import das.tools.weather.gui.color.ColorElement;
 import das.tools.weather.gui.color.ColorEngineFactory;
-import das.tools.weather.service.AlertService;
-import das.tools.weather.service.GuiConfigService;
-import das.tools.weather.service.LocalizeResourcesService;
-import das.tools.weather.service.WeatherService;
+import das.tools.weather.service.*;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -54,12 +51,12 @@ public class GuiControllerImpl implements GuiController {
     private final LocalizeResourcesService localizeService;
     private final AlertService alertService;
     private final FxWeaver fxWeaver;
+    private final CommonUtilsService commonUtils;
 
     @FXML private AnchorPane root;
     @FXML private HBox airQualityBox;
     @FXML private Label lbForecast;
     @FXML private Label lbWindSpeedText;
-
     @FXML private ImageView imgFillsLikeTemp;
     @FXML private ImageView imgDayLength;
     @FXML private Label lbDayLength;
@@ -132,7 +129,7 @@ public class GuiControllerImpl implements GuiController {
     @FXML private HBox cloudyBox;
     @FXML private HBox precipBox;
 
-    public GuiControllerImpl(GuiConfigService configService, WeatherService weatherService, ConfigController configController, ForecastController forecastController, LocalizeResourcesService localizeService, AlertService alertService, FxWeaver fxWeaver) {
+    public GuiControllerImpl(GuiConfigService configService, WeatherService weatherService, ConfigController configController, ForecastController forecastController, LocalizeResourcesService localizeService, AlertService alertService, FxWeaver fxWeaver, CommonUtilsService commonUtils) {
         this.configService = configService;
         this.weatherService = weatherService;
         this.configController = configController;
@@ -140,6 +137,7 @@ public class GuiControllerImpl implements GuiController {
         this.localizeService = localizeService;
         this.alertService = alertService;
         this.fxWeaver = fxWeaver;
+        this.commonUtils = commonUtils;
     }
 
     @Override
@@ -395,7 +393,7 @@ public class GuiControllerImpl implements GuiController {
         tooltip.setGraphic(getTooltipImage(imgPressure.getImage(), 100));
         Tooltip.install(pressureBox, tooltip);
         pressureBox.setStyle(String.format("-fx-background-color: %s",
-                ColorEngineFactory.getEngine(ColorElement.PRESSURE).getColor(current.getHumidity())));
+                ColorEngineFactory.getEngine(ColorElement.PRESSURE).getColor((int) current.getPressureMb())));
     }
 
     public static ImageView getTooltipImage(Image image, int width) {
@@ -555,14 +553,7 @@ public class GuiControllerImpl implements GuiController {
         tooltip.setGraphic(getTooltipImage(imgDayLength.getImage(), 100));
         Tooltip.install(dayLenBox, tooltip);
         dayLenBox.setStyle(String.format("-fx-background-color: %s",
-                ColorEngineFactory.getEngine(ColorElement.DAY_LENGTH).getColor(strTimeToInt(dayLength))));
-    }
-
-    private int strTimeToInt(String source) {
-        String[] split = source.split(":");
-        int h = Integer.parseInt(split[0]);
-        int m = Integer.parseInt(split[1]);
-        return h*60 + m;
+                ColorEngineFactory.getEngine(ColorElement.DAY_LENGTH).getColor(commonUtils.toIntTime(dayLength))));
     }
 
     private void fillAstro(WeatherAstro currentAstro) {

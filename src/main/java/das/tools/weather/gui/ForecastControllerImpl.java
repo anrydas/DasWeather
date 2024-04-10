@@ -285,11 +285,11 @@ public class ForecastControllerImpl implements ForecastController {
 
     private void fillGraphics() {
         chartDataProducer.initChartsData(this.data.getForecast().getDayForecast());
-        chartDataProducer.fillChart(chTemperature, TAB_NAMES.get(1));
-        chartDataProducer.fillChart(chPressure, TAB_NAMES.get(2));
-        chartDataProducer.fillChart(chHumidity, TAB_NAMES.get(3));
-        chartDataProducer.fillChart(chCloud, TAB_NAMES.get(4));
-        chartDataProducer.fillChart(chWind, TAB_NAMES.get(5));
+        chartDataProducer.fillChart(chTemperature, TAB_NAMES.get(1), this.data.getCurrent());
+        chartDataProducer.fillChart(chPressure, TAB_NAMES.get(2), this.data.getCurrent());
+        chartDataProducer.fillChart(chHumidity, TAB_NAMES.get(3), this.data.getCurrent());
+        chartDataProducer.fillChart(chCloud, TAB_NAMES.get(4), this.data.getCurrent());
+        chartDataProducer.fillChart(chWind, TAB_NAMES.get(5), this.data.getCurrent());
 
         chartDataProducer.makeLegendClickable(chTemperature);
         chartDataProducer.makeLegendClickable(chPressure);

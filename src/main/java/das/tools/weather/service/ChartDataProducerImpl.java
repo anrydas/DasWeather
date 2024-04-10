@@ -1,10 +1,12 @@
 package das.tools.weather.service;
 
 import com.sun.javafx.charts.Legend;
+import das.tools.weather.entity.current.WeatherCurrent;
 import das.tools.weather.entity.forecast.WeatherDayForecast;
 import das.tools.weather.entity.forecast.WeatherHour;
 import das.tools.weather.gui.ForecastController;
 import das.tools.weather.gui.GuiControllerImpl;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.chart.XYChart;
@@ -15,6 +17,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -26,10 +30,12 @@ public class ChartDataProducerImpl implements ChartDataProducer {
 
     private final WeatherService weatherService;
     private final LocalizeResourcesService localizeService;
+    private final CbwmService cbwmService;
 
-    public ChartDataProducerImpl(WeatherService weatherService, LocalizeResourcesService localizeService) {
+    public ChartDataProducerImpl(WeatherService weatherService, LocalizeResourcesService localizeService, CbwmService cbwmService) {
         this.weatherService = weatherService;
         this.localizeService = localizeService;
+        this.cbwmService = cbwmService;
     }
 
     @Override
@@ -69,7 +75,7 @@ public class ChartDataProducerImpl implements ChartDataProducer {
     }
 
     @Override
-    public void fillChart(XYChart<String, Number> chart, String tabName) {
+    public void fillChart(XYChart<String, Number> chart, String tabName, WeatherCurrent current) {
         chart.getData().clear();
         for (DataHolder dataHolder: this.dataList) {
             XYChart.Series<String,Number> series = new XYChart.Series<>();
@@ -84,19 +90,34 @@ public class ChartDataProducerImpl implements ChartDataProducer {
                 if (dataNode != null) {
                     dataNode.setOnMouseEntered(event -> dataNode.getStyleClass().add("chart-on-hover"));
                     dataNode.setOnMouseExited(event -> dataNode.getStyleClass().remove("chart-on-hover"));
-                    installTooltipOnNode(data, dataHolder);
+                    installTooltipOnNode(data, dataHolder, current);
                 }
             }
         }
     }
 
-    private void installTooltipOnNode(XYChart.Data<String, Number> data, DataHolder dataHolder) {
+    private void installTooltipOnNode(XYChart.Data<String, Number> data, DataHolder dataHolder, WeatherCurrent current) {
         int hourIndex = Integer.parseInt(data.getXValue());
         WeatherHour hour = dataHolder.getDayForecastData().getHour()[hourIndex];
-        Image image = weatherService.getWeatherIcon(hour.getCondition().getCode(), hour.isDay());
+        Image image = getExtWeatherImage(dataHolder, hourIndex, current);
         Tooltip tooltip = new Tooltip(getTooltipText(hour));
-        tooltip.setGraphic(GuiControllerImpl.getTooltipImage(image, 64));
+        tooltip.setGraphic(GuiControllerImpl.getTooltipImage(image, (int) image.getWidth()));
         Tooltip.install(data.getNode(), tooltip);
+    }
+
+    private Image getExtWeatherImage(DataHolder dataHolder, int hourIndex, WeatherCurrent current) {
+        WeatherHour hour = dataHolder.getDayForecastData().getHour()[hourIndex];
+        Image weatherIcon = weatherService.getWeatherIcon(hour.getCondition().getCode(), hour.isDay());
+
+        BufferedImage cbwmImage = cbwmService.getCbwmImage(dataHolder, hourIndex, current);
+        BufferedImage source = SwingFXUtils.fromFXImage(weatherIcon, null);
+        BufferedImage resImage = new BufferedImage(source.getWidth() * 2 + 10, source.getHeight(), source.getType());
+        Graphics g = resImage.getGraphics();
+        g.drawImage(source, 0, 0, null);
+        g.drawImage(cbwmImage, source.getWidth() - 1, 4, source.getWidth() + 10, source.getHeight() - 8, null);
+        g.dispose();
+
+        return SwingFXUtils.toFXImage(resImage, null);
     }
 
     private String getTooltipText(WeatherHour hour) {
@@ -144,7 +165,7 @@ public class ChartDataProducerImpl implements ChartDataProducer {
 
     @Getter
     @Setter
-    private static class DataHolder {
+    static class DataHolder {
         private String name;
         private Map<String,Number[]> tabAndValues;
         private WeatherDayForecast dayForecastData;
