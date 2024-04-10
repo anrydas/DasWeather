@@ -72,7 +72,7 @@ public class CbwmServiceImpl implements CbwmService { // CBWM - Color Bricks Wea
         WeatherAstro astro = dataHolder.getDayForecastData().getAstro();
         String dayLength = commonUtils.getTimeLength(astro.getSunRise(), astro.getSunSet());
         int[] res = new int[3];
-        res[0] = commonUtils.toIntColor(ColorEngineFactory.getEngine(ColorElement.VISIBILITY).getColor((int) hour.getVisibilityKm()));
+        res[0] = commonUtils.toIntColor(ColorEngineFactory.getEngine(ColorElement.VISIBILITY).getColor((int) hour.getVisibilityKm() * 1000));
         res[1] = commonUtils.toIntColor(ColorEngineFactory.getEngine(ColorElement.UV_INDEX).getColor((int) hour.getUvIndex()));
         res[2] = commonUtils.toIntColor(ColorEngineFactory.getEngine(ColorElement.DAY_LENGTH).getColor(commonUtils.toIntTime(dayLength)));
         return res;
