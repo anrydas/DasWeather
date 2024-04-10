@@ -47,7 +47,6 @@ public class GuiControllerImpl implements GuiController {
     private final GuiConfigService configService;
     private final WeatherService weatherService;
     private final ConfigController configController;
-    private final ForecastController forecastController;
     private final LocalizeResourcesService localizeService;
     private final AlertService alertService;
     private final FxWeaver fxWeaver;
@@ -129,11 +128,10 @@ public class GuiControllerImpl implements GuiController {
     @FXML private HBox cloudyBox;
     @FXML private HBox precipBox;
 
-    public GuiControllerImpl(GuiConfigService configService, WeatherService weatherService, ConfigController configController, ForecastController forecastController, LocalizeResourcesService localizeService, AlertService alertService, FxWeaver fxWeaver, CommonUtilsService commonUtils) {
+    public GuiControllerImpl(GuiConfigService configService, WeatherService weatherService, ConfigController configController, LocalizeResourcesService localizeService, AlertService alertService, FxWeaver fxWeaver, CommonUtilsService commonUtils) {
         this.configService = configService;
         this.weatherService = weatherService;
         this.configController = configController;
-        this.forecastController = forecastController;
         this.localizeService = localizeService;
         this.alertService = alertService;
         this.fxWeaver = fxWeaver;
@@ -547,7 +545,7 @@ public class GuiControllerImpl implements GuiController {
     }
 
     private void fillDayLength(WeatherAstro currentAstro) {
-        String dayLength = forecastController.getTimeLength(currentAstro.getSunRise(), currentAstro.getSunSet());
+        String dayLength = commonUtils.getTimeLength(currentAstro.getSunRise(), currentAstro.getSunSet());
         lbDayLength.setText(dayLength);
         Tooltip tooltip = getTooltip(String.format(localizeService.getLocalizedResource("dayLength.tooltip"), dayLength));
         tooltip.setGraphic(getTooltipImage(imgDayLength.getImage(), 100));
@@ -560,7 +558,7 @@ public class GuiControllerImpl implements GuiController {
         lbSunRise.setText(getProperlyFormattedTime(currentAstro.getSunRise()));
         lbSunSet.setText(getProperlyFormattedTime(currentAstro.getSunSet()));
         Tooltip dayLength = getTooltip(String.format(localizeService.getLocalizedResource("dayLength.tooltip"),
-                forecastController.getTimeLength(currentAstro.getSunRise(), currentAstro.getSunSet())));
+                commonUtils.getTimeLength(currentAstro.getSunRise(), currentAstro.getSunSet())));
         lbSunRise.setTooltip(dayLength);
         lbSunSet.setTooltip(dayLength);
         Tooltip.install(imgSunRise, dayLength);

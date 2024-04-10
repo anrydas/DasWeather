@@ -4,10 +4,8 @@ import das.tools.weather.entity.current.WeatherCurrent;
 import das.tools.weather.entity.forecast.WeatherAstro;
 import das.tools.weather.entity.forecast.WeatherDayForecast;
 import das.tools.weather.entity.forecast.WeatherHour;
-import das.tools.weather.gui.ForecastController;
 import das.tools.weather.gui.color.ColorElement;
 import das.tools.weather.gui.color.ColorEngineFactory;
-import net.rgielen.fxweaver.core.FxWeaver;
 import org.springframework.stereotype.Service;
 
 import java.awt.*;
@@ -17,11 +15,9 @@ import java.awt.image.BufferedImage;
 public class CbwmServiceImpl implements CbwmService { // CBWM - Color Bricks Weather Map
     private final int WIDTH = 159;
     private final int HEIGHT = 111;
-    private final FxWeaver fxWeaver;
     private final CommonUtilsService commonUtils;
 
-    public CbwmServiceImpl(FxWeaver fxWeaver, CommonUtilsService commonUtils) {
-        this.fxWeaver = fxWeaver;
+    public CbwmServiceImpl(CommonUtilsService commonUtils) {
         this.commonUtils = commonUtils;
     }
 
@@ -74,8 +70,7 @@ public class CbwmServiceImpl implements CbwmService { // CBWM - Color Bricks Wea
     private int[] get3LineColors(ChartDataProducerImpl.DataHolder dataHolder, int hourIndex) {
         WeatherHour hour = dataHolder.getDayForecastData().getHour()[hourIndex];
         WeatherAstro astro = dataHolder.getDayForecastData().getAstro();
-        ForecastController controller = fxWeaver.loadController(ForecastController.class);
-        String dayLength = controller.getTimeLength(astro.getSunRise(), astro.getSunSet());
+        String dayLength = commonUtils.getTimeLength(astro.getSunRise(), astro.getSunSet());
         int[] res = new int[3];
         res[0] = commonUtils.toIntColor(ColorEngineFactory.getEngine(ColorElement.VISIBILITY).getColor((int) hour.getVisibilityKm()));
         res[1] = commonUtils.toIntColor(ColorEngineFactory.getEngine(ColorElement.UV_INDEX).getColor((int) hour.getUvIndex()));
