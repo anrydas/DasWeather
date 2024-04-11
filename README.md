@@ -50,7 +50,7 @@
 ![Screenshot](images/ForecastWindow.png) ![Screenshot](images/ForecastWindow_L.png)
 - Any forecast chart could be saved as PNG, JPEG, GIF or BMP file.
 - Chart's tabs may be dragged, tabs order will be saved and restored next time window appears
-- Each dot on cart shows weather tooltip, which represents Weather conditions as image and text. The image includes traditional weather condition icon and CBWM - Color Brick Weather Map   
+- Each dot on chart shows weather tooltip, which represents Weather conditions as image and text. The image includes traditional weather condition icon and CBWM - Color Brick Weather Map   
 ![Screenshot](images/ForecastCbwmTooltip.png)
 - CBWM emulates [Main window's](#MainWin) colored background controls for Temperature, Humidity, Pressure, Clouds, etc. but in minimised view - as a color map.
 
