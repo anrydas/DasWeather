@@ -13,7 +13,7 @@ public class TemperatureColor extends AbstractColor implements ColorEngine {
         COLOR_MAP.put(-10, "#7B82F5");
         COLOR_MAP.put(-5, "#7BC3F5");
         COLOR_MAP.put(0, "#7BEAF5");
-        COLOR_MAP.put(5, "#E8F57B");
+        COLOR_MAP.put(5, "#7BF5C7");
         COLOR_MAP.put(17, "#C9F57B");
         COLOR_MAP.put(25, "#A3FFB9");
         COLOR_MAP.put(30, "#F5CC7B");
