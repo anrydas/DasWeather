@@ -689,7 +689,9 @@ public class GuiControllerImpl implements GuiController {
         task.setOnFailed(e -> {
             pb.setVisible(false);
             btUpdate.setDisable(false);
-            alertService.showError(task.getException().getCause().getLocalizedMessage(), "");
+            alertService.showError(task.getException().getCause().getLocalizedMessage()
+                            .replaceAll("; ","\n"),
+                    "");
         });
         return task;
     }
