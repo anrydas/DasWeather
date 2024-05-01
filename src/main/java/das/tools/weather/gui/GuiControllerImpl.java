@@ -690,7 +690,8 @@ public class GuiControllerImpl implements GuiController {
             pb.setVisible(false);
             btUpdate.setDisable(false);
             alertService.showError(task.getException().getCause().getLocalizedMessage()
-                            .replaceAll("; ","\n"),
+                            .replaceAll("; ","\n")
+                            .replaceAll(": ", ":\n"),
                     "");
         });
         return task;
