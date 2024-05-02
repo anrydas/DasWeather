@@ -57,6 +57,8 @@ public class ConfigControllerImpl implements ConfigController {
     @FXML private Button btCancel;
     @FXML private Button btSearchLocation;
     @FXML private ImageView imgConfirmed;
+    @FXML private Label lbPressureCorrection;
+    @FXML private Spinner<Integer> spPressureCorrection;
     public ConfigControllerImpl(GuiConfigService configService, LocalizeResourcesService localizeService, BuildProperties buildProperties, AlertService alertService, FxWeaver fxWeaver, WeatherService weatherService) {
         this.configService = configService;
         this.localizeService = localizeService;
@@ -130,6 +132,12 @@ public class ConfigControllerImpl implements ConfigController {
                         )
                 )
         );
+        spPressureCorrection.getValueFactory().setValue(
+                Integer.parseInt(
+                        appProps.getProperty(GuiConfigService.GUI_PRESSURE_CORRECTION_KEY,
+                                configService.getDefaultConfigValue(GuiConfigService.GUI_PRESSURE_CORRECTION_KEY)
+                )
+        ));
         cbCondLang.setItems(getLanguagesList());
         String langName = configService.getLangName(
                 appProps.getProperty(GuiConfigService.GUI_CONFIG_CONDITION_LANGUAGE_KEY,
@@ -202,6 +210,7 @@ public class ConfigControllerImpl implements ConfigController {
         lbLanguage.setText(localizeService.getLocalizedResource("label.language"));
         chbConfirmExit.setText(localizeService.getLocalizedResource("box.confirm.exit"));
         btCancel.setText(localizeService.getLocalizedResource( "button.close"));
+        lbPressureCorrection.setText(localizeService.getLocalizedResource("label.pressure.correction"));
     }
 
     @Override
@@ -246,6 +255,7 @@ public class ConfigControllerImpl implements ConfigController {
         setPropertyIfChanged(GuiConfigService.GUI_CONFIG_UPDATE_INTERVAL_KEY, String.valueOf(minToMSec(spUpdateInterval.getValue())));
         String langCode = configService.getLangCode(cbCondLang.getValue());
         setPropertyIfChanged(GuiConfigService.GUI_CONFIG_CONDITION_LANGUAGE_KEY, langCode);
+        setPropertyIfChanged(GuiConfigService.GUI_PRESSURE_CORRECTION_KEY, String.valueOf(spPressureCorrection.getValue()));
     }
 
     private void setPropertyIfChanged(String key, String value) {

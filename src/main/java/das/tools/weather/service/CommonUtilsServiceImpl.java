@@ -9,6 +9,12 @@ import java.time.LocalTime;
 @Service
 public class CommonUtilsServiceImpl implements CommonUtilsService {
 
+    private final GuiConfigService configService;
+
+    public CommonUtilsServiceImpl(GuiConfigService configService) {
+        this.configService = configService;
+    }
+
     @Override
     public int toIntTime(String s) {
         String[] split = s.split(":");
@@ -35,5 +41,10 @@ public class CommonUtilsServiceImpl implements CommonUtilsService {
         LocalTime startTime = LocalTime.parse(start, GuiController.TIME_FORMATTER_FOR_RESPONSE);
         LocalTime stopTime = LocalTime.parse(stop, GuiController.TIME_FORMATTER_FOR_RESPONSE);
         return Duration.between(startTime, stopTime).getSeconds();
+    }
+
+    @Override
+    public int getCorrectedPressureValue(double sourcePressure) {
+        return (int) (sourcePressure + Integer.parseInt(configService.getConfigStringValue(GuiConfigService.GUI_PRESSURE_CORRECTION_KEY)));
     }
 }

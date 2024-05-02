@@ -34,7 +34,6 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.time.Duration;
 import java.time.LocalTime;
 import java.util.LinkedList;
 import java.util.List;

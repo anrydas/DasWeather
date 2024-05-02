@@ -31,11 +31,13 @@ public class ChartDataProducerImpl implements ChartDataProducer {
     private final WeatherService weatherService;
     private final LocalizeResourcesService localizeService;
     private final CbwmService cbwmService;
+    private final CommonUtilsService commonUtils;
 
-    public ChartDataProducerImpl(WeatherService weatherService, LocalizeResourcesService localizeService, CbwmService cbwmService) {
+    public ChartDataProducerImpl(WeatherService weatherService, LocalizeResourcesService localizeService, CbwmService cbwmService, CommonUtilsService commonUtils) {
         this.weatherService = weatherService;
         this.localizeService = localizeService;
         this.cbwmService = cbwmService;
+        this.commonUtils = commonUtils;
     }
 
     @Override
@@ -59,7 +61,8 @@ public class ChartDataProducerImpl implements ChartDataProducer {
             Number[] windValues = new Number[HOURS];
             for (WeatherHour hour : day.getHour()) {
                 temperatureValues[hourIndex] = hour.getTemperature();
-                pressureValues[hourIndex] = GuiControllerImpl.millibarToMmHg(hour.getPressure());
+                float pressure = commonUtils.getCorrectedPressureValue(hour.getPressure());
+                pressureValues[hourIndex] = GuiControllerImpl.millibarToMmHg(pressure);
                 humidityValues[hourIndex] = hour.getHumidity();
                 cloudValues[hourIndex] = hour.getCloud();
                 windValues[hourIndex] = hour.getWindKmh();
@@ -121,13 +124,14 @@ public class ChartDataProducerImpl implements ChartDataProducer {
     }
 
     private String getTooltipText(WeatherHour hour) {
+        float pressure = commonUtils.getCorrectedPressureValue(hour.getPressure());
         return String.format(
                 localizeService.getLocalizedResource("point.tooltip"),
                 hour.getTime(),
                 hour.getCondition().getText(),
                 hour.getTemperature(), hour.getTemperatureF(), hour.getFeelsLike(), hour.getFeelsLikeF(),
                 hour.getHumidity(),
-                GuiControllerImpl.millibarToMmHg(hour.getPressure()), hour.getPressure(),
+                GuiControllerImpl.millibarToMmHg(pressure), pressure,
                 hour.getWindDirection(), hour.getWindKmh(), hour.getWindMph(), hour.getGustKmh(), hour.getGustMph()
         );
     }

@@ -4,8 +4,10 @@ import das.tools.weather.entity.current.WeatherCurrent;
 import das.tools.weather.entity.forecast.WeatherAstro;
 import das.tools.weather.entity.forecast.WeatherDayForecast;
 import das.tools.weather.entity.forecast.WeatherHour;
+import das.tools.weather.gui.GuiControllerImpl;
 import das.tools.weather.gui.color.ColorElement;
 import das.tools.weather.gui.color.ColorEngineFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.awt.*;
@@ -54,7 +56,8 @@ public class CbwmServiceImpl implements CbwmService { // CBWM - Color Bricks Wea
         int[] res = new int[3];
         res[0] = commonUtils.toIntColor(ColorEngineFactory.getEngine(ColorElement.CLOUDY).getColor(hour.getCloud()));
         res[1] = commonUtils.toIntColor(ColorEngineFactory.getEngine(ColorElement.PRECIPITATIONS).getColor((int) hour.getPrecipitation()));
-        res[2] = commonUtils.toIntColor(ColorEngineFactory.getEngine(ColorElement.PRESSURE).getColor((int) hour.getPressure()));
+        double pressureMmHg = GuiControllerImpl.millibarToMmHg(commonUtils.getCorrectedPressureValue(hour.getPressure()));
+        res[2] = commonUtils.toIntColor(ColorEngineFactory.getEngine(ColorElement.PRESSURE).getColor((int) pressureMmHg));
         return res;
     }
 

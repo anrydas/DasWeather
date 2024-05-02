@@ -386,12 +386,17 @@ public class GuiControllerImpl implements GuiController {
     }
 
     private void fillPressure(WeatherCurrent current) {
-        lbPressure.setText(String.format("%.0f mmHg", millibarToMmHg(current.getPressureMb())));
-        Tooltip tooltip = getTooltip(String.format(localizeService.getLocalizedResource("pressure.tooltip"), millibarToMmHg(current.getPressureMb()), current.getPressureMb()));
+        float pressureMb = commonUtils.getCorrectedPressureValue(current.getPressureMb());
+        double pressureMmHg = millibarToMmHg(pressureMb);
+        lbPressure.setText(String.format("%.0f mmHg", pressureMmHg));
+        int pressureCorrection = Integer.parseInt(configService.getConfigStringValue(GuiConfigService.GUI_PRESSURE_CORRECTION_KEY));
+        String correctionText = (pressureCorrection != 0) ? String.format(localizeService.getLocalizedResource("pressure.tooltip.corrected"), pressureCorrection) : "";
+        Tooltip tooltip = getTooltip(String.format(localizeService.getLocalizedResource("pressure.tooltip") + correctionText,
+                pressureMmHg, pressureMb));
         tooltip.setGraphic(getTooltipImage(imgPressure.getImage(), 100));
         Tooltip.install(pressureBox, tooltip);
         pressureBox.setStyle(String.format("-fx-background-color: %s",
-                ColorEngineFactory.getEngine(ColorElement.PRESSURE).getColor((int) current.getPressureMb())));
+                ColorEngineFactory.getEngine(ColorElement.PRESSURE).getColor((int) pressureMmHg)));
     }
 
     public static ImageView getTooltipImage(Image image, int width) {

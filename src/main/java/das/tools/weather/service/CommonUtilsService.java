@@ -8,4 +8,6 @@ public interface CommonUtilsService {
     String getTimeLength(String start, String stop);
 
     long getDiffSeconds(String start, String stop);
+
+    int getCorrectedPressureValue(double sourcePressure);
 }
