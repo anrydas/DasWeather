@@ -31,7 +31,7 @@
          </HBox>
          <HBox alignment="CENTER_LEFT" spacing="5.0">
             <Label fx:id="lbPressureCorrection" text="Pressure Correction" />
-            <Spinner fx:id="spPressureCorrection" amountToStepBy="1" editable="true" max="100" min="-100" prefHeight="24.0" prefWidth="81.0" />
+            <Spinner fx:id="spPressureCorrection" amountToStepBy="1" max="100" min="-100" prefHeight="24.0" prefWidth="81.0" />
             <Label text="mBar" />
          </HBox>
       </HBox>
