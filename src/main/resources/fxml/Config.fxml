@@ -24,12 +24,12 @@
          <Button fx:id="btSearchLocation" mnemonicParsing="false" text="Search" />
       </HBox>
       <HBox alignment="CENTER" layoutX="14.0" layoutY="14.0" prefHeight="46.0" prefWidth="487.0" spacing="20.0">
-         <HBox alignment="CENTER_LEFT" spacing="5.0">
+         <HBox fx:id="hbInterval" alignment="CENTER_LEFT" spacing="5.0">
             <Label fx:id="lbInterval" text="Update Interval" />
             <Spinner fx:id="spUpdateInterval" amountToStepBy="10" max="360" min="60" prefHeight="24.0" prefWidth="81.0" />
-            <Label text="min." />
+            <Label text="min" />
          </HBox>
-         <HBox alignment="CENTER_LEFT" spacing="5.0">
+         <HBox fx:id="hbCorrection" alignment="CENTER_LEFT" spacing="5.0">
             <Label fx:id="lbPressureCorrection" text="Pressure Correction" />
             <Spinner fx:id="spPressureCorrection" amountToStepBy="1" max="100" min="-100" prefHeight="24.0" prefWidth="81.0" />
             <Label text="mBar" />

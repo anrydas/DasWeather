@@ -13,6 +13,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +30,7 @@ import java.util.regex.Matcher;
 @FxmlView("/fxml/Config.fxml")
 @Slf4j
 public class ConfigControllerImpl implements ConfigController {
+    public static final String SPINNER_TOOLTIP = "%s %d %s";
     private final GuiConfigService configService;
     private final LocalizeResourcesService localizeService;
     private final BuildProperties buildProperties;
@@ -59,6 +61,8 @@ public class ConfigControllerImpl implements ConfigController {
     @FXML private ImageView imgConfirmed;
     @FXML private Label lbPressureCorrection;
     @FXML private Spinner<Integer> spPressureCorrection;
+    @FXML private HBox hbInterval;
+    @FXML private HBox hbCorrection;
     public ConfigControllerImpl(GuiConfigService configService, LocalizeResourcesService localizeService, BuildProperties buildProperties, AlertService alertService, FxWeaver fxWeaver, WeatherService weatherService) {
         this.configService = configService;
         this.localizeService = localizeService;
@@ -73,6 +77,8 @@ public class ConfigControllerImpl implements ConfigController {
         setLabelNames();
         btSearchLocation.setText(localizeService.getLocalizedResource("button.search"));
         btSearchLocation.setTooltip(new Tooltip(localizeService.getLocalizedResource("button.search.tooltip")));
+        Tooltip.install(hbInterval, new Tooltip(String.format(SPINNER_TOOLTIP, lbInterval.getText(), spUpdateInterval.getValue(), "min.")));
+        Tooltip.install(hbCorrection, new Tooltip(String.format(SPINNER_TOOLTIP, lbPressureCorrection.getText(), spPressureCorrection.getValue(), "mBar")));
     }
 
     @FXML
