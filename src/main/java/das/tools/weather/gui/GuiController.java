@@ -35,5 +35,8 @@ public interface GuiController extends Localized, GuiWindow {
 
     void onShowingStage();
     void updateWeatherData();
+
+    void setUptime();
+
     void updateWeatherDataForce();
 }

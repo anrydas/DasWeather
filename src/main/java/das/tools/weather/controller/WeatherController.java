@@ -24,4 +24,10 @@ public class WeatherController {
         Thread t = new Thread(() -> Platform.runLater(guiController::updateWeatherData));
         t.start();
     }
+
+    @Async
+    @Scheduled(fixedRate = 30000, initialDelay = 60000)
+    public void setUptime() {
+        Platform.runLater(guiController::setUptime);
+    }
 }

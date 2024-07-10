@@ -7,7 +7,6 @@ import das.tools.weather.entity.forecast.WeatherHour;
 import das.tools.weather.gui.GuiControllerImpl;
 import das.tools.weather.gui.color.ColorElement;
 import das.tools.weather.gui.color.ColorEngineFactory;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.awt.*;

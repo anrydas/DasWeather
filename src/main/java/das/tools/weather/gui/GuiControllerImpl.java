@@ -51,6 +51,7 @@ public class GuiControllerImpl implements GuiController {
     private final AlertService alertService;
     private final FxWeaver fxWeaver;
     private final CommonUtilsService commonUtils;
+    private final UptimeService uptimeService;
 
     @FXML private AnchorPane root;
     @FXML private HBox airQualityBox;
@@ -127,8 +128,11 @@ public class GuiControllerImpl implements GuiController {
     @FXML private HBox windBox;
     @FXML private HBox cloudyBox;
     @FXML private HBox precipBox;
+    @FXML private Label lbUptime;
+    @FXML private Label lbUptimeLabel;
+    @FXML private HBox hbUptime;;
 
-    public GuiControllerImpl(GuiConfigService configService, WeatherService weatherService, ConfigController configController, LocalizeResourcesService localizeService, AlertService alertService, FxWeaver fxWeaver, CommonUtilsService commonUtils) {
+    public GuiControllerImpl(GuiConfigService configService, WeatherService weatherService, ConfigController configController, LocalizeResourcesService localizeService, AlertService alertService, FxWeaver fxWeaver, CommonUtilsService commonUtils, UptimeService uptimeService) {
         this.configService = configService;
         this.weatherService = weatherService;
         this.configController = configController;
@@ -136,6 +140,7 @@ public class GuiControllerImpl implements GuiController {
         this.alertService = alertService;
         this.fxWeaver = fxWeaver;
         this.commonUtils = commonUtils;
+        this.uptimeService = uptimeService;
     }
 
     @Override
@@ -641,6 +646,12 @@ public class GuiControllerImpl implements GuiController {
             if (log.isDebugEnabled()) log.debug("Update Weather Data has been called but after last data updated spent only {} msec " +
                     "with real update interval {} msec. So it doesn't updated.", msecsAfterUpdateData, updateInterval);
         }
+    }
+
+    @Override
+    public void setUptime() {
+        hbUptime.setVisible(uptimeService.getUptimeMillis() > 60000);
+        lbUptime.setText(uptimeService.getFormattedUptime());
     }
 
     @Override
