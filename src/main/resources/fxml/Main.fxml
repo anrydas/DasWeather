@@ -260,9 +260,15 @@
             <bottom>
                 <HBox alignment="CENTER">
                     <ProgressBar fx:id="pb" prefHeight="18.0" prefWidth="387.0" progress="0.0" visible="false" />
-                     <HBox fx:id="hbUptime" alignment="CENTER_RIGHT" prefHeight="18.0" prefWidth="141.0" spacing="5.0" visible="false">
-                         <Label fx:id="lbUptimeLabel" text="Uptime: " />
-                         <Label fx:id="lbUptime" text="100 days 23:55" />
+                     <HBox fx:id="hbUptime" alignment="CENTER_RIGHT" prefHeight="18.0" prefWidth="183.0" spacing="5.0" visible="false">
+                         <Label fx:id="lbUptimeLabel" alignment="CENTER_RIGHT" prefHeight="18.0" prefWidth="42.0" text="Uptime: ">
+                     <font>
+                        <Font size="10.0" />
+                     </font></Label>
+                         <Label fx:id="lbUptime" minWidth="-Infinity" prefHeight="18.0" prefWidth="75.0" text="100 days 23:55">
+                     <font>
+                        <Font size="10.0" />
+                     </font></Label>
                      </HBox>
                 </HBox>
             </bottom>

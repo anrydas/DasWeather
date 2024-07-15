@@ -18,6 +18,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
@@ -30,6 +31,7 @@ import net.rgielen.fxweaver.core.FxWeaver;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.springframework.stereotype.Component;
 
+import javax.tools.Tool;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -655,7 +657,16 @@ public class GuiControllerImpl implements GuiController {
     @Override
     public void setUptime() {
         hbUptime.setVisible(uptimeService.getUptimeMillis() > 60000);
-        lbUptime.setText(uptimeService.getFormattedUptime());
+        String uptime = uptimeService.getFormattedUptime();
+        lbUptime.setText(uptime);
+        Tooltip.install(hbUptime, new Tooltip(uptime));
+        if (uptime.length() <= UptimeService.MIN_UPTIME_TEXT_WIDTH) {
+            lbUptime.setPrefWidth(UptimeService.MIN_UPTIME_LABEL_WIDTH);
+            lbUptime.setMinWidth(Region.USE_PREF_SIZE);
+        } else {
+            lbUptime.setPrefWidth(UptimeService.MAX_UPTIME_LABEL_WIDTH);
+        }
+        lbUptime.setMinWidth(Region.USE_PREF_SIZE);
     }
 
     @Override
