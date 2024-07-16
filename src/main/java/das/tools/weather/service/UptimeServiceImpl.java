@@ -30,7 +30,9 @@ public class UptimeServiceImpl implements UptimeService {
         long hours = TimeUnit.SECONDS.toHours(seconds) - (days * 24);
         long minutes = TimeUnit.SECONDS.toMinutes(seconds) - (TimeUnit.SECONDS.toHours(seconds) * 60);
         if (log.isDebugEnabled()) log.debug("Got seconds={}, days={}, hours={}, minutes={}", seconds, days, hours, minutes);
-        if (days > 0) sb.append(String.format("%d days ", days));
+        if (days > 0) {
+            sb.append(String.format("%d %s ", days, (days > 1 ? "days" : "day")));
+        }
         sb.append(String.format("%02d:%02d", hours, minutes));
         if (log.isDebugEnabled()) log.debug("Got uptime={}", sb);
         return sb.toString();
