@@ -17,7 +17,7 @@ public class WeatherController {
     }
 
     @Async
-    @Scheduled(fixedRate = 600000, initialDelay = 3000)
+    @Scheduled(fixedDelay = 600000, initialDelay = 3000)
     public void updateWeather() {
         // New thread needs to prevent IllegalStateException:
         // This operation is permitted on the event thread only; currentThread = task-1
@@ -26,7 +26,7 @@ public class WeatherController {
     }
 
     @Async
-    @Scheduled(fixedRate = 30000, initialDelay = 60000)
+    @Scheduled(fixedDelay = 30000, initialDelay = 60000)
     public void setUptime() {
         Platform.runLater(guiController::setUptime);
     }
