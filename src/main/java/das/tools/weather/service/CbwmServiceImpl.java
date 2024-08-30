@@ -7,6 +7,8 @@ import das.tools.weather.entity.forecast.WeatherHour;
 import das.tools.weather.gui.GuiControllerImpl;
 import das.tools.weather.gui.color.ColorElement;
 import das.tools.weather.gui.color.ColorEngineFactory;
+import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.image.Image;
 import org.springframework.stereotype.Service;
 
 import java.awt.*;
@@ -29,6 +31,18 @@ public class CbwmServiceImpl implements CbwmService { // CBWM - Color Bricks Wea
         drawCbwmImage(g2d, dataHolder, hourIndex, current);
         g2d.dispose();
         return cbwmImage;
+    }
+
+    @Override
+    public javafx.scene.image.Image getExtendedWeatherImage(ChartDataProducerImpl.DataHolder dataHolder, int hourIndex, WeatherCurrent current, Image weatherIcon) {
+        BufferedImage cbwmImage = getCbwmImage(dataHolder, hourIndex, current);
+        BufferedImage source = SwingFXUtils.fromFXImage(weatherIcon, null);
+        BufferedImage resImage = new BufferedImage(source.getWidth() * 2 + 10, source.getHeight(), source.getType());
+        Graphics g = resImage.getGraphics();
+        g.drawImage(source, 0, 0, null);
+        g.drawImage(cbwmImage, source.getWidth() - 1, 4, source.getWidth() + 10, source.getHeight() - 8, null);
+        g.dispose();
+        return SwingFXUtils.toFXImage(resImage, null);
     }
 
     private void drawCbwmImage(Graphics2D g2d, ChartDataProducerImpl.DataHolder dataHolder, int hourIndex, WeatherCurrent current) {

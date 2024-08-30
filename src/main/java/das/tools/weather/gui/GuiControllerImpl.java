@@ -31,7 +31,6 @@ import net.rgielen.fxweaver.core.FxWeaver;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.springframework.stereotype.Component;
 
-import javax.tools.Tool;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -54,6 +53,7 @@ public class GuiControllerImpl implements GuiController {
     private final FxWeaver fxWeaver;
     private final CommonUtilsService commonUtils;
     private final UptimeService uptimeService;
+    private final CbwmService cbwmService;
 
     @FXML private AnchorPane root;
     @FXML private HBox airQualityBox;
@@ -134,7 +134,7 @@ public class GuiControllerImpl implements GuiController {
     @FXML private Label lbUptimeLabel;
     @FXML private HBox hbUptime;;
 
-    public GuiControllerImpl(GuiConfigService configService, WeatherService weatherService, ConfigController configController, LocalizeResourcesService localizeService, AlertService alertService, FxWeaver fxWeaver, CommonUtilsService commonUtils, UptimeService uptimeService) {
+    public GuiControllerImpl(GuiConfigService configService, WeatherService weatherService, ConfigController configController, LocalizeResourcesService localizeService, AlertService alertService, FxWeaver fxWeaver, CommonUtilsService commonUtils, UptimeService uptimeService, CbwmService cbwmService) {
         this.configService = configService;
         this.weatherService = weatherService;
         this.configController = configController;
@@ -143,6 +143,7 @@ public class GuiControllerImpl implements GuiController {
         this.fxWeaver = fxWeaver;
         this.commonUtils = commonUtils;
         this.uptimeService = uptimeService;
+        this.cbwmService = cbwmService;
     }
 
     @Override
@@ -344,17 +345,28 @@ public class GuiControllerImpl implements GuiController {
                 updateTime,
                 current.getCondition().getText()
         ));
-        ImageView iv = getTooltipImage(imgWeather.getImage(), 100);
-        tooltip.setGraphic(iv);
+        Image extImage = getCurrentExtendedImage(imgWeather.getImage());
+        tooltip.setGraphic(getTooltipImage(extImage, (int) extImage.getWidth()));
         lbLocation.setTooltip(tooltip);
     }
 
     private void fillConditions(WeatherCurrent current) {
         imgWeather.setImage(this.dataHolder.getImage());
         String conditionText = current.getCondition().getText();
-        Tooltip.install(imgWeather, getTooltip(conditionText));
+        Image extImage = getCurrentExtendedImage(imgWeather.getImage());
+        Tooltip tooltip = getTooltip(conditionText);
+        tooltip.setGraphic(getTooltipImage(extImage, (int) extImage.getWidth()));
+        Tooltip.install(imgWeather, tooltip);
         lbCondition.setText(conditionText);
         lbCondition.setTooltip(getTooltip(conditionText));
+    }
+
+    private Image getCurrentExtendedImage(Image currentConditionImage) {
+        ChartDataProducerImpl.DataHolder holder = new ChartDataProducerImpl.DataHolder(this.dataHolder.getResponse().getForecast().getDayForecast()[0].getDate());
+        holder.setDayForecastData(this.dataHolder.getResponse().getForecast().getDayForecast()[0]);
+        return cbwmService.getExtendedWeatherImage(holder, LocalTime.now().getHour(),
+                this.dataHolder.getResponse().getCurrent(),
+                currentConditionImage);
     }
 
     private void fillTemperature(WeatherCurrent current) {

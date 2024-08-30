@@ -102,25 +102,11 @@ public class ChartDataProducerImpl implements ChartDataProducer {
     private void installTooltipOnNode(XYChart.Data<String, Number> data, DataHolder dataHolder, WeatherCurrent current) {
         int hourIndex = Integer.parseInt(data.getXValue());
         WeatherHour hour = dataHolder.getDayForecastData().getHour()[hourIndex];
-        Image image = getExtWeatherImage(dataHolder, hourIndex, current);
+        Image weatherIcon = weatherService.getWeatherIcon(hour.getCondition().getCode(), hour.isDay());
+        Image image = cbwmService.getExtendedWeatherImage(dataHolder, hourIndex, current, weatherIcon);
         Tooltip tooltip = new Tooltip(getTooltipText(hour));
         tooltip.setGraphic(GuiControllerImpl.getTooltipImage(image, (int) image.getWidth()));
         Tooltip.install(data.getNode(), tooltip);
-    }
-
-    private Image getExtWeatherImage(DataHolder dataHolder, int hourIndex, WeatherCurrent current) {
-        WeatherHour hour = dataHolder.getDayForecastData().getHour()[hourIndex];
-        Image weatherIcon = weatherService.getWeatherIcon(hour.getCondition().getCode(), hour.isDay());
-
-        BufferedImage cbwmImage = cbwmService.getCbwmImage(dataHolder, hourIndex, current);
-        BufferedImage source = SwingFXUtils.fromFXImage(weatherIcon, null);
-        BufferedImage resImage = new BufferedImage(source.getWidth() * 2 + 10, source.getHeight(), source.getType());
-        Graphics g = resImage.getGraphics();
-        g.drawImage(source, 0, 0, null);
-        g.drawImage(cbwmImage, source.getWidth() - 1, 4, source.getWidth() + 10, source.getHeight() - 8, null);
-        g.dispose();
-
-        return SwingFXUtils.toFXImage(resImage, null);
     }
 
     private String getTooltipText(WeatherHour hour) {
@@ -169,7 +155,7 @@ public class ChartDataProducerImpl implements ChartDataProducer {
 
     @Getter
     @Setter
-    static class DataHolder {
+    public static class DataHolder {
         private String name;
         private Map<String,Number[]> tabAndValues;
         private WeatherDayForecast dayForecastData;
