@@ -78,9 +78,9 @@ public class GuiControllerImpl implements GuiController {
     @FXML private ImageView imgForecast01;
     @FXML private Label lbForecast01;
     @FXML private ImageView imgForecast02;
-    @FXML private Label lbgForecast02;
+    @FXML private Label lbForecast02;
     @FXML private ImageView imgForecast03;
-    @FXML private Label lbgForecast03;
+    @FXML private Label lbForecast03;
     @FXML private ImageView imgMoonPhase;
     @FXML private Label lbMoonPhase;
     @FXML private Label lbHumidity;
@@ -522,11 +522,15 @@ public class GuiControllerImpl implements GuiController {
         imgForecast02.setImage(this.dataHolder.getImageForecast1());
         imgForecast03.setImage(this.dataHolder.getImageForecast2());
 
-        lbForecast01.setText(DATE_FORMATTER_FOR_VIEW.format(LocalDate.now()));
-        LocalDate dt1 = LocalDate.parse(dayForecasts[1].getDate(), DATE_FORMATTER_FOR_RESPONSE);
-        lbgForecast02.setText(DATE_FORMATTER_FOR_VIEW.format(dt1));
-        LocalDate dt2 = LocalDate.parse(dayForecasts[2].getDate(), DATE_FORMATTER_FOR_RESPONSE);
-        lbgForecast03.setText(DATE_FORMATTER_FOR_VIEW.format(dt2));
+        LocalDate dt1 = LocalDate.now();
+        lbForecast01.setText(DATE_FORMATTER_FOR_VIEW.format(dt1));
+        lbForecast01.setTooltip(getTooltip(FULL_DATE_FORMATTER_FOR_VIEW.format(dt1)));
+        LocalDate dt2 = LocalDate.parse(dayForecasts[1].getDate(), DATE_FORMATTER_FOR_RESPONSE);
+        lbForecast02.setText(DATE_FORMATTER_FOR_VIEW.format(dt2));
+        lbForecast02.setTooltip(getTooltip(FULL_DATE_FORMATTER_FOR_VIEW.format(dt2)));
+        LocalDate dt3 = LocalDate.parse(dayForecasts[2].getDate(), DATE_FORMATTER_FOR_RESPONSE);
+        lbForecast03.setText(DATE_FORMATTER_FOR_VIEW.format(dt3));
+        lbForecast03.setTooltip(getTooltip(FULL_DATE_FORMATTER_FOR_VIEW.format(dt3)));
 
         final String TOOLTIP_TEXT = localizeService.getLocalizedResource("forecast.tooltip");
         Tooltip.install(imgForecast01, getTooltip(String.format(

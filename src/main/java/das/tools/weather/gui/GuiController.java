@@ -9,6 +9,7 @@ public interface GuiController extends Localized, GuiWindow {
     int MINIMAL_UPDATE_INTERVAL = 1800000;
     DateTimeFormatter DATE_FORMATTER_FOR_RESPONSE = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     DateTimeFormatter DATE_FORMATTER_FOR_VIEW = DateTimeFormatter.ofPattern("dd-MMM-yyyy");
+    DateTimeFormatter FULL_DATE_FORMATTER_FOR_VIEW = DateTimeFormatter.ofPattern("E, dd-MMM-yyyy");
     DateTimeFormatter TIME_FORMATTER_FOR_VIEW = DateTimeFormatter.ofPattern("HH:mm");
     GuiControllerImpl.RemoteDataHolder dataHolder = GuiControllerImpl.RemoteDataHolder.builder().build();
     DateTimeFormatter TIME_FORMATTER_FOR_RESPONSE = DateTimeFormatter.ofPattern("hh:mm a");
