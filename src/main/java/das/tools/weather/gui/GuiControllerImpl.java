@@ -675,7 +675,7 @@ public class GuiControllerImpl implements GuiController {
         hbUptime.setVisible(uptimeService.getUptimeMillis() > 60000);
         String uptime = uptimeService.getFormattedUptime();
         lbUptime.setText(uptime);
-        Tooltip.install(hbUptime, new Tooltip(uptime));
+        Tooltip.install(hbUptime, new Tooltip(String.format("%s %s", lbUptimeLabel.getText(), uptime)));
         if (uptime.length() <= UptimeService.MIN_UPTIME_TEXT_WIDTH) {
             lbUptime.setPrefWidth(UptimeService.MIN_UPTIME_LABEL_WIDTH);
             lbUptime.setMinWidth(Region.USE_PREF_SIZE);
