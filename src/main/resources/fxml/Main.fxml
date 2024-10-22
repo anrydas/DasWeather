@@ -25,7 +25,28 @@
                 </font>
             </Label>
         </HBox>
-        <HBox id="HBox" alignment="CENTER" prefHeight="38.0" prefWidth="250.0" spacing="5.0">
+        <GridPane vgap="20.0">
+            <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="142.0" minWidth="10.0" prefWidth="139.0" />
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="186.39999999999998" minWidth="10.0" prefWidth="186.39999999999998" />
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="176.0" minWidth="10.0" prefWidth="168.0" />
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            </rowConstraints>
+            <HBox fx:id="cloudyBox" alignment="CENTER" prefHeight="28.0" prefWidth="116.0" GridPane.rowIndex="1">
+                <ImageView fx:id="imgCloud" fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
+                    <Image url="@/images/cloud.png" />
+                </ImageView>
+                <Label fx:id="lbCloud" alignment="CENTER" prefHeight="27.0" prefWidth="59.0" text="100%" textAlignment="CENTER">
+                    <font>
+                        <Font size="18.0" />
+                    </font>
+                </Label>
+            </HBox>
             <HBox fx:id="tempBox" alignment="CENTER" prefHeight="28.0" prefWidth="100.0">
                 <ImageView fx:id="imgTemperature" fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
                     <Image url="@/images/temp_hot.png" />
@@ -36,27 +57,7 @@
                     </font>
                 </Label>
             </HBox>
-            <HBox fx:id="fillsTempBox" alignment="CENTER" prefHeight="28.0" prefWidth="100.0">
-                <ImageView fx:id="imgFillsLikeTemp" fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
-                    <Image url="@/images/temp_fills.png" />
-                </ImageView>
-                <Label fx:id="lbFeels" alignment="CENTER" contentDisplay="CENTER" prefHeight="27.0" prefWidth="51.0" text="20 C" textAlignment="CENTER">
-                    <font>
-                        <Font size="18.0" />
-                    </font>
-                </Label>
-            </HBox>
-            <HBox fx:id="avgTempBox" alignment="CENTER" prefHeight="28.0" prefWidth="100.0">
-                <ImageView fx:id="imgAvgTemp" fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
-                    <Image url="@/images/temp_avg.png" />
-                </ImageView>
-                <Label fx:id="lbAverage" alignment="CENTER" contentDisplay="CENTER" prefHeight="27.0" prefWidth="51.0" text="20 C" textAlignment="CENTER">
-                    <font>
-                        <Font size="18.0" />
-                    </font>
-                </Label>
-            </HBox>
-            <HBox fx:id="humidityBox" alignment="CENTER" prefHeight="28.0" prefWidth="100.0">
+            <HBox fx:id="humidityBox" alignment="CENTER" prefHeight="28.0" prefWidth="100.0" GridPane.columnIndex="2">
                 <ImageView fx:id="imgHumidity" fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
                     <Image url="@/images/humidity.png" />
                 </ImageView>
@@ -66,19 +67,32 @@
                     </font>
                 </Label>
             </HBox>
-        </HBox>
-        <HBox id="HBox" alignment="CENTER" prefHeight="38.0" prefWidth="250.0" spacing="5.0">
-            <HBox fx:id="cloudyBox" alignment="CENTER" prefHeight="28.0" prefWidth="116.0">
-                <ImageView fx:id="imgCloud" fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
-                    <Image url="@/images/cloud.png" />
-                </ImageView>
-                <Label fx:id="lbCloud" alignment="CENTER" prefHeight="27.0" prefWidth="59.0" text="100%" textAlignment="CENTER">
-                    <font>
-                        <Font size="18.0" />
-                    </font>
-                </Label>
+            <HBox alignment="CENTER" spacing="2.0" GridPane.columnIndex="1">
+                <padding>
+                    <Insets left="2.0" right="2.0" />
+                </padding>
+                <HBox fx:id="fillsTempBox" alignment="CENTER" prefHeight="27.0" prefWidth="178.0">
+                    <ImageView fx:id="imgFillsLikeTemp" fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
+                        <Image url="@/images/temp_fills.png" />
+                    </ImageView>
+                    <Label fx:id="lbFeels" alignment="CENTER" contentDisplay="CENTER" prefHeight="27.0" prefWidth="51.0" text="20 C" textAlignment="CENTER">
+                        <font>
+                            <Font size="18.0" />
+                        </font>
+                    </Label>
+                </HBox>
+                <HBox fx:id="avgTempBox" alignment="CENTER" prefHeight="27.0" prefWidth="166.0" GridPane.columnIndex="2">
+                    <ImageView fx:id="imgAvgTemp" fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
+                        <Image url="@/images/temp_avg.png" />
+                    </ImageView>
+                    <Label fx:id="lbAverage" alignment="CENTER" contentDisplay="CENTER" prefHeight="27.0" prefWidth="51.0" text="20 C" textAlignment="CENTER">
+                        <font>
+                            <Font size="18.0" />
+                        </font>
+                    </Label>
+                </HBox>
             </HBox>
-            <HBox fx:id="precipBox" alignment="CENTER" prefHeight="28.0" prefWidth="133.0">
+            <HBox fx:id="precipBox" alignment="CENTER" prefHeight="28.0" prefWidth="133.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
                 <ImageView fx:id="imgPrecipitation" fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
                     <Image url="@/images/precip/snow.png" />
                 </ImageView>
@@ -87,8 +101,11 @@
                         <Font size="18.0" />
                     </font>
                 </Label>
+            <padding>
+               <Insets left="2.0" right="2.0" />
+            </padding>
             </HBox>
-            <HBox fx:id="pressureBox" alignment="CENTER" prefHeight="28.0" prefWidth="148.0">
+            <HBox fx:id="pressureBox" alignment="CENTER" prefHeight="28.0" prefWidth="148.0" GridPane.columnIndex="2" GridPane.rowIndex="1">
                 <ImageView fx:id="imgPressure" fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
                     <Image url="@/images/pressure.png" />
                 </ImageView>
@@ -98,9 +115,7 @@
                     </font>
                 </Label>
             </HBox>
-        </HBox>
-        <HBox id="HBox" alignment="CENTER" prefHeight="27.0" prefWidth="477.0" spacing="5.0">
-            <HBox fx:id="windBox" alignment="CENTER" prefHeight="27.0" prefWidth="122.0">
+            <HBox fx:id="windBox" alignment="CENTER" prefHeight="27.0" prefWidth="122.0" GridPane.rowIndex="2">
                 <ImageView fx:id="imgWind" fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
                     <Image url="@/images/wind_dir.png" />
                 </ImageView>
@@ -113,7 +128,7 @@
                     <Image url="@/images/wind_arrow.png" />
                 </ImageView>
             </HBox>
-            <HBox fx:id="windSpeedBox" alignment="CENTER" prefHeight="27.0" prefWidth="149.0">
+            <HBox fx:id="windSpeedBox" alignment="CENTER" prefHeight="27.0" prefWidth="149.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
                 <ImageView fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
                     <Image url="@/images/wind_speed.png" />
                 </ImageView>
@@ -122,8 +137,11 @@
                         <Font size="18.0" />
                     </font>
                 </Label>
+            <padding>
+               <Insets left="2.0" right="2.0" />
+            </padding>
             </HBox>
-            <HBox fx:id="windGustBox" alignment="CENTER" prefHeight="27.0" prefWidth="135.0">
+            <HBox fx:id="windGustBox" alignment="CENTER" prefHeight="27.0" prefWidth="135.0" GridPane.columnIndex="2" GridPane.rowIndex="2">
                 <ImageView fx:id="imgWindGists" fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
                     <Image url="@/images/wind_gist.png" />
                 </ImageView>
@@ -133,9 +151,7 @@
                     </font>
                 </Label>
             </HBox>
-        </HBox>
-        <HBox id="HBox" alignment="CENTER" prefHeight="38.0" prefWidth="494.0" spacing="5.0">
-            <HBox fx:id="visibilityBox" alignment="CENTER" prefHeight="28.0" prefWidth="131.0">
+            <HBox fx:id="visibilityBox" alignment="CENTER" prefHeight="28.0" prefWidth="131.0" GridPane.rowIndex="3">
                 <ImageView fx:id="imgVisibility" fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
                     <Image url="@/images/visibility.png" />
                 </ImageView>
@@ -145,7 +161,7 @@
                     </font>
                 </Label>
             </HBox>
-            <HBox fx:id="uvIndexBox" alignment="CENTER" prefHeight="28.0" prefWidth="131.0">
+            <HBox fx:id="uvIndexBox" alignment="CENTER" prefHeight="28.0" prefWidth="131.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
                 <ImageView fx:id="imgUvIndex" fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
                     <Image url="@/images/UVindex.png" />
                 </ImageView>
@@ -154,8 +170,14 @@
                         <Font size="18.0" />
                     </font>
                 </Label>
+            <padding>
+               <Insets left="2.0" right="2.0" />
+            </padding>
+            <GridPane.margin>
+               <Insets />
+            </GridPane.margin>
             </HBox>
-            <HBox fx:id="dayLenBox" alignment="CENTER" prefHeight="28.0" prefWidth="124.0">
+            <HBox fx:id="dayLenBox" alignment="CENTER" prefHeight="28.0" prefWidth="124.0" GridPane.columnIndex="2" GridPane.rowIndex="3">
                 <ImageView fx:id="imgDayLength" fitHeight="26.0" fitWidth="32.0" preserveRatio="true">
                     <Image url="@/images/DayLength.png" />
                 </ImageView>
@@ -165,8 +187,14 @@
                     </font>
                 </Label>
             </HBox>
-        </HBox>
-        <HBox id="HBox" fx:id="airQualityBox" alignment="CENTER" prefHeight="50.0" prefWidth="502.0" spacing="10.0">
+         <padding>
+            <Insets bottom="10.0" top="10.0" />
+         </padding>
+         <VBox.margin>
+            <Insets top="10.0" />
+         </VBox.margin>
+        </GridPane>
+        <HBox id="HBox" fx:id="airQualityBox" alignment="CENTER" prefHeight="50.0" prefWidth="195.0" spacing="10.0">
             <ImageView fx:id="imgAirQuality" fitHeight="32.0" fitWidth="32.0" preserveRatio="true">
                 <Image url="@/images/AirQuality.png" />
             </ImageView>
