@@ -25,7 +25,7 @@
                 </font>
             </Label>
         </HBox>
-        <GridPane vgap="20.0">
+        <GridPane alignment="TOP_CENTER" vgap="20.0">
             <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="142.0" minWidth="10.0" prefWidth="139.0" />
                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="186.39999999999998" minWidth="10.0" prefWidth="186.39999999999998" />
