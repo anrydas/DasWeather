@@ -16,10 +16,7 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import lombok.AllArgsConstructor;
@@ -132,7 +129,8 @@ public class GuiControllerImpl implements GuiController {
     @FXML private HBox precipBox;
     @FXML private Label lbUptime;
     @FXML private Label lbUptimeLabel;
-    @FXML private HBox hbUptime;;
+    @FXML private HBox hbUptime;
+    @FXML private GridPane gridPane;
 
     public GuiControllerImpl(GuiConfigService configService, WeatherService weatherService, ConfigController configController, LocalizeResourcesService localizeService, AlertService alertService, FxWeaver fxWeaver, CommonUtilsService commonUtils, UptimeService uptimeService, CbwmService cbwmService) {
         this.configService = configService;
@@ -211,6 +209,8 @@ public class GuiControllerImpl implements GuiController {
         vboxForecast1.setOnMouseClicked(event -> showForecastWindow());
         vboxForecast2.setOnMouseClicked(event -> showForecastWindow());
         vboxForecast3.setOnMouseClicked(event -> showForecastWindow());
+
+        gridPane.setHgap(2);
     }
 
     @Override
