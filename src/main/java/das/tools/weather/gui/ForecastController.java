@@ -17,6 +17,4 @@ public interface ForecastController extends Localized, GuiWindow {
     void onShowing();
 
     void setData(ForecastWeatherResponse data);
-
-    String getTimeLength(String start, String stop);
 }

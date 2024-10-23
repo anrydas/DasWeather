@@ -1,10 +1,12 @@
 package das.tools.weather.service;
 
 import com.sun.javafx.charts.Legend;
+import das.tools.weather.entity.current.WeatherCurrent;
 import das.tools.weather.entity.forecast.WeatherDayForecast;
 import das.tools.weather.entity.forecast.WeatherHour;
 import das.tools.weather.gui.ForecastController;
 import das.tools.weather.gui.GuiControllerImpl;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.chart.XYChart;
@@ -15,6 +17,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -26,10 +30,14 @@ public class ChartDataProducerImpl implements ChartDataProducer {
 
     private final WeatherService weatherService;
     private final LocalizeResourcesService localizeService;
+    private final CbwmService cbwmService;
+    private final CommonUtilsService commonUtils;
 
-    public ChartDataProducerImpl(WeatherService weatherService, LocalizeResourcesService localizeService) {
+    public ChartDataProducerImpl(WeatherService weatherService, LocalizeResourcesService localizeService, CbwmService cbwmService, CommonUtilsService commonUtils) {
         this.weatherService = weatherService;
         this.localizeService = localizeService;
+        this.cbwmService = cbwmService;
+        this.commonUtils = commonUtils;
     }
 
     @Override
@@ -53,7 +61,8 @@ public class ChartDataProducerImpl implements ChartDataProducer {
             Number[] windValues = new Number[HOURS];
             for (WeatherHour hour : day.getHour()) {
                 temperatureValues[hourIndex] = hour.getTemperature();
-                pressureValues[hourIndex] = GuiControllerImpl.millibarToMmHg(hour.getPressure());
+                float pressure = commonUtils.getCorrectedPressureValue(hour.getPressure());
+                pressureValues[hourIndex] = GuiControllerImpl.millibarToMmHg(pressure);
                 humidityValues[hourIndex] = hour.getHumidity();
                 cloudValues[hourIndex] = hour.getCloud();
                 windValues[hourIndex] = hour.getWindKmh();
@@ -69,7 +78,7 @@ public class ChartDataProducerImpl implements ChartDataProducer {
     }
 
     @Override
-    public void fillChart(XYChart<String, Number> chart, String tabName) {
+    public void fillChart(XYChart<String, Number> chart, String tabName, WeatherCurrent current) {
         chart.getData().clear();
         for (DataHolder dataHolder: this.dataList) {
             XYChart.Series<String,Number> series = new XYChart.Series<>();
@@ -84,29 +93,31 @@ public class ChartDataProducerImpl implements ChartDataProducer {
                 if (dataNode != null) {
                     dataNode.setOnMouseEntered(event -> dataNode.getStyleClass().add("chart-on-hover"));
                     dataNode.setOnMouseExited(event -> dataNode.getStyleClass().remove("chart-on-hover"));
-                    installTooltipOnNode(data, dataHolder);
+                    installTooltipOnNode(data, dataHolder, current);
                 }
             }
         }
     }
 
-    private void installTooltipOnNode(XYChart.Data<String, Number> data, DataHolder dataHolder) {
+    private void installTooltipOnNode(XYChart.Data<String, Number> data, DataHolder dataHolder, WeatherCurrent current) {
         int hourIndex = Integer.parseInt(data.getXValue());
         WeatherHour hour = dataHolder.getDayForecastData().getHour()[hourIndex];
-        Image image = weatherService.getWeatherIcon(hour.getCondition().getCode(), hour.isDay());
+        Image weatherIcon = weatherService.getWeatherIcon(hour.getCondition().getCode(), hour.isDay());
+        Image image = cbwmService.getExtendedWeatherImage(dataHolder, hourIndex, current, weatherIcon);
         Tooltip tooltip = new Tooltip(getTooltipText(hour));
-        tooltip.setGraphic(GuiControllerImpl.getTooltipImage(image, 64));
+        tooltip.setGraphic(GuiControllerImpl.getTooltipImage(image, (int) image.getWidth()));
         Tooltip.install(data.getNode(), tooltip);
     }
 
     private String getTooltipText(WeatherHour hour) {
+        float pressure = commonUtils.getCorrectedPressureValue(hour.getPressure());
         return String.format(
                 localizeService.getLocalizedResource("point.tooltip"),
                 hour.getTime(),
                 hour.getCondition().getText(),
                 hour.getTemperature(), hour.getTemperatureF(), hour.getFeelsLike(), hour.getFeelsLikeF(),
                 hour.getHumidity(),
-                GuiControllerImpl.millibarToMmHg(hour.getPressure()), hour.getPressure(),
+                GuiControllerImpl.millibarToMmHg(pressure), pressure,
                 hour.getWindDirection(), hour.getWindKmh(), hour.getWindMph(), hour.getGustKmh(), hour.getGustMph()
         );
     }
@@ -144,7 +155,7 @@ public class ChartDataProducerImpl implements ChartDataProducer {
 
     @Getter
     @Setter
-    private static class DataHolder {
+    public static class DataHolder {
         private String name;
         private Map<String,Number[]> tabAndValues;
         private WeatherDayForecast dayForecastData;

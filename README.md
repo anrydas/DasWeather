@@ -43,6 +43,7 @@
   - Weather's API end point link
   - Location - may be found in [Location Window](#LocationWin)
   - Weather update interval (60 minutes - minimal interval)
+  - Pressure correction value (between -100 and 100 mBar; 0 - default value). Those value was added because coming from weather server is not valid.
   - Interface language
   - Application exit confirmation
 
@@ -50,6 +51,9 @@
 ![Screenshot](images/ForecastWindow.png) ![Screenshot](images/ForecastWindow_L.png)
 - Any forecast chart could be saved as PNG, JPEG, GIF or BMP file.
 - Chart's tabs may be dragged, tabs order will be saved and restored next time window appears
+- Each dot on chart shows weather tooltip, which represents Weather conditions as image and text. The image includes traditional weather condition icon and CBWM - Color Brick Weather Map   
+![Screenshot](images/ForecastCbwmTooltip.png)
+- CBWM emulates [Main window's](#MainWin) colored background controls for Temperature, Humidity, Pressure, Clouds, etc. but in minimised view - as a color map.
 
 ### 📜 Location Window<a id='LocationWin'/>
 ![Screenshot](images/LocationWindow.png) ![Screenshot](images/LocationWindow_L.png)

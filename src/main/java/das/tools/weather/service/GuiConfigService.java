@@ -7,6 +7,7 @@ import java.util.Properties;
 public interface GuiConfigService {
     String GUI_CONFIG_DEFAULT_FILE_NAME_KEY = "gui.config";
     String GUI_CONFIG_UPDATE_INTERVAL_KEY = "app.update.interval.msec";
+    String GUI_PRESSURE_CORRECTION_KEY = "app.pressure.correction.mbar";
     String GUI_CONFIG_CONFIRM_EXIT_KEY = "app.confirm-exit";
     String GUI_CONFIG_API_KEY_KEY = "app.api-key";
     String GUI_CONFIG_WEATHER_LOCATION_KEY = "app.weather.location";
@@ -28,6 +29,8 @@ public interface GuiConfigService {
     void saveConfig(Properties props);
 
     String getConfigStringValue(String key, String defValue);
+
+    String getConfigStringValue(String key);
 
     String getLangName(String code);
 

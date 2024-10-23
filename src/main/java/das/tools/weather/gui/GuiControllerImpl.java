@@ -7,10 +7,7 @@ import das.tools.weather.entity.forecast.WeatherDay;
 import das.tools.weather.entity.forecast.WeatherDayForecast;
 import das.tools.weather.gui.color.ColorElement;
 import das.tools.weather.gui.color.ColorEngineFactory;
-import das.tools.weather.service.AlertService;
-import das.tools.weather.service.GuiConfigService;
-import das.tools.weather.service.LocalizeResourcesService;
-import das.tools.weather.service.WeatherService;
+import das.tools.weather.service.*;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -19,9 +16,7 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import lombok.AllArgsConstructor;
@@ -50,16 +45,17 @@ public class GuiControllerImpl implements GuiController {
     private final GuiConfigService configService;
     private final WeatherService weatherService;
     private final ConfigController configController;
-    private final ForecastController forecastController;
     private final LocalizeResourcesService localizeService;
     private final AlertService alertService;
     private final FxWeaver fxWeaver;
+    private final CommonUtilsService commonUtils;
+    private final UptimeService uptimeService;
+    private final CbwmService cbwmService;
 
     @FXML private AnchorPane root;
     @FXML private HBox airQualityBox;
     @FXML private Label lbForecast;
     @FXML private Label lbWindSpeedText;
-
     @FXML private ImageView imgFillsLikeTemp;
     @FXML private ImageView imgDayLength;
     @FXML private Label lbDayLength;
@@ -79,9 +75,9 @@ public class GuiControllerImpl implements GuiController {
     @FXML private ImageView imgForecast01;
     @FXML private Label lbForecast01;
     @FXML private ImageView imgForecast02;
-    @FXML private Label lbgForecast02;
+    @FXML private Label lbForecast02;
     @FXML private ImageView imgForecast03;
-    @FXML private Label lbgForecast03;
+    @FXML private Label lbForecast03;
     @FXML private ImageView imgMoonPhase;
     @FXML private Label lbMoonPhase;
     @FXML private Label lbHumidity;
@@ -131,15 +127,21 @@ public class GuiControllerImpl implements GuiController {
     @FXML private HBox windBox;
     @FXML private HBox cloudyBox;
     @FXML private HBox precipBox;
+    @FXML private Label lbUptime;
+    @FXML private Label lbUptimeLabel;
+    @FXML private HBox hbUptime;
+    @FXML private GridPane gridPane;
 
-    public GuiControllerImpl(GuiConfigService configService, WeatherService weatherService, ConfigController configController, ForecastController forecastController, LocalizeResourcesService localizeService, AlertService alertService, FxWeaver fxWeaver) {
+    public GuiControllerImpl(GuiConfigService configService, WeatherService weatherService, ConfigController configController, LocalizeResourcesService localizeService, AlertService alertService, FxWeaver fxWeaver, CommonUtilsService commonUtils, UptimeService uptimeService, CbwmService cbwmService) {
         this.configService = configService;
         this.weatherService = weatherService;
         this.configController = configController;
-        this.forecastController = forecastController;
         this.localizeService = localizeService;
         this.alertService = alertService;
         this.fxWeaver = fxWeaver;
+        this.commonUtils = commonUtils;
+        this.uptimeService = uptimeService;
+        this.cbwmService = cbwmService;
     }
 
     @Override
@@ -207,6 +209,8 @@ public class GuiControllerImpl implements GuiController {
         vboxForecast1.setOnMouseClicked(event -> showForecastWindow());
         vboxForecast2.setOnMouseClicked(event -> showForecastWindow());
         vboxForecast3.setOnMouseClicked(event -> showForecastWindow());
+
+        gridPane.setHgap(2);
     }
 
     @Override
@@ -341,17 +345,28 @@ public class GuiControllerImpl implements GuiController {
                 updateTime,
                 current.getCondition().getText()
         ));
-        ImageView iv = getTooltipImage(imgWeather.getImage(), 100);
-        tooltip.setGraphic(iv);
+        Image extImage = getCurrentExtendedImage(imgWeather.getImage());
+        tooltip.setGraphic(getTooltipImage(extImage, (int) extImage.getWidth()));
         lbLocation.setTooltip(tooltip);
     }
 
     private void fillConditions(WeatherCurrent current) {
         imgWeather.setImage(this.dataHolder.getImage());
         String conditionText = current.getCondition().getText();
-        Tooltip.install(imgWeather, getTooltip(conditionText));
+        Image extImage = getCurrentExtendedImage(imgWeather.getImage());
+        Tooltip tooltip = getTooltip(conditionText);
+        tooltip.setGraphic(getTooltipImage(extImage, (int) extImage.getWidth()));
+        Tooltip.install(imgWeather, tooltip);
         lbCondition.setText(conditionText);
         lbCondition.setTooltip(getTooltip(conditionText));
+    }
+
+    private Image getCurrentExtendedImage(Image currentConditionImage) {
+        ChartDataProducerImpl.DataHolder holder = new ChartDataProducerImpl.DataHolder(this.dataHolder.getResponse().getForecast().getDayForecast()[0].getDate());
+        holder.setDayForecastData(this.dataHolder.getResponse().getForecast().getDayForecast()[0]);
+        return cbwmService.getExtendedWeatherImage(holder, LocalTime.now().getHour(),
+                this.dataHolder.getResponse().getCurrent(),
+                currentConditionImage);
     }
 
     private void fillTemperature(WeatherCurrent current) {
@@ -390,12 +405,17 @@ public class GuiControllerImpl implements GuiController {
     }
 
     private void fillPressure(WeatherCurrent current) {
-        lbPressure.setText(String.format("%.0f mmHg", millibarToMmHg(current.getPressureMb())));
-        Tooltip tooltip = getTooltip(String.format(localizeService.getLocalizedResource("pressure.tooltip"), millibarToMmHg(current.getPressureMb()), current.getPressureMb()));
+        float pressureMb = commonUtils.getCorrectedPressureValue(current.getPressureMb());
+        double pressureMmHg = millibarToMmHg(pressureMb);
+        lbPressure.setText(String.format("%.0f mmHg", pressureMmHg));
+        int pressureCorrection = Integer.parseInt(configService.getConfigStringValue(GuiConfigService.GUI_PRESSURE_CORRECTION_KEY));
+        String correctionText = (pressureCorrection != 0) ? String.format(localizeService.getLocalizedResource("pressure.tooltip.corrected"), pressureCorrection) : "";
+        Tooltip tooltip = getTooltip(String.format(localizeService.getLocalizedResource("pressure.tooltip") + correctionText,
+                pressureMmHg, pressureMb));
         tooltip.setGraphic(getTooltipImage(imgPressure.getImage(), 100));
         Tooltip.install(pressureBox, tooltip);
         pressureBox.setStyle(String.format("-fx-background-color: %s",
-                ColorEngineFactory.getEngine(ColorElement.PRESSURE).getColor(current.getHumidity())));
+                ColorEngineFactory.getEngine(ColorElement.PRESSURE).getColor((int) pressureMmHg)));
     }
 
     public static ImageView getTooltipImage(Image image, int width) {
@@ -502,11 +522,15 @@ public class GuiControllerImpl implements GuiController {
         imgForecast02.setImage(this.dataHolder.getImageForecast1());
         imgForecast03.setImage(this.dataHolder.getImageForecast2());
 
-        lbForecast01.setText(DATE_FORMATTER_FOR_VIEW.format(LocalDate.now()));
-        LocalDate dt1 = LocalDate.parse(dayForecasts[1].getDate(), DATE_FORMATTER_FOR_RESPONSE);
-        lbgForecast02.setText(DATE_FORMATTER_FOR_VIEW.format(dt1));
-        LocalDate dt2 = LocalDate.parse(dayForecasts[2].getDate(), DATE_FORMATTER_FOR_RESPONSE);
-        lbgForecast03.setText(DATE_FORMATTER_FOR_VIEW.format(dt2));
+        LocalDate dt1 = LocalDate.now();
+        lbForecast01.setText(DATE_FORMATTER_FOR_VIEW.format(dt1));
+        lbForecast01.setTooltip(getTooltip(FULL_DATE_FORMATTER_FOR_VIEW.format(dt1)));
+        LocalDate dt2 = LocalDate.parse(dayForecasts[1].getDate(), DATE_FORMATTER_FOR_RESPONSE);
+        lbForecast02.setText(DATE_FORMATTER_FOR_VIEW.format(dt2));
+        lbForecast02.setTooltip(getTooltip(FULL_DATE_FORMATTER_FOR_VIEW.format(dt2)));
+        LocalDate dt3 = LocalDate.parse(dayForecasts[2].getDate(), DATE_FORMATTER_FOR_RESPONSE);
+        lbForecast03.setText(DATE_FORMATTER_FOR_VIEW.format(dt3));
+        lbForecast03.setTooltip(getTooltip(FULL_DATE_FORMATTER_FOR_VIEW.format(dt3)));
 
         final String TOOLTIP_TEXT = localizeService.getLocalizedResource("forecast.tooltip");
         Tooltip.install(imgForecast01, getTooltip(String.format(
@@ -549,27 +573,20 @@ public class GuiControllerImpl implements GuiController {
     }
 
     private void fillDayLength(WeatherAstro currentAstro) {
-        String dayLength = forecastController.getTimeLength(currentAstro.getSunRise(), currentAstro.getSunSet());
+        String dayLength = commonUtils.getTimeLength(currentAstro.getSunRise(), currentAstro.getSunSet());
         lbDayLength.setText(dayLength);
         Tooltip tooltip = getTooltip(String.format(localizeService.getLocalizedResource("dayLength.tooltip"), dayLength));
         tooltip.setGraphic(getTooltipImage(imgDayLength.getImage(), 100));
         Tooltip.install(dayLenBox, tooltip);
         dayLenBox.setStyle(String.format("-fx-background-color: %s",
-                ColorEngineFactory.getEngine(ColorElement.DAY_LENGTH).getColor(strTimeToInt(dayLength))));
-    }
-
-    private int strTimeToInt(String source) {
-        String[] split = source.split(":");
-        int h = Integer.parseInt(split[0]);
-        int m = Integer.parseInt(split[1]);
-        return h*60 + m;
+                ColorEngineFactory.getEngine(ColorElement.DAY_LENGTH).getColor(commonUtils.toIntTime(dayLength))));
     }
 
     private void fillAstro(WeatherAstro currentAstro) {
         lbSunRise.setText(getProperlyFormattedTime(currentAstro.getSunRise()));
         lbSunSet.setText(getProperlyFormattedTime(currentAstro.getSunSet()));
         Tooltip dayLength = getTooltip(String.format(localizeService.getLocalizedResource("dayLength.tooltip"),
-                forecastController.getTimeLength(currentAstro.getSunRise(), currentAstro.getSunSet())));
+                commonUtils.getTimeLength(currentAstro.getSunRise(), currentAstro.getSunSet())));
         lbSunRise.setTooltip(dayLength);
         lbSunSet.setTooltip(dayLength);
         Tooltip.install(imgSunRise, dayLength);
@@ -641,7 +658,11 @@ public class GuiControllerImpl implements GuiController {
         long msecsAfterUpdateData = Math.abs(Instant.now().getEpochSecond() - lastUpdated) * 1000;
         if (log.isDebugEnabled()) log.debug("after last data updated spent {} msec.", msecsAfterUpdateData);
         if (msecsAfterUpdateData >= updateInterval) {
-            loadDataWithProgress();
+            try {
+                loadDataWithProgress();
+            } finally {
+                btUpdate.setDisable(false);
+            }
         } else {
             log.info("Update Weather Data has been called but weather doesn't updated due to update interval doesn't reached yet.");
             if (log.isDebugEnabled()) log.debug("Update Weather Data has been called but after last data updated spent only {} msec " +
@@ -650,8 +671,27 @@ public class GuiControllerImpl implements GuiController {
     }
 
     @Override
+    public void setUptime() {
+        hbUptime.setVisible(uptimeService.getUptimeMillis() > 60000);
+        String uptime = uptimeService.getFormattedUptime();
+        lbUptime.setText(uptime);
+        Tooltip.install(hbUptime, new Tooltip(String.format("%s %s", lbUptimeLabel.getText(), uptime)));
+        if (uptime.length() <= UptimeService.MIN_UPTIME_TEXT_WIDTH) {
+            lbUptime.setPrefWidth(UptimeService.MIN_UPTIME_LABEL_WIDTH);
+            lbUptime.setMinWidth(Region.USE_PREF_SIZE);
+        } else {
+            lbUptime.setPrefWidth(UptimeService.MAX_UPTIME_LABEL_WIDTH);
+        }
+        lbUptime.setMinWidth(Region.USE_PREF_SIZE);
+    }
+
+    @Override
     public void updateWeatherDataForce() {
-        loadDataWithProgress();
+        try {
+            loadDataWithProgress();
+        } finally {
+            btUpdate.setDisable(false);
+        }
     }
 
     private void loadDataWithProgress() {
@@ -700,7 +740,10 @@ public class GuiControllerImpl implements GuiController {
         task.setOnFailed(e -> {
             pb.setVisible(false);
             btUpdate.setDisable(false);
-            alertService.showError(task.getException().getCause().getLocalizedMessage(), "");
+            alertService.showError(task.getException().getCause().getLocalizedMessage()
+                            .replaceAll("; ","\n")
+                            .replaceAll(": ", ":\n"),
+                    "");
         });
         return task;
     }

@@ -4,10 +4,7 @@ import das.tools.weather.entity.ForecastWeatherResponse;
 import das.tools.weather.entity.forecast.WeatherAstro;
 import das.tools.weather.entity.forecast.WeatherDay;
 import das.tools.weather.entity.forecast.WeatherDayForecast;
-import das.tools.weather.service.AlertService;
-import das.tools.weather.service.ChartDataProducer;
-import das.tools.weather.service.GuiConfigService;
-import das.tools.weather.service.LocalizeResourcesService;
+import das.tools.weather.service.*;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -37,7 +34,6 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.time.Duration;
 import java.time.LocalTime;
 import java.util.LinkedList;
 import java.util.List;
@@ -68,6 +64,7 @@ public class ForecastControllerImpl implements ForecastController {
     private final AlertService alertService;
     private final BuildProperties buildProperties;
     private final GuiConfigService configService;
+    private final CommonUtilsService commonUtils;
 
     static {
         Map<String,String> extMap = FILE_FORMAT_NAMES;
@@ -78,12 +75,13 @@ public class ForecastControllerImpl implements ForecastController {
         extMap.put("BMP", "BMP");
     }
 
-    public ForecastControllerImpl(ChartDataProducer chartDataProducer, LocalizeResourcesService localizeService, AlertService alertService, BuildProperties buildProperties, GuiConfigService configService) {
+    public ForecastControllerImpl(ChartDataProducer chartDataProducer, LocalizeResourcesService localizeService, AlertService alertService, BuildProperties buildProperties, GuiConfigService configService, CommonUtilsService commonUtils) {
         this.chartDataProducer = chartDataProducer;
         this.localizeService = localizeService;
         this.alertService = alertService;
         this.buildProperties = buildProperties;
         this.configService = configService;
+        this.commonUtils = commonUtils;
     }
 
     @Override
@@ -285,11 +283,11 @@ public class ForecastControllerImpl implements ForecastController {
 
     private void fillGraphics() {
         chartDataProducer.initChartsData(this.data.getForecast().getDayForecast());
-        chartDataProducer.fillChart(chTemperature, TAB_NAMES.get(1));
-        chartDataProducer.fillChart(chPressure, TAB_NAMES.get(2));
-        chartDataProducer.fillChart(chHumidity, TAB_NAMES.get(3));
-        chartDataProducer.fillChart(chCloud, TAB_NAMES.get(4));
-        chartDataProducer.fillChart(chWind, TAB_NAMES.get(5));
+        chartDataProducer.fillChart(chTemperature, TAB_NAMES.get(1), this.data.getCurrent());
+        chartDataProducer.fillChart(chPressure, TAB_NAMES.get(2), this.data.getCurrent());
+        chartDataProducer.fillChart(chHumidity, TAB_NAMES.get(3), this.data.getCurrent());
+        chartDataProducer.fillChart(chCloud, TAB_NAMES.get(4), this.data.getCurrent());
+        chartDataProducer.fillChart(chWind, TAB_NAMES.get(5), this.data.getCurrent());
 
         chartDataProducer.makeLegendClickable(chTemperature);
         chartDataProducer.makeLegendClickable(chPressure);
@@ -360,7 +358,7 @@ public class ForecastControllerImpl implements ForecastController {
         String msg = String.format(localizeService.getLocalizedResource("sun.point.tooltip"),
                 astro.getSunRise(),
                 astro.getSunSet(),
-                getTimeLength(astro.getSunRise(), astro.getSunSet()));
+                commonUtils.getTimeLength(astro.getSunRise(), astro.getSunSet()));
         installTooltipOnNode(node, msg);
     }
 
@@ -391,25 +389,11 @@ public class ForecastControllerImpl implements ForecastController {
     }
 
     private double getDayLength(String start, String stop) {
-        long diff = getDiffSeconds(start, stop);
+        long diff = commonUtils.getDiffSeconds(start, stop);
         long hours = diff / (60 * 60) % 24;
         long minutes = diff / (60) % 60;
         double res = hours + (minutes * MINUTES_TO_DECIMAL_FACTOR);
         if (log.isDebugEnabled()) log.debug("got parsed length={}", res);
         return res;
-    }
-
-    @Override
-    public String getTimeLength(String start, String stop) {
-        long diff = getDiffSeconds(start, stop);
-        long hours = diff / (60 * 60) % 24;
-        long minutes = diff / (60) % 60;
-        return String.format("%02d:%02d", hours, minutes);
-    }
-
-    private long getDiffSeconds(String start, String stop) {
-        LocalTime startTime = LocalTime.parse(start, GuiController.TIME_FORMATTER_FOR_RESPONSE);
-        LocalTime stopTime = LocalTime.parse(stop, GuiController.TIME_FORMATTER_FOR_RESPONSE);
-        return Duration.between(startTime, stopTime).getSeconds();
     }
 }

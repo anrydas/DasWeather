@@ -43,6 +43,7 @@ public class GuiConfigServiceImpl implements GuiConfigService {
         Map<String,String> mapDefaults = GUI_CONFIG_DEFAULT_VALUES;
         mapDefaults.put(GUI_CONFIG_DEFAULT_FILE_NAME_KEY, "config/gui.config");
         mapDefaults.put(GUI_CONFIG_UPDATE_INTERVAL_KEY, "3600000");
+        mapDefaults.put(GUI_PRESSURE_CORRECTION_KEY, "0");
         mapDefaults.put(GUI_CONFIG_CONFIRM_EXIT_KEY, "true");
         mapDefaults.put(GUI_CONFIG_API_KEY_KEY, "");
         mapDefaults.put(GUI_CONFIG_WEATHER_LOCATION_KEY, "Kyiv");
@@ -76,6 +77,12 @@ public class GuiConfigServiceImpl implements GuiConfigService {
 
     @Override
     public String getConfigStringValue(String key, String defValue) {
+        return getCurrentConfig().getProperty(key, defValue);
+    }
+
+    @Override
+    public String getConfigStringValue(String key) {
+        String defValue = getDefaultConfigValue(key);
         return getCurrentConfig().getProperty(key, defValue);
     }
 
