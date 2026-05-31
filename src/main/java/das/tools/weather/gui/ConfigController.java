@@ -5,8 +5,8 @@ import javafx.scene.image.Image;
 import java.util.regex.Pattern;
 
 public interface ConfigController extends Localized, GuiWindow {
-    Pattern FORECAST_URL_PATTERN = Pattern.compile("https?\\:\\/\\/api\\.weatherapi\\.com\\/v1\\/forecast\\.json");
-    Pattern API_KEY_PATTERN = Pattern.compile("^[a-fA-F0-9]+$");
+    Pattern FORECAST_URL_PATTERN = Pattern.compile("https?\\:\\/\\/[a-z\\/1-9.]+");
+    Pattern API_KEY_PATTERN = Pattern.compile("^\\w+$");
 
     void setWindowIcon(Image icon);
 

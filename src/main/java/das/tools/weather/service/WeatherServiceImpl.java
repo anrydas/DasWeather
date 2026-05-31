@@ -156,7 +156,10 @@ public class WeatherServiceImpl implements WeatherService {
     public WeatherLocation[] getLocations(String location, String key) {
         Properties props = configService.getCurrentConfig();
         WeatherLocation[] res = null;
-        String url = ServletUriComponentsBuilder.fromHttpUrl("http://api.weatherapi.com/v1/search.json")
+        String base_url = props.getProperty(GuiConfigService.GUI_CONFIG_FORECAST_URL_KEY,
+                configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_FORECAST_URL_KEY))
+                .replace("forecast", "search");
+        String url = ServletUriComponentsBuilder.fromHttpUrl(base_url)
                 .queryParam("key", getApiKey(props, key))
                 .queryParam("q", location)
                 .toUriString();
