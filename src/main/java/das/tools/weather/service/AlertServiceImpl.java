@@ -1,5 +1,6 @@
 package das.tools.weather.service;
 
+import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,11 @@ public class AlertServiceImpl implements AlertService {
     }
 
     private void showDialog(Alert.AlertType type, String title, String header, String content) {
+        // dialogs could be created on the FX Application Thread only
+        if (!Platform.isFxApplicationThread()) {
+            Platform.runLater(() -> showDialog(type, title, header, content));
+            return;
+        }
         Alert alert = new Alert(type);
         alert.setHeaderText(header);
         alert.setTitle(title);
