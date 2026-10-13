@@ -5,6 +5,7 @@ import das.tools.weather.entity.current.WeatherCurrent;
 import das.tools.weather.entity.forecast.WeatherAstro;
 import das.tools.weather.entity.forecast.WeatherDay;
 import das.tools.weather.entity.forecast.WeatherDayForecast;
+import das.tools.weather.exceptions.WeatherDataException;
 import das.tools.weather.gui.color.ColorElement;
 import das.tools.weather.gui.color.ColorEngineFactory;
 import das.tools.weather.service.*;
@@ -51,6 +52,7 @@ public class GuiControllerImpl implements GuiController {
     private final CommonUtilsService commonUtils;
     private final UptimeService uptimeService;
     private final CbwmService cbwmService;
+    private boolean isLoading = false;
 
     @FXML private AnchorPane root;
     @FXML private HBox airQualityBox;
@@ -635,6 +637,10 @@ public class GuiControllerImpl implements GuiController {
     }
 
     private void showForecastWindow() {
+        if (this.dataHolder.getResponse() == null) {
+            log.info("Forecast window couldn't be shown: weather data hasn't been loaded yet");
+            return;
+        }
         ForecastController controller = fxWeaver.loadController(ForecastControllerImpl.class);
         controller.setWindowIcon(((Stage) root.getScene().getWindow()).getIcons().get(0));
         controller.setData(this.dataHolder.getResponse());
@@ -658,11 +664,7 @@ public class GuiControllerImpl implements GuiController {
         long msecsAfterUpdateData = Math.abs(Instant.now().getEpochSecond() - lastUpdated) * 1000;
         if (log.isDebugEnabled()) log.debug("after last data updated spent {} msec.", msecsAfterUpdateData);
         if (msecsAfterUpdateData >= updateInterval) {
-            try {
-                loadDataWithProgress();
-            } finally {
-                btUpdate.setDisable(false);
-            }
+            loadDataWithProgress();
         } else {
             log.info("Update Weather Data has been called but weather doesn't updated due to update interval doesn't reached yet.");
             if (log.isDebugEnabled()) log.debug("Update Weather Data has been called but after last data updated spent only {} msec " +
@@ -687,65 +689,105 @@ public class GuiControllerImpl implements GuiController {
 
     @Override
     public void updateWeatherDataForce() {
-        try {
-            loadDataWithProgress();
-        } finally {
-            btUpdate.setDisable(false);
-        }
+        loadDataWithProgress();
     }
 
+    // Must be called on the FX Application Thread only
     private void loadDataWithProgress() {
+        if (isLoading) {
+            log.info("Weather data is loading already, the new update request is skipped");
+            return;
+        }
+        isLoading = true;
         if (pb.progressProperty().isBound()) pb.progressProperty().unbind();
-        final Task<Void> loadDataTask = getLoadingTask();
+        final Task<RemoteDataHolder> loadDataTask = getLoadingTask();
         pb.progressProperty().bind(loadDataTask.progressProperty());
+        btUpdate.setDisable(true);
+        pb.setVisible(true);
 
         Thread thread = new Thread(loadDataTask, "progress-thread");
         thread.setDaemon(true);
         thread.start();
     }
 
-    private Task<Void> getLoadingTask() {
-        final Task<Void> task = new Task<Void>() {
+    private void finishLoading() {
+        isLoading = false;
+        pb.setVisible(false);
+        btUpdate.setDisable(false);
+    }
+
+    private Task<RemoteDataHolder> getLoadingTask() {
+        // The task works with local data only and doesn't touch any UI controls:
+        // loaded data is published into the dataHolder on the FX Application Thread when the task succeeded
+        final Task<RemoteDataHolder> task = new Task<RemoteDataHolder>() {
             @Override
-            protected Void call() throws Exception {
+            protected RemoteDataHolder call() throws Exception {
                 final int MAX_VALUE = 100;
-                btUpdate.setDisable(true);
-                pb.setVisible(true);
                 updateProgress(10, MAX_VALUE);
-                dataHolder.setResponse(weatherService.getForecastWeather());
+                ForecastWeatherResponse response = weatherService.getForecastWeather();
+                WeatherDayForecast[] dayForecasts = response.getForecast().getDayForecast();
                 updateProgress(20, MAX_VALUE);
                 Thread.sleep(10);
-                dataHolder.setImage(weatherService.getWeatherIcon(dataHolder.getResponse().getCurrent().getCondition().getCode(), dataHolder.getResponse().getCurrent().isDay()));
-                dataHolder.setLastUpdatedTimestamp(Instant.now());
+                Image image = weatherService.getWeatherIcon(response.getCurrent().getCondition().getCode(), response.getCurrent().isDay());
                 updateProgress(30, MAX_VALUE);
                 Thread.sleep(10);
-                dataHolder.setImageForecast1(weatherService.getWeatherIcon(
-                        dataHolder.getResponse().getForecast().getDayForecast()[1].getDay().getCondition().getCode(), true));
+                Image imageForecast1 = weatherService.getWeatherIcon(dayForecasts[1].getDay().getCondition().getCode(), true);
                 updateProgress(40, MAX_VALUE);
                 Thread.sleep(10);
-                dataHolder.setImageForecast2(weatherService.getWeatherIcon(
-                        dataHolder.getResponse().getForecast().getDayForecast()[2].getDay().getCondition().getCode(), true));
+                Image imageForecast2 = weatherService.getWeatherIcon(dayForecasts[2].getDay().getCondition().getCode(), true);
                 updateProgress(60, MAX_VALUE);
                 Thread.sleep(10);
                 updateProgress(80, MAX_VALUE);
                 Thread.sleep(10);
                 updateProgress(MAX_VALUE, MAX_VALUE);
                 Thread.sleep(MAX_VALUE);
-                pb.setVisible(false);
-                btUpdate.setDisable(false);
-                return null;
+                return RemoteDataHolder.builder()
+                        .response(response)
+                        .image(image)
+                        .imageForecast1(imageForecast1)
+                        .imageForecast2(imageForecast2)
+                        .lastUpdatedTimestamp(Instant.now())
+                        .build();
             }
         };
-        task.setOnSucceeded(e -> updateControls());
-        task.setOnFailed(e -> {
-            pb.setVisible(false);
-            btUpdate.setDisable(false);
-            alertService.showError(task.getException().getCause().getLocalizedMessage()
-                            .replaceAll("; ","\n")
-                            .replaceAll(": ", ":\n"),
-                    "");
+        task.setOnSucceeded(e -> {
+            finishLoading();
+            RemoteDataHolder loaded = task.getValue();
+            dataHolder.setResponse(loaded.getResponse());
+            dataHolder.setImage(loaded.getImage());
+            dataHolder.setImageForecast1(loaded.getImageForecast1());
+            dataHolder.setImageForecast2(loaded.getImageForecast2());
+            dataHolder.setLastUpdatedTimestamp(loaded.getLastUpdatedTimestamp());
+            try {
+                updateControls();
+            } catch (RuntimeException ex) {
+                log.error("Error displaying weather data: ", ex);
+                alertService.showError(localizeService.getLocalizedResource("alert.ex.header.error"), getErrorMessage(ex));
+            }
         });
+        task.setOnFailed(e -> {
+            finishLoading();
+            Throwable ex = task.getException();
+            if (ex instanceof WeatherDataException) {
+                alertService.showError(((WeatherDataException) ex).getHeader(), ex.getMessage());
+            } else {
+                log.error("Error loading weather data: ", ex);
+                alertService.showError(getErrorMessage(ex)
+                                .replaceAll("; ","\n")
+                                .replaceAll(": ", ":\n"),
+                        "");
+            }
+        });
+        task.setOnCancelled(e -> finishLoading());
         return task;
+    }
+
+    private static String getErrorMessage(Throwable ex) {
+        Throwable cause = ex;
+        while (cause.getCause() != null && cause.getCause() != cause && cause.getLocalizedMessage() == null) {
+            cause = cause.getCause();
+        }
+        return cause.getLocalizedMessage() != null ? cause.getLocalizedMessage() : cause.getClass().getSimpleName();
     }
 
     public static double millibarToMmHg(float mbar) {

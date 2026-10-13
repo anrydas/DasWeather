@@ -1,9 +1,11 @@
 package das.tools.weather.exceptions;
 
-import java.io.IOException;
-
-public class ClientException extends IOException {
+public class ClientException extends ApplicationException {
     public ClientException(String message) {
         super(message);
+    }
+
+    public ClientException(String header, String message) {
+        super(header, message);
     }
 }

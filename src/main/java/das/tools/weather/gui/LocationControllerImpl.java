@@ -1,6 +1,8 @@
 package das.tools.weather.gui;
 
 import das.tools.weather.entity.current.WeatherLocation;
+import das.tools.weather.exceptions.WeatherDataException;
+import das.tools.weather.service.AlertService;
 import das.tools.weather.service.GuiConfigService;
 import das.tools.weather.service.LocalizeResourcesService;
 import das.tools.weather.service.WeatherService;
@@ -32,7 +34,8 @@ public class LocationControllerImpl implements LocationController {
     private final WeatherService weatherService;
     private final GuiConfigService configService;
     private final BuildProperties buildProperties;
-    private WeatherLocation[] foundLocations;
+    private final AlertService alertService;
+    private WeatherLocation[] foundLocations = new WeatherLocation[0];
     private String key;
     private boolean isLocationChanged = false;
 
@@ -46,11 +49,12 @@ public class LocationControllerImpl implements LocationController {
     @FXML private Button btCancel;
     private Stage stage;
 
-    public LocationControllerImpl(LocalizeResourcesService localizeService, WeatherService weatherService, GuiConfigService configService, BuildProperties buildProperties) {
+    public LocationControllerImpl(LocalizeResourcesService localizeService, WeatherService weatherService, GuiConfigService configService, BuildProperties buildProperties, AlertService alertService) {
         this.localizeService = localizeService;
         this.weatherService = weatherService;
         this.configService = configService;
         this.buildProperties = buildProperties;
+        this.alertService = alertService;
     }
 
     @FXML
@@ -78,7 +82,12 @@ public class LocationControllerImpl implements LocationController {
     }
 
     private void saveLocation() {
-        WeatherLocation location = foundLocations[lstLocations.getSelectionModel().getSelectedIndex()];
+        int selectedIndex = lstLocations.getSelectionModel().getSelectedIndex();
+        if (selectedIndex < 0 || selectedIndex >= foundLocations.length) {
+            btOk.setDisable(true);
+            return;
+        }
+        WeatherLocation location = foundLocations[selectedIndex];
         Properties props = configService.getCurrentConfig();
         Properties oldProps = (Properties) props.clone();
         props.setProperty(GuiConfigService.GUI_CONFIG_WEATHER_LOCATION_ID_KEY, String.valueOf(location.getId()));
@@ -138,8 +147,20 @@ public class LocationControllerImpl implements LocationController {
     }
 
     private void searchForLocations() {
-        foundLocations = weatherService.getLocations(edLocationName.getText(), this.key);
         lstLocations.getItems().clear();
+        btOk.setDisable(true);
+        try {
+            foundLocations = weatherService.getLocations(edLocationName.getText(), this.key);
+        } catch (WeatherDataException e) {
+            foundLocations = new WeatherLocation[0];
+            alertService.showError(e.getHeader(), e.getMessage());
+            return;
+        } catch (RuntimeException e) {
+            foundLocations = new WeatherLocation[0];
+            log.error("Error searching for locations: ", e);
+            alertService.showError(localizeService.getLocalizedResource("alert.ex.header.error"), String.valueOf(e.getLocalizedMessage()));
+            return;
+        }
         for (WeatherLocation loc : foundLocations) {
             String locName = String.format("%s, %s (%s)", loc.getName(), loc.getRegion(), loc.getCountry());
             lstLocations.getItems().add(locName);

@@ -19,10 +19,8 @@ public class WeatherController {
     @Async
     @Scheduled(fixedDelay = 600000, initialDelay = 3000)
     public void updateWeather() {
-        // New thread needs to prevent IllegalStateException:
-        // This operation is permitted on the event thread only; currentThread = task-1
-        Thread t = new Thread(() -> Platform.runLater(guiController::updateWeatherData));
-        t.start();
+        // GUI controls could be accessed on the FX Application Thread only
+        Platform.runLater(guiController::updateWeatherData);
     }
 
     @Async

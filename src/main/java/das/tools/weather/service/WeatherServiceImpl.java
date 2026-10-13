@@ -3,7 +3,11 @@ package das.tools.weather.service;
 import das.tools.weather.entity.CurrenWeatherResponse;
 import das.tools.weather.entity.ForecastWeatherResponse;
 import das.tools.weather.entity.current.WeatherLocation;
+import das.tools.weather.entity.forecast.WeatherDayForecast;
+import das.tools.weather.exceptions.ApplicationException;
 import das.tools.weather.exceptions.RestTemplateResponseErrorHandler;
+import das.tools.weather.exceptions.WeatherDataException;
+import das.tools.weather.gui.GuiController;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import lombok.extern.slf4j.Slf4j;
@@ -11,29 +15,33 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
+import java.time.Duration;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 
 @Service
 @Slf4j
 public class WeatherServiceImpl implements WeatherService {
+    private static final Duration CONNECT_TIMEOUT = Duration.ofSeconds(30);
+    private static final Duration READ_TIMEOUT = Duration.ofSeconds(30);
+    private static final int FORECAST_DAYS = 3;
+    private static final Pattern API_KEY_IN_URL_PATTERN = Pattern.compile("(?i)(key=)[^&\\s\"]*");
 
     private final RestTemplate restTemplate;
     private final GuiConfigService configService;
-    private final RestTemplateResponseErrorHandler responseErrorHandler;
-    private final AlertService alertService;
+    private final LocalizeResourcesService localizeService;
+    private final Map<String, Image> iconsCache = new ConcurrentHashMap<>();
 
     static {
         Map<Integer,Integer> map = WEATHER_CODE_CONDITION_IMAGES;
@@ -87,13 +95,14 @@ public class WeatherServiceImpl implements WeatherService {
         map.put(1282, 395);
     }
 
-    public WeatherServiceImpl(RestTemplateBuilder restTemplateBuilder, GuiConfigService configService, RestTemplateResponseErrorHandler responseErrorHandler, AlertService alertService) {
-        this.alertService = alertService;
+    public WeatherServiceImpl(RestTemplateBuilder restTemplateBuilder, GuiConfigService configService, RestTemplateResponseErrorHandler responseErrorHandler, LocalizeResourcesService localizeService) {
+        this.localizeService = localizeService;
         this.restTemplate = restTemplateBuilder
+                .setConnectTimeout(CONNECT_TIMEOUT)
+                .setReadTimeout(READ_TIMEOUT)
                 .errorHandler(responseErrorHandler)
                 .build();
         this.configService = configService;
-        this.responseErrorHandler = responseErrorHandler;
     }
 
     @Override
@@ -104,8 +113,7 @@ public class WeatherServiceImpl implements WeatherService {
     @Override
     public ForecastWeatherResponse getForecastWeather() {
         Properties props = configService.getCurrentConfig();
-        ForecastWeatherResponse response = null;
-        String url = ServletUriComponentsBuilder.fromHttpUrl(props.getProperty(GuiConfigService.GUI_CONFIG_FORECAST_URL_KEY,
+        String url = UriComponentsBuilder.fromHttpUrl(props.getProperty(GuiConfigService.GUI_CONFIG_FORECAST_URL_KEY,
                         configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_FORECAST_URL_KEY)))
                 .queryParam("key", props.getProperty(GuiConfigService.GUI_CONFIG_API_KEY_KEY,
                         configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_API_KEY_KEY)))
@@ -113,20 +121,44 @@ public class WeatherServiceImpl implements WeatherService {
                 .queryParam("aqi", "yes")
                 .queryParam("lang", props.getProperty(GuiConfigService.GUI_CONFIG_CONDITION_LANGUAGE_KEY,
                         configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_CONDITION_LANGUAGE_KEY)))
-                .queryParam("days", "3")
+                .queryParam("days", FORECAST_DAYS)
                 .toUriString();
-        if(log.isDebugEnabled()) log.debug("[WeatherService].getForecastWeather: got url={}", url);
+        if (log.isDebugEnabled()) log.debug("[WeatherService].getForecastWeather: got url={}", maskApiKey(url));
 
-        try {
-            response = getResponseAsync(url);
-            if(log.isDebugEnabled()) log.debug("[WeatherService].getForecastWeather: response={}", response);
-            log.info("Weather was updated");
-        } catch (HttpClientErrorException e) {
-            log.error("Couldn't get response from server: ", e);
-            throw new RuntimeException(e);
-        }
-
+        ForecastWeatherResponse response = requestData(url, ForecastWeatherResponse.class);
+        if (log.isDebugEnabled()) log.debug("[WeatherService].getForecastWeather: response={}", response);
+        validateForecastResponse(response);
+        log.info("Weather was updated");
         return response;
+    }
+
+    private void validateForecastResponse(ForecastWeatherResponse response) {
+        String problem = null;
+        if (response == null) {
+            problem = "empty response";
+        } else if (response.getCurrent() == null || response.getCurrent().getCondition() == null) {
+            problem = "no current weather";
+        } else if (response.getLocation() == null) {
+            problem = "no location";
+        } else if (response.getForecast() == null || response.getForecast().getDayForecast() == null
+                || response.getForecast().getDayForecast().length < FORECAST_DAYS) {
+            problem = "not enough forecast days";
+        } else {
+            for (WeatherDayForecast day : response.getForecast().getDayForecast()) {
+                if (day == null || day.getDay() == null || day.getDay().getCondition() == null
+                        || day.getAstro() == null || day.getHour() == null || day.getHour().length == 0) {
+                    problem = "incomplete forecast day";
+                    break;
+                }
+            }
+        }
+        if (problem != null) {
+            log.error("Got invalid forecast response ({}): {}", problem, response);
+            throw new WeatherDataException(
+                    localizeService.getLocalizedResource("alert.ex.header.common"),
+                    localizeService.getLocalizedResource("alert.ex.message.common") + "\n" + problem,
+                    null);
+        }
     }
 
     private String getLocationParameterValue(Properties props) {
@@ -139,34 +171,51 @@ public class WeatherServiceImpl implements WeatherService {
         return res;
     }
 
-    private ForecastWeatherResponse getResponseAsync(String url) {
-        CompletableFuture<ResponseEntity<ForecastWeatherResponse>> completableFuture =
-                CompletableFuture.supplyAsync(() -> restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(new HttpHeaders()), ForecastWeatherResponse.class));
-        ResponseEntity<ForecastWeatherResponse> response;
+    private <T> T requestData(String url, Class<T> responseType) {
         try {
-            response = completableFuture.get();
-            return response.getBody();
-        } catch (InterruptedException | ExecutionException e) {
-            log.error("Error getting response from server: ", e);
-            throw new RuntimeException(e);
+            return restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(new HttpHeaders()), responseType).getBody();
+        } catch (RestClientException e) {
+            ApplicationException appException = findApplicationException(e);
+            if (appException != null) {
+                log.error("Error response from server: {}", appException.getMessage());
+                throw new WeatherDataException(appException);
+            }
+            String message = maskApiKey(e.getMessage());
+            log.error("Error getting response from server: {}", message);
+            throw new WeatherDataException(
+                    localizeService.getLocalizedResource("alert.ex.header.common"),
+                    localizeService.getLocalizedResource("alert.ex.message.common") + "\n" + message,
+                    null);
         }
+    }
+
+    private static ApplicationException findApplicationException(Throwable e) {
+        for (Throwable t = e; t != null; t = (t.getCause() == t) ? null : t.getCause()) {
+            if (t instanceof ApplicationException) {
+                return (ApplicationException) t;
+            }
+        }
+        return null;
+    }
+
+    static String maskApiKey(String s) {
+        return s == null ? "" : API_KEY_IN_URL_PATTERN.matcher(s).replaceAll("$1***");
     }
 
     @Override
     public WeatherLocation[] getLocations(String location, String key) {
         Properties props = configService.getCurrentConfig();
-        WeatherLocation[] res = null;
-        String base_url = props.getProperty(GuiConfigService.GUI_CONFIG_FORECAST_URL_KEY,
+        String baseUrl = props.getProperty(GuiConfigService.GUI_CONFIG_FORECAST_URL_KEY,
                 configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_FORECAST_URL_KEY))
                 .replace("forecast", "search");
-        String url = ServletUriComponentsBuilder.fromHttpUrl(base_url)
+        String url = UriComponentsBuilder.fromHttpUrl(baseUrl)
                 .queryParam("key", getApiKey(props, key))
                 .queryParam("q", location)
                 .toUriString();
-        if(log.isDebugEnabled()) log.debug("[WeatherService].getLocation: got url={}", url);
-        res = getLocationResponseAsync(url);
-        if(log.isDebugEnabled()) log.debug("[WeatherService].getLocations: result={}", res);
-        return res;
+        if (log.isDebugEnabled()) log.debug("[WeatherService].getLocation: got url={}", maskApiKey(url));
+        WeatherLocation[] res = requestData(url, WeatherLocation[].class);
+        if (log.isDebugEnabled()) log.debug("[WeatherService].getLocations: result={}", (Object) res);
+        return res != null ? res : new WeatherLocation[0];
     }
 
     private String getApiKey(Properties props, String key) {
@@ -175,55 +224,44 @@ public class WeatherServiceImpl implements WeatherService {
         return (storedKey != null && !"".equals(storedKey)) ? storedKey : key;
     }
 
-    private WeatherLocation[] getLocationResponseAsync(String url) {
-        CompletableFuture<ResponseEntity<WeatherLocation[]>> completableFuture =
-                CompletableFuture.supplyAsync(() -> restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(new HttpHeaders()),WeatherLocation[].class));
-        ResponseEntity<WeatherLocation[]> response;
-        try {
-            response = completableFuture.get();
-            return response.getBody();
-        } catch (InterruptedException | ExecutionException e) {
-            log.error("Error getting response from server: ", e);
-            throw new RuntimeException(e);
-        }
-    }
-
     @Override
     public Image getRemoteImage(String imageUrl) {
         String url = "https:" + imageUrl;
-        Image image = null;
-        BufferedImage bufferedImage = getImageAsync(url);
-        image = SwingFXUtils.toFXImage(bufferedImage, null);
-        String msg = image != null ? "[WeatherService].getRemoteImage: got weather image from {}" : "[WeatherService].getRemoteImage: Couldn't get weather image from {}" ;
-        if(log.isDebugEnabled()) log.debug(msg, url);
-        return image;
+        BufferedImage bufferedImage = readImage(url);
+        if (bufferedImage == null) {
+            log.warn("[WeatherService].getRemoteImage: Couldn't get weather image from {}", url);
+            return null;
+        }
+        if (log.isDebugEnabled()) log.debug("[WeatherService].getRemoteImage: got weather image from {}", url);
+        return SwingFXUtils.toFXImage(bufferedImage, null);
     }
 
     @Override
     public Image getWeatherIcon(int weatherCode, boolean isDay) {
-        String path = "/images/conditions" + (isDay ? "/day" : "/night");
-        String url = path + "/" + WEATHER_CODE_CONDITION_IMAGES.get(weatherCode) + ".png";
-        if (log.isDebugEnabled()) log.debug("got image file url={}", url);
-        return new Image(url);
+        Integer imageCode = WEATHER_CODE_CONDITION_IMAGES.get(weatherCode);
+        String url = imageCode != null ?
+                "/images/conditions" + (isDay ? "/day" : "/night") + "/" + imageCode + ".png" :
+                GuiController.IMAGE_WEATHER_DEFAULT_ICON_PNG;
+        if (imageCode == null) log.warn("Unknown weather code {}, default icon will be used", weatherCode);
+        return iconsCache.computeIfAbsent(url, this::loadResourceImage);
     }
 
-    private BufferedImage getImageAsync(String urlString) {
-        CompletableFuture<BufferedImage> completableFuture =
-                CompletableFuture.supplyAsync(() -> {
-                    try {
-                        return ImageIO.read(new URL(urlString));
-                    } catch (IOException e) {
-                        log.error("Error getting image from '{}'", urlString, e);
-                    }
-                    return null;
-                });
-        BufferedImage res = null;
-        try {
-            res = completableFuture.get();
-        } catch (InterruptedException | ExecutionException e) {
-            log.error("Error getting Image from server: ", e);
-            throw new RuntimeException(e);
+    private Image loadResourceImage(String path) {
+        if (log.isDebugEnabled()) log.debug("loading image file url={}", path);
+        URL resource = getClass().getResource(path);
+        if (resource == null) {
+            log.error("Image resource '{}' not found, default icon will be used", path);
+            resource = getClass().getResource(GuiController.IMAGE_WEATHER_DEFAULT_ICON_PNG);
         }
-        return res;
+        return new Image(String.valueOf(resource));
+    }
+
+    private BufferedImage readImage(String urlString) {
+        try {
+            return ImageIO.read(new URL(urlString));
+        } catch (IOException e) {
+            log.error("Error getting image from '{}'", urlString, e);
+            return null;
+        }
     }
 }
