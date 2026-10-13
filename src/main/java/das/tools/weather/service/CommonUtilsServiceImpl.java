@@ -45,6 +45,6 @@ public class CommonUtilsServiceImpl implements CommonUtilsService {
 
     @Override
     public int getCorrectedPressureValue(double sourcePressure) {
-        return (int) (sourcePressure + Integer.parseInt(configService.getConfigStringValue(GuiConfigService.GUI_PRESSURE_CORRECTION_KEY)));
+        return (int) (sourcePressure + configService.getConfigIntValue(GuiConfigService.GUI_PRESSURE_CORRECTION_KEY));
     }
 }

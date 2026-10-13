@@ -5,8 +5,10 @@ import das.tools.weather.service.AlertService;
 import das.tools.weather.service.GuiConfigService;
 import das.tools.weather.service.LocalizeResourcesService;
 import das.tools.weather.service.WeatherService;
+import javafx.animation.PauseTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -16,6 +18,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import lombok.extern.slf4j.Slf4j;
 import net.rgielen.fxweaver.core.FxWeaver;
 import net.rgielen.fxweaver.core.FxmlView;
@@ -23,6 +26,7 @@ import org.springframework.boot.info.BuildProperties;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.regex.Matcher;
 
@@ -41,6 +45,8 @@ public class ConfigControllerImpl implements ConfigController {
     private boolean isConfigChanged = false;
     private boolean isLocationChanged = false;
     private String oldLocationName;
+    private long locationCheckId = 0;
+    private PauseTransition locationCheckDelay;
 
     private Stage stage;
     @FXML private AnchorPane root;
@@ -95,6 +101,8 @@ public class ConfigControllerImpl implements ConfigController {
         });
         btSearchLocation.setOnAction(actionEvent -> showLocationWindow());
         edApiKey.setOnKeyReleased(event -> apiKeyPressed());
+        locationCheckDelay = new PauseTransition(Duration.millis(500));
+        locationCheckDelay.setOnFinished(event -> setLocationConfirmation());
     }
 
     @Override
@@ -130,20 +138,9 @@ public class ConfigControllerImpl implements ConfigController {
         chbConfirmExit.setSelected(Boolean.parseBoolean(appProps.getProperty(GuiConfigService.GUI_CONFIG_CONFIRM_EXIT_KEY,
                 configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_CONFIRM_EXIT_KEY))));
         spUpdateInterval.getValueFactory().setValue(
-                mSecToMin(
-                        Integer.parseInt(
-                                appProps.getProperty(GuiConfigService.GUI_CONFIG_UPDATE_INTERVAL_KEY,
-                                        configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_UPDATE_INTERVAL_KEY)
-                                )
-                        )
-                )
-        );
+                mSecToMin(configService.getConfigIntValue(GuiConfigService.GUI_CONFIG_UPDATE_INTERVAL_KEY)));
         spPressureCorrection.getValueFactory().setValue(
-                Integer.parseInt(
-                        appProps.getProperty(GuiConfigService.GUI_PRESSURE_CORRECTION_KEY,
-                                configService.getDefaultConfigValue(GuiConfigService.GUI_PRESSURE_CORRECTION_KEY)
-                )
-        ));
+                configService.getConfigIntValue(GuiConfigService.GUI_PRESSURE_CORRECTION_KEY));
         cbCondLang.setItems(getLanguagesList());
         String langName = configService.getLangName(
                 appProps.getProperty(GuiConfigService.GUI_CONFIG_CONDITION_LANGUAGE_KEY,
@@ -151,14 +148,41 @@ public class ConfigControllerImpl implements ConfigController {
                 )
         );
         cbCondLang.getSelectionModel().select(langName);
-        edLocation.setOnKeyReleased(event -> setLocationConfirmation());
+        edLocation.setOnKeyReleased(event -> locationCheckDelay.playFromStart());
         apiKeyPressed();
         setLocationConfirmation();
     }
 
     @Override
     public void setLocationConfirmation() {
-        boolean locationConfirmed = isLocationConfirmed();
+        // Location is checked on remote server, so it's done in background to don't freeze the window
+        final long checkId = ++locationCheckId;
+        final String location = edLocation.getText();
+        final String apiKey = appProps.getProperty(GuiConfigService.GUI_CONFIG_API_KEY_KEY);
+        final String storedLocationId = configService.getCurrentConfig()
+                .getProperty(GuiConfigService.GUI_CONFIG_WEATHER_LOCATION_ID_KEY, "");
+        if ("".equals(storedLocationId)) {
+            showLocationConfirmation(false);
+            return;
+        }
+        Task<Boolean> task = new Task<Boolean>() {
+            @Override
+            protected Boolean call() {
+                return storedLocationId.equals(getLocationId(location, apiKey));
+            }
+        };
+        task.setOnSucceeded(e -> {
+            if (checkId == locationCheckId) showLocationConfirmation(task.getValue());
+        });
+        task.setOnFailed(e -> {
+            if (checkId == locationCheckId) showLocationConfirmation(false);
+        });
+        Thread thread = new Thread(task, "location-check");
+        thread.setDaemon(true);
+        thread.start();
+    }
+
+    private void showLocationConfirmation(boolean locationConfirmed) {
         String msg = locationConfirmed ?
                 localizeService.getLocalizedResource("location.confirm.tooltip") :
                 localizeService.getLocalizedResource("location.unConfirm.tooltip");
@@ -170,31 +194,24 @@ public class ConfigControllerImpl implements ConfigController {
         Tooltip.install(imgConfirmed, tooltip);
     }
 
-    private boolean isLocationConfirmed() {
-        appProps = configService.getCurrentConfig();
-        String storedLocationId = appProps.getProperty(GuiConfigService.GUI_CONFIG_WEATHER_LOCATION_ID_KEY, "");
-        String locationId = getCurrentLocationId();
-        return storedLocationId != null && !"".equals(storedLocationId)
-                && locationId.equals(storedLocationId);
-    }
-
-    private String getCurrentLocationId() {
+    private String getLocationId(String location, String apiKey) {
         String res = "";
         try {
-            WeatherLocation[] locations = weatherService.getLocations(edLocation.getText(), appProps.getProperty(GuiConfigService.GUI_CONFIG_API_KEY_KEY));
-            assert locations != null;
-            if (locations.length > 0) {
+            WeatherLocation[] locations = weatherService.getLocations(location, apiKey);
+            if (locations != null && locations.length > 0) {
                 res = String.valueOf(locations[0].getId());
             }
         } catch (Exception e) {
-            log.error("Error getting current location: ", e);
+            log.error("Error getting current location: {}", e.getMessage());
         }
         return res;
     }
 
     private void showLocationWindow() {
         LocationController controller = fxWeaver.loadController(LocationControllerImpl.class);
-        controller.setWindowIcon(((Stage) root.getScene().getWindow()).getIcons().get(0));
+        if (!stage.getIcons().isEmpty()) {
+            controller.setWindowIcon(stage.getIcons().get(0));
+        }
         controller.setLocation(edLocation.getText());
         controller.setApiKey(edApiKey.getText());
         controller.show();
@@ -266,7 +283,7 @@ public class ConfigControllerImpl implements ConfigController {
 
     private void setPropertyIfChanged(String key, String value) {
         String oldProperty = appProps.getProperty(key, configService.getDefaultConfigValue(key));
-        if (!oldProperty.equals(value)) {
+        if (!Objects.equals(oldProperty, value)) {
             appProps.setProperty(key, value);
         }
     }
@@ -301,7 +318,7 @@ public class ConfigControllerImpl implements ConfigController {
         }
         matchKey = FORECAST_URL_PATTERN.matcher(edForecastUrl.getText());
         if (!matchKey.find()) {
-            showError(String.format(msgNotValid, localizeService.getLocalizedResource("alert.app.config.field.location")));
+            showError(String.format(msgNotValid, localizeService.getLocalizedResource("alert.app.config.field.url")));
             return false;
         }
         return true;

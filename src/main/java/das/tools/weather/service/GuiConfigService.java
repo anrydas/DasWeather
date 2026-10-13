@@ -32,6 +32,15 @@ public interface GuiConfigService {
 
     String getConfigStringValue(String key);
 
+    /**
+     * Returns config value parsed as long. If the stored value is absent or malformed the default one is used.
+     */
+    long getConfigLongValue(String key);
+
+    default int getConfigIntValue(String key) {
+        return (int) getConfigLongValue(key);
+    }
+
     String getLangName(String code);
 
     String getLangCode(String name);

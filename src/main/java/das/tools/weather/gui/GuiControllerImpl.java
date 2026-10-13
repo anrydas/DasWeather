@@ -410,7 +410,7 @@ public class GuiControllerImpl implements GuiController {
         float pressureMb = commonUtils.getCorrectedPressureValue(current.getPressureMb());
         double pressureMmHg = millibarToMmHg(pressureMb);
         lbPressure.setText(String.format("%.0f mmHg", pressureMmHg));
-        int pressureCorrection = Integer.parseInt(configService.getConfigStringValue(GuiConfigService.GUI_PRESSURE_CORRECTION_KEY));
+        int pressureCorrection = configService.getConfigIntValue(GuiConfigService.GUI_PRESSURE_CORRECTION_KEY);
         String correctionText = (pressureCorrection != 0) ? String.format(localizeService.getLocalizedResource("pressure.tooltip.corrected"), pressureCorrection) : "";
         Tooltip tooltip = getTooltip(String.format(localizeService.getLocalizedResource("pressure.tooltip") + correctionText,
                 pressureMmHg, pressureMb));
@@ -653,8 +653,7 @@ public class GuiControllerImpl implements GuiController {
 
     @Override
     public void updateWeatherData() {
-        long updateInterval = Long.parseLong(configService.getConfigStringValue(GuiConfigService.GUI_CONFIG_UPDATE_INTERVAL_KEY,
-                configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_UPDATE_INTERVAL_KEY)));
+        long updateInterval = configService.getConfigLongValue(GuiConfigService.GUI_CONFIG_UPDATE_INTERVAL_KEY);
         if (updateInterval < MINIMAL_UPDATE_INTERVAL) {
             updateInterval = MINIMAL_UPDATE_INTERVAL;
             if (log.isDebugEnabled()) log.debug("Update Interval corrected to {} msec.", MINIMAL_UPDATE_INTERVAL);
