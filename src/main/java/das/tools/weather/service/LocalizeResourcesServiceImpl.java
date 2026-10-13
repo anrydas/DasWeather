@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Locale;
+import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 @Service
@@ -11,7 +12,7 @@ import java.util.ResourceBundle;
 public class LocalizeResourcesServiceImpl implements LocalizeResourcesService {
     private final GuiConfigService configService;
     private final ResourceBundle.Control utf8Control;
-    private ResourceBundle storedLocale;
+    private volatile ResourceBundle storedLocale;
 
     public LocalizeResourcesServiceImpl(GuiConfigService configService, ResourceBundle.Control utf8Control) {
         this.configService = configService;
@@ -33,6 +34,14 @@ public class LocalizeResourcesServiceImpl implements LocalizeResourcesService {
 
     @Override
     public String getLocalizedResource(String key) {
-        return storedLocale.getString(key);
+        if (storedLocale == null) {
+            initLocale();
+        }
+        try {
+            return storedLocale.getString(key);
+        } catch (MissingResourceException e) {
+            log.error("Localized resource '{}' not found", key);
+            return key;
+        }
     }
 }

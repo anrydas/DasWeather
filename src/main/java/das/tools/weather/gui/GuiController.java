@@ -2,6 +2,7 @@ package das.tools.weather.gui;
 
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public interface GuiController extends Localized, GuiWindow {
@@ -12,7 +13,8 @@ public interface GuiController extends Localized, GuiWindow {
     DateTimeFormatter FULL_DATE_FORMATTER_FOR_VIEW = DateTimeFormatter.ofPattern("E, dd-MMM-yyyy");
     DateTimeFormatter TIME_FORMATTER_FOR_VIEW = DateTimeFormatter.ofPattern("HH:mm");
     GuiControllerImpl.RemoteDataHolder dataHolder = GuiControllerImpl.RemoteDataHolder.builder().build();
-    DateTimeFormatter TIME_FORMATTER_FOR_RESPONSE = DateTimeFormatter.ofPattern("hh:mm a");
+    // AM/PM markers in the response are always in English, so it shouldn't depend on system locale
+    DateTimeFormatter TIME_FORMATTER_FOR_RESPONSE = DateTimeFormatter.ofPattern("hh:mm a", Locale.ENGLISH);
     String IMAGE_CONFIGURE_PNG = "/images/configure.png";
     String IMAGE_WIND_ARROW_PNG = "/images/wind_arrow.png";
     String IMAGE_SUNRISE_PNG = "/images/sunrise.png";

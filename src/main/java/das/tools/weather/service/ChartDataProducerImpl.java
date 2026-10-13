@@ -80,12 +80,15 @@ public class ChartDataProducerImpl implements ChartDataProducer {
     @Override
     public void fillChart(XYChart<String, Number> chart, String tabName, WeatherCurrent current) {
         chart.getData().clear();
+        if (this.dataList == null) {
+            return;
+        }
         for (DataHolder dataHolder: this.dataList) {
             XYChart.Series<String,Number> series = new XYChart.Series<>();
             Map<String, Number[]> dayValues = dataHolder.getTabAndValues();
             series.setName(dataHolder.getName());
             chart.getData().add(series);
-            Number[] numbers = dayValues.get(tabName);
+            Number[] numbers = dayValues.getOrDefault(tabName, new Number[0]);
             for (int i = 0; i < numbers.length; i++) {
                 XYChart.Data<String, Number> data = new XYChart.Data<>(String.valueOf(i), numbers[i]);
                 series.getData().add(data);

@@ -31,11 +31,13 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.imageio.ImageIO;
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalTime;
-import java.util.LinkedList;
+import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -147,7 +149,9 @@ public class ForecastControllerImpl implements ForecastController {
     private File selectFileToSaveChart() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle(localizeService.getLocalizedResource("file.dialog.title"));
-        fileChooser.setInitialDirectory(this.saveFileInitialDirectory);
+        if (this.saveFileInitialDirectory != null && this.saveFileInitialDirectory.isDirectory()) {
+            fileChooser.setInitialDirectory(this.saveFileInitialDirectory);
+        }
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("PNG Files", "*.png"),
                 new FileChooser.ExtensionFilter("JPEG Files", "*.jpg"),
@@ -164,6 +168,10 @@ public class ForecastControllerImpl implements ForecastController {
         File file = selectFileToSaveChart();
         if (file != null) {
             XYChart<String, Number> activeCart = getActiveChart();
+            if (activeCart == null || activeCart.getWidth() < 1 || activeCart.getHeight() < 1) {
+                log.warn("There is no chart to save on the active tab");
+                return;
+            }
             WritableImage image = activeCart.snapshot(
                     new SnapshotParameters(),
                     new WritableImage((int) activeCart.getWidth(), (int) activeCart.getHeight())
@@ -174,10 +182,13 @@ public class ForecastControllerImpl implements ForecastController {
                 if ("JPEG".equals(fileFormatName) || "JPG".equals(fileFormatName)) {
                     // W/A for JPEG from https://bugs.openjdk.org/browse/JDK-8119048
                     BufferedImage bImage = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
-                    bImage.getGraphics().drawImage(img, 0, 0, null);
-                    ImageIO.write(bImage, fileFormatName, file);
-                } else {
-                    ImageIO.write(img, fileFormatName, file);
+                    Graphics graphics = bImage.getGraphics();
+                    graphics.drawImage(img, 0, 0, null);
+                    graphics.dispose();
+                    img = bImage;
+                }
+                if (!ImageIO.write(img, fileFormatName, file)) {
+                    throw new IOException("There is no image writer for format " + fileFormatName);
                 }
                 this.saveFileInitialDirectory = file.getParentFile();
                 alertService.showInfo(
@@ -199,7 +210,7 @@ public class ForecastControllerImpl implements ForecastController {
         if (log.isDebugEnabled()) log.debug("got ext={}", ext);
         String res = FILE_FORMAT_NAMES.get(ext);
         if (log.isDebugEnabled()) log.debug("got resulted file extension={}", res);
-        return !"".equals(res) ? ext : "PNG";
+        return res != null ? res : "PNG";
     }
 
     @Override
@@ -218,25 +229,31 @@ public class ForecastControllerImpl implements ForecastController {
     private void reorderingTabs() {
         String storedOrder = configService.getConfigStringValue(GuiConfigService.GUI_CONFIG_FORECAST_TABS_ORDER_KEY,
                 configService.getDefaultConfigValue(GuiConfigService.GUI_CONFIG_FORECAST_TABS_ORDER_KEY));
-        String[] storedTabs = storedOrder.split(",");
-        int[] tabsIndexes = new int[tabPane.getTabs().size()];
-        for (int i = 0; i < tabPane.getTabs().size(); i++) {
-            tabsIndexes[i] = getSwapIndex(tabPane.getTabs().get(i).getId(), storedTabs);
-        }
-        log.debug("tabsIndexes={}", tabsIndexes);
-        List<Tab> sourceTabs = new LinkedList<>(tabPane.getTabs());
-        for (int j = 0; j < tabsIndexes.length - 1; j++) {
-            for (int i = 0; i < tabsIndexes.length; i++) {
-                if (tabsIndexes[i] != j) {
-                    Tab tab = sourceTabs.get(i);
-                    tabPane.getTabs().remove(getTabByName(tab.getId(), tabPane.getTabs()));
-                    tabPane.getTabs().add(tabsIndexes[i], tab);
-                }
-                if (String.join(",", storedOrder).equals(getTabIds())) {
-                    return;
-                }
+        // tabs are placed in stored order, unknown or duplicated stored ids are ignored,
+        // tabs absent in stored order are placed after the ordered ones in their default order
+        List<Tab> orderedTabs = new ArrayList<>(tabPane.getTabs().size());
+        for (String tabId : storedOrder.split(",")) {
+            Tab tab = getTabByName(tabId.trim(), tabPane.getTabs());
+            if (tab != null && !orderedTabs.contains(tab)) {
+                orderedTabs.add(tab);
             }
         }
+        for (Tab tab : tabPane.getTabs()) {
+            if (!orderedTabs.contains(tab)) {
+                orderedTabs.add(tab);
+            }
+        }
+        // tabs are moved one by one because TabPane doesn't update tab headers on list permutation (setAll)
+        List<Tab> tabs = tabPane.getTabs();
+        for (int i = 0; i < orderedTabs.size(); i++) {
+            Tab tab = orderedTabs.get(i);
+            if (tabs.get(i) != tab) {
+                tabs.remove(tab);
+                tabs.add(i, tab);
+            }
+        }
+        tabPane.getSelectionModel().selectFirst();
+        if (log.isDebugEnabled()) log.debug("tabs order={}", getTabIds());
     }
 
     private Tab getTabByName(String name, List<Tab> tabs) {
@@ -246,13 +263,6 @@ public class ForecastControllerImpl implements ForecastController {
             }
         }
         return null;
-    }
-
-    private int getSwapIndex(String el, String[] ar) {
-        for (int i = 0; i < ar.length; i++) {
-            if (el.equals(ar[i])) return i;
-        }
-        return -1;
     }
 
     private String getTabIds() {
@@ -271,14 +281,16 @@ public class ForecastControllerImpl implements ForecastController {
     }
 
     private XYChart<String, Number> getActiveChart() {
-        XYChart<String, Number> res = null;
-        for (Node node: ((Parent) tabPane.getSelectionModel().getSelectedItem().getContent()).getChildrenUnmodifiable()) {
+        Tab selectedTab = tabPane.getSelectionModel().getSelectedItem();
+        if (selectedTab == null || !(selectedTab.getContent() instanceof Parent)) {
+            return null;
+        }
+        for (Node node: ((Parent) selectedTab.getContent()).getChildrenUnmodifiable()) {
             if (node instanceof XYChart) {
-                res = (XYChart<String, Number>) node;
-                break;
+                return (XYChart<String, Number>) node;
             }
-        };
-        return res;
+        }
+        return null;
     }
 
     private void fillGraphics() {
@@ -381,7 +393,13 @@ public class ForecastControllerImpl implements ForecastController {
     }
 
     private double getParsedTime(String value) {
-        LocalTime time = LocalTime.parse(value, GuiController.TIME_FORMATTER_FOR_RESPONSE);
+        LocalTime time;
+        try {
+            time = LocalTime.parse(value, GuiController.TIME_FORMATTER_FOR_RESPONSE);
+        } catch (DateTimeParseException | NullPointerException e) {
+            log.warn("Couldn't parse time '{}': {}", value, e.toString());
+            return 0;
+        }
         if (log.isDebugEnabled()) log.debug("got parsed time={}", time);
         double res = time.getHour() + (time.getMinute() * MINUTES_TO_DECIMAL_FACTOR);
         if (log.isDebugEnabled()) log.debug("got parsed time res={}", res);

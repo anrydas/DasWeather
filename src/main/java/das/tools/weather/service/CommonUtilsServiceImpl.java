@@ -1,13 +1,17 @@
 package das.tools.weather.service;
 
 import das.tools.weather.gui.GuiController;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
 
 @Service
+@Slf4j
 public class CommonUtilsServiceImpl implements CommonUtilsService {
+    private static final int DEFAULT_COLOR = 0xFFFFFF;
 
     private final GuiConfigService configService;
 
@@ -17,15 +21,25 @@ public class CommonUtilsServiceImpl implements CommonUtilsService {
 
     @Override
     public int toIntTime(String s) {
-        String[] split = s.split(":");
-        int h = Integer.parseInt(split[0]);
-        int m = Integer.parseInt(split[1]);
-        return h*60 + m;
+        try {
+            String[] split = s.split(":");
+            int h = Integer.parseInt(split[0].trim());
+            int m = Integer.parseInt(split[1].trim());
+            return h*60 + m;
+        } catch (RuntimeException e) {
+            log.warn("Couldn't parse time '{}': {}", s, e.toString());
+            return 0;
+        }
     }
 
     @Override
     public int toIntColor(String c) {
-        return Integer.parseInt(c.substring(1), 16);
+        try {
+            return Integer.parseInt(c.substring(1), 16);
+        } catch (RuntimeException e) {
+            log.warn("Couldn't parse color '{}': {}", c, e.toString());
+            return DEFAULT_COLOR;
+        }
     }
 
     @Override
@@ -38,9 +52,15 @@ public class CommonUtilsServiceImpl implements CommonUtilsService {
 
     @Override
     public long getDiffSeconds(String start, String stop) {
-        LocalTime startTime = LocalTime.parse(start, GuiController.TIME_FORMATTER_FOR_RESPONSE);
-        LocalTime stopTime = LocalTime.parse(stop, GuiController.TIME_FORMATTER_FOR_RESPONSE);
-        return Duration.between(startTime, stopTime).getSeconds();
+        // API returns text like 'No sunset' for polar days and nights
+        try {
+            LocalTime startTime = LocalTime.parse(start, GuiController.TIME_FORMATTER_FOR_RESPONSE);
+            LocalTime stopTime = LocalTime.parse(stop, GuiController.TIME_FORMATTER_FOR_RESPONSE);
+            return Duration.between(startTime, stopTime).getSeconds();
+        } catch (DateTimeParseException | NullPointerException e) {
+            log.warn("Couldn't calculate time length between '{}' and '{}': {}", start, stop, e.toString());
+            return 0;
+        }
     }
 
     @Override

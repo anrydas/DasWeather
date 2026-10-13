@@ -1,6 +1,7 @@
 package das.tools.weather.gui;
 
 import das.tools.weather.entity.ForecastWeatherResponse;
+import das.tools.weather.entity.current.WeatherAirQuality;
 import das.tools.weather.entity.current.WeatherCurrent;
 import das.tools.weather.entity.forecast.WeatherAstro;
 import das.tools.weather.entity.forecast.WeatherDay;
@@ -29,6 +30,7 @@ import net.rgielen.fxweaver.core.FxWeaver;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.springframework.stereotype.Component;
 
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -288,13 +290,14 @@ public class GuiControllerImpl implements GuiController {
 
     private void fillAirQuality(WeatherCurrent current) {
         String MSG_AIR_QUALITY = "Idx=%d, CO=%.1f, NO2=%.1f, O3=%.1f, SO2=%.1f";
-        int colorIndex = current.getAirQuality().getIndex();
+        WeatherAirQuality airQuality = current.getAirQuality() != null ? current.getAirQuality() : new WeatherAirQuality();
+        int colorIndex = airQuality.getIndex();
         lbAirQuality.setText(String.format(MSG_AIR_QUALITY,
                 colorIndex,
-                current.getAirQuality().getCo(),
-                current.getAirQuality().getNo2(),
-                current.getAirQuality().getO3(),
-                current.getAirQuality().getSo2())
+                airQuality.getCo(),
+                airQuality.getNo2(),
+                airQuality.getO3(),
+                airQuality.getSo2())
         );
         Tooltip tooltip = getTooltip(
                 String.format(localizeService.getLocalizedResource("airQuality.tooltip"), lbAirQuality.getText()) +
@@ -333,8 +336,9 @@ public class GuiControllerImpl implements GuiController {
     }
 
     private void fillLocation(WeatherCurrent current) {
-        String updateDate = current.getLastUpdate().split(" ")[0];
-        String updateTime = current.getLastUpdate().split(" ")[1];
+        String[] lastUpdate = String.valueOf(current.getLastUpdate()).split(" ", 2);
+        String updateDate = lastUpdate[0];
+        String updateTime = lastUpdate.length > 1 ? lastUpdate[1] : "";
         lbLocation.setText(String.format(localizeService.getLocalizedResource("label.location.text"),
                 this.dataHolder.getResponse().getLocation().getName(),
                 updateDate,
@@ -597,7 +601,7 @@ public class GuiControllerImpl implements GuiController {
         String moonPhase = currentAstro.getMoonPhase();
         String moonPhaseLocalized = MOON_PHASES.get(getMoonPhaseAcronim(moonPhase));
         lbMoonRise.setText(getProperlyFormattedTime(currentAstro.getMoonRise()));
-        imgMoonPhase.setImage(new Image(getMoonPhaseImageName(moonPhase)));
+        imgMoonPhase.setImage(getResourceImage(getMoonPhaseImageName(moonPhase)));
         lbMoonPhase.setText(moonPhaseLocalized);
         lbMoonSet.setText(getProperlyFormattedTime(currentAstro.getMoonSet()));
         Tooltip moonPhaseTooltip = getTooltip(moonPhaseLocalized);
@@ -623,7 +627,16 @@ public class GuiControllerImpl implements GuiController {
     }
 
     private String getMoonPhaseAcronim(String phase) {
-        return phase.toLowerCase().replace(" ", "-");
+        return phase == null ? "" : phase.trim().toLowerCase().replace(" ", "-");
+    }
+
+    private Image getResourceImage(String path) {
+        URL url = getClass().getResource(path);
+        if (url == null) {
+            log.warn("Image resource '{}' not found", path);
+            return null;
+        }
+        return new Image(url.toExternalForm());
     }
 
     private void showConfigWindow() {

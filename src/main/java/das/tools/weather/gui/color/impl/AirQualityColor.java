@@ -24,6 +24,6 @@ public class AirQualityColor extends AbstractColor implements ColorEngine {
 
     @Override
     public String getColor(int value) {
-        return COLOR_MAP.get(value);
+        return COLOR_MAP.get(getIndex(value));
     }
 }

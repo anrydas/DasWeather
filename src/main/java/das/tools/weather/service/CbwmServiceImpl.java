@@ -37,7 +37,7 @@ public class CbwmServiceImpl implements CbwmService { // CBWM - Color Bricks Wea
     public javafx.scene.image.Image getExtendedWeatherImage(ChartDataProducerImpl.DataHolder dataHolder, int hourIndex, WeatherCurrent current, Image weatherIcon) {
         BufferedImage cbwmImage = getCbwmImage(dataHolder, hourIndex, current);
         BufferedImage source = SwingFXUtils.fromFXImage(weatherIcon, null);
-        BufferedImage resImage = new BufferedImage(source.getWidth() * 2 + 10, source.getHeight(), source.getType());
+        BufferedImage resImage = new BufferedImage(source.getWidth() * 2 + 10, source.getHeight(), BufferedImage.TYPE_INT_ARGB);
         Graphics g = resImage.getGraphics();
         g.drawImage(source, 0, 0, null);
         g.drawImage(cbwmImage, source.getWidth() - 1, 4, source.getWidth() + 10, source.getHeight() - 8, null);
@@ -46,6 +46,8 @@ public class CbwmServiceImpl implements CbwmService { // CBWM - Color Bricks Wea
     }
 
     private void drawCbwmImage(Graphics2D g2d, ChartDataProducerImpl.DataHolder dataHolder, int hourIndex, WeatherCurrent current) {
+        int hoursCount = dataHolder.getDayForecastData().getHour().length;
+        hourIndex = Math.max(0, Math.min(hourIndex, hoursCount - 1));
         drawRectsLine(g2d, 0, get0LineColors(dataHolder, hourIndex));
         drawRectsLine(g2d, 1, get1LineColors(dataHolder, hourIndex));
         drawRectsLine(g2d, 2, get2LineColors(dataHolder, hourIndex));
@@ -95,9 +97,9 @@ public class CbwmServiceImpl implements CbwmService { // CBWM - Color Bricks Wea
     }
 
     private int[] get4LineColors(ChartDataProducerImpl.DataHolder dataHolder, int hourIndex, WeatherCurrent current) {
-        WeatherHour hour = dataHolder.getDayForecastData().getHour()[hourIndex];
         int[] res = new int[1];
-        res[0] = commonUtils.toIntColor(ColorEngineFactory.getEngine(ColorElement.AIR_QUALITY).getColor((int) current.getAirQuality().getIndex()));
+        int airQualityIndex = current.getAirQuality() != null ? current.getAirQuality().getIndex() : 0;
+        res[0] = commonUtils.toIntColor(ColorEngineFactory.getEngine(ColorElement.AIR_QUALITY).getColor(airQualityIndex));
         return res;
     }
 
